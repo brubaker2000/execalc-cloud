@@ -24,9 +24,11 @@ def seal_envelope(envelope: IngressEnvelope) -> IngressEnvelope:
     if not envelope.mutable:
         raise RuntimeError("Envelope is already sealed")
 
+    if envelope.tenant_context is None:
+        raise RuntimeError("Tenant context missing")
+
     # Enforce tenant context immutability
     assert_tenant_context_immutable({"tenant_context": envelope.tenant_context})
 
     envelope.mutable = False
     return envelope
-
