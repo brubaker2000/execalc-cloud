@@ -1,18 +1,15 @@
+from datetime import datetime
 from src.service.execution_record import ExecutionRecord
-from src.service.tenant.context import TenantContext
 
 
 def test_execution_record_defaults():
     record = ExecutionRecord(
-        tenant_context=TenantContext(
-            tenant_id="tenant_test_001",
-            tenant_name="Test Tenant",
-        )
+        tenant_id="tenant_test_001",
+        envelope_id="env_123",
+        result={"status": "ok"},
     )
 
-    assert record.seat_id is None
-    assert record.input == {}
-    assert record.output == {}
-    assert record.meta == {}
-    assert record.executed_at is not None
-
+    assert record.tenant_id == "tenant_test_001"
+    assert record.envelope_id == "env_123"
+    assert record.result == {"status": "ok"}
+    assert isinstance(record.created_at, datetime)
