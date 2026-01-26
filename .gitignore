@@ -10,3 +10,6 @@ __pycache__/
 
 # Tenant deprecated reference code
 src/service/tenant/_deprecated/
+
+# Local scratch work
+scratch/
