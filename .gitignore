@@ -7,3 +7,6 @@ __pycache__/
 
 # Local SQLite databases
 *.db
+
+# Tenant deprecated reference code
+src/service/tenant/_deprecated/
