@@ -1,5 +1,6 @@
 from src.service.tenant.actor_context import get_actor_context
 from src.service.tenant.context import get_tenant_context
+from src.service.tenant.guards import assert_target_tenant_matches_execution
 from src.service.tenant.errors import InvalidTenantPayload
 
 def ingest_envelope(payload: dict) -> None:
@@ -14,5 +15,6 @@ def ingest_envelope(payload: dict) -> None:
         raise InvalidTenantPayload("Payload must be a dict.")
     if not payload.get("tenant_id"):
         raise InvalidTenantPayload("Missing tenant_id in the payload.")
+    assert_target_tenant_matches_execution(payload["tenant_id"])
     if not payload.get("name"):
         raise InvalidTenantPayload("Missing name in the payload.")
