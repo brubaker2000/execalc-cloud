@@ -1,56 +1,18 @@
-"""
-Tenant Persistence Service
-
-Mutation-only layer.
-Validation happens upstream.
-"""
-
+import os
 import sqlite3
-from typing import Dict, Any
 
+# Always write to the tenant DB inside this package directory (never repo root).
+DB_PATH = os.path.join(os.path.dirname(__file__), "tenants.db")
 
-class TenantPersistenceError(Exception):
-    pass
-
-
-DB_PATH = "src/service/tenant/tenant.db"
-
-
-def persist_tenant(validated_payload: Dict[str, Any]) -> Dict[str, Any]:
-    required_fields = ["tenant_id", "tenant_name"]
-    missing = [f for f in required_fields if f not in validated_payload]
-    if missing:
-        raise TenantPersistenceError(f"Missing fields: {missing}")
-
-    conn = None
+def create_tenant(tenant_id, name, status, created_at):
+    # Short timeout + explicit close prevents most Cloud Shell lock hiccups.
+    conn = sqlite3.connect(DB_PATH, timeout=10)
     try:
-        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-
         cursor.execute(
-            """
-            INSERT INTO tenants (
-                tenant_id,
-                name
-            )
-            VALUES (?, ?)
-            """,
-            (
-                validated_payload["tenant_id"],
-                validated_payload["tenant_name"],
-            ),
+            "INSERT INTO tenants (tenant_id, name, status, created_at) VALUES (?, ?, ?, ?)",
+            (tenant_id, name, status, created_at),
         )
-
         conn.commit()
-
-        return {
-            "status": "persisted",
-            "tenant_id": validated_payload["tenant_id"],
-        }
-
-    except sqlite3.IntegrityError as e:
-        raise TenantPersistenceError(str(e))
-
     finally:
-        if conn:
-            conn.close()
+        conn.close()
