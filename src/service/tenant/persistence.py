@@ -16,3 +16,16 @@ def create_tenant(tenant_id, name, status, created_at):
         conn.commit()
     finally:
         conn.close()
+
+def get_tenant(tenant_id: str):
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT tenant_id, name, status, created_at FROM tenants WHERE tenant_id = ?",
+            (tenant_id,),
+        )
+        row = cursor.fetchone()
+        return row
+    finally:
+        conn.close()

@@ -1,15 +1,15 @@
 from src.service.tenant.envelope import ingest_envelope
+from src.service.tenant.errors import TenantNotFound
 from src.service.tenant.model import Tenant
-from src.service.tenant.persistence import create_tenant
+from src.service.tenant.persistence import create_tenant, get_tenant
 
 def create_tenant_service(payload: dict) -> dict:
-    # Enforce tenant context + envelope validation first.
     ingest_envelope(payload)
 
     tenant_id = payload["tenant_id"]
     name = payload["name"]
-    status = "active"  # Default status for now
-    created_at = "2026-01-01T00:00:00Z"  # Placeholder created_at timestamp
+    status = "active"
+    created_at = "2026-01-01T00:00:00Z"
 
     tenant = Tenant(tenant_id, name, status, created_at)
     create_tenant(tenant.tenant_id, tenant.name, tenant.status, tenant.created_at)
@@ -19,4 +19,19 @@ def create_tenant_service(payload: dict) -> dict:
         "name": tenant.name,
         "status": tenant.status,
         "created_at": tenant.created_at,
+    }
+
+def get_tenant_service(tenant_id: str) -> dict:
+    # Envelope expects a dict payload; use a minimal one for enforcement.
+    ingest_envelope({"tenant_id": tenant_id, "name": "__read__"})
+
+    row = get_tenant(tenant_id)
+    if not row:
+        raise TenantNotFound(f"Tenant '{tenant_id}' not found.")
+
+    return {
+        "tenant_id": row[0],
+        "name": row[1],
+        "status": row[2],
+        "created_at": row[3],
     }
