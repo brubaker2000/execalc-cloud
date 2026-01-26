@@ -13,3 +13,7 @@ src/service/tenant/_deprecated/
 
 # Local scratch work
 scratch/
+
+# SQLite runtime artifacts
+**/tenants.db
+**/tenant.db
