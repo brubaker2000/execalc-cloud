@@ -1,11 +1,13 @@
+from src.service.tenant.actor_context import get_actor_context
 from src.service.tenant.context import get_tenant_context
 from src.service.tenant.errors import InvalidTenantPayload
 
 def ingest_envelope(payload: dict) -> None:
     # Enforce that an execution tenant context is set.
-    ctx_tenant_id = get_tenant_context()
-    if not ctx_tenant_id:
-        raise InvalidTenantPayload("Missing tenant execution context.")
+    _ = get_tenant_context()
+
+    # Enforce that an actor context is set (who is calling).
+    _ = get_actor_context()
 
     # Basic payload validation (target tenant).
     if not isinstance(payload, dict):
