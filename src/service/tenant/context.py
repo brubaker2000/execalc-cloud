@@ -22,3 +22,10 @@ def get_tenant_context() -> str:
 
 def clear_tenant_context() -> None:
     _tenant_id_ctx.set(None)
+
+def peek_tenant_context() -> Optional[str]:
+    """
+    Non-raising read of the current execution tenant context.
+    Returns None if not set.
+    """
+    return _tenant_id_ctx.get()
