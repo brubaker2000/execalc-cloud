@@ -16,3 +16,8 @@ class TenantNotFound(TenantError):
 class InvalidTenantPayload(TenantError):
     """Raised when tenant input data is invalid."""
     pass
+
+
+class Unauthorized(TenantError):
+    """Raised when an actor lacks permission to perform an action."""
+    pass
