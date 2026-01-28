@@ -26,3 +26,15 @@ def assert_target_tenant_matches_execution(target_tenant_id: str) -> None:
         raise InvalidTenantPayload(
             f"Target tenant_id '{target_tenant_id}' does not match execution tenant context '{exec_tenant_id}'."
         )
+
+
+def assert_tenant_context_immutable(expected_tenant_id: str) -> None:
+    """
+    Ensures the execution tenant context has not changed unexpectedly.
+    Used to prevent mid-request tenant switching.
+    """
+    current = get_tenant_context()
+    if current != expected_tenant_id:
+        raise InvalidTenantPayload(
+            f"Tenant context changed unexpectedly: expected '{expected_tenant_id}', got '{current}'."
+        )

@@ -29,3 +29,28 @@ def peek_tenant_context() -> Optional[str]:
     Returns None if not set.
     """
     return _tenant_id_ctx.get()
+
+
+class TenantContext:
+    """
+    Backwards-compatible wrapper used by higher-level service modules.
+
+    This class delegates to the contextvar-backed functions in this module,
+    keeping a single source of truth for tenant context handling.
+    """
+
+    @staticmethod
+    def set(tenant_id: str) -> None:
+        set_tenant_context(tenant_id)
+
+    @staticmethod
+    def get() -> str:
+        return get_tenant_context()
+
+    @staticmethod
+    def clear() -> None:
+        clear_tenant_context()
+
+    @staticmethod
+    def peek() -> Optional[str]:
+        return peek_tenant_context()
