@@ -27,7 +27,7 @@ def create_tenant_service(payload: dict) -> dict:
 
 def get_tenant_service(tenant_id: str) -> dict:
     # Envelope expects a dict payload; use a minimal one for enforcement.
-    ingest_envelope({"tenant_id": tenant_id, "name": "__read__"})
+    ingest_envelope({"tenant_id": tenant_id}, require_name=False)
 
     # Reading tenant metadata requires at least read access.
     assert_actor_role_in(["admin", "operator", "viewer", "system"])
