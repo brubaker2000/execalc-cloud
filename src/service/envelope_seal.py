@@ -7,6 +7,7 @@ Defines the irreversible transition from ingress
 
 from src.service.envelope import IngressEnvelope
 from src.service.tenant.guards import assert_tenant_context_immutable
+from src.service.tenant.context import peek_tenant_context
 
 
 def seal_envelope(envelope: IngressEnvelope) -> IngressEnvelope:
@@ -27,8 +28,10 @@ def seal_envelope(envelope: IngressEnvelope) -> IngressEnvelope:
     if envelope.tenant_context is None:
         raise RuntimeError("Tenant context missing")
 
-    # Enforce tenant context immutability
-    assert_tenant_context_immutable({"tenant_context": envelope.tenant_context})
+    # If an execution tenant context is already established, enforce it matches.
+    current = peek_tenant_context()
+    if current is not None:
+        assert_tenant_context_immutable(envelope.tenant_context.tenant_id)
 
     envelope.mutable = False
     return envelope

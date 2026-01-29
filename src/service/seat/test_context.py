@@ -1,15 +1,18 @@
+import unittest
+
 from src.service.seat.context import SeatContext
-import pytest
 
 
-def test_seat_context_is_immutable():
-    seat = SeatContext(
-        seat_id="seat_001",
-        seat_name="Board Member A",
-    )
+class TestSeatContext(unittest.TestCase):
+    def test_seat_context_is_immutable(self):
+        seat = SeatContext(seat_id="seat_001", seat_name="Board Member A")
 
-    assert seat.seat_id == "seat_001"
-    assert seat.seat_name == "Board Member A"
+        self.assertEqual(seat.seat_id, "seat_001")
+        self.assertEqual(seat.seat_name, "Board Member A")
 
-    with pytest.raises(Exception):
-        seat.seat_name = "Mutated"
+        with self.assertRaises(Exception):
+            seat.seat_name = "Mutated"
+
+
+if __name__ == "__main__":
+    unittest.main()

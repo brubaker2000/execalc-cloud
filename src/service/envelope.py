@@ -8,7 +8,7 @@ No validation, routing, or execution logic is permitted here.
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional
-from src.service.tenant.context import TenantContext
+from src.service.tenant.identity import TenantIdentity
 
 
 @dataclass
@@ -24,7 +24,7 @@ class IngressEnvelope:
     input: Dict[str, Any]
 
     # Immutable tenant identity (injected at ingress)
-    tenant_context: Optional[TenantContext] = None
+    tenant_context: Optional[TenantIdentity] = None
 
     # System metadata (timestamps, ids, trace info)
     meta: Dict[str, Any] = field(default_factory=dict)

@@ -8,7 +8,7 @@ Structure only. No logic permitted.
 
 from dataclasses import dataclass
 from typing import Optional
-from src.service.tenant.context import TenantContext
+from src.service.tenant.identity import TenantIdentity
 from src.service.execution_record import ExecutionRecord
 
 
@@ -18,7 +18,7 @@ class ArtifactAttribution:
     Immutable attribution metadata for any produced artifact.
     """
 
-    tenant_context: TenantContext
+    tenant_context: TenantIdentity
     execution_record: ExecutionRecord
 
     # Optional seat / actor identifier (future use)

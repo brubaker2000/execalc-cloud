@@ -1,23 +1,29 @@
+import unittest
+
 from src.service.judgment_record import JudgmentRecord
-import pytest
 
 
-def test_judgment_record_is_immutable_and_complete():
-    record = JudgmentRecord(
-        judgment_id="judgment_001",
-        decision="Proceed with acquisition",
-        rationale="Strong strategic fit and favorable risk profile",
-        context={
-            "execution_id": "exec_001",
-            "scenario": "m&a_decision",
-        },
-    )
+class TestJudgmentRecord(unittest.TestCase):
+    def test_judgment_record_is_immutable_and_complete(self):
+        record = JudgmentRecord(
+            judgment_id="judgment_001",
+            decision="Proceed with acquisition",
+            rationale="Strong strategic fit and favorable risk profile",
+            context={
+                "execution_id": "exec_001",
+                "scenario": "m&a_decision",
+            },
+        )
 
-    assert record.judgment_id == "judgment_001"
-    assert record.decision == "Proceed with acquisition"
-    assert record.rationale.startswith("Strong strategic fit")
-    assert record.context["scenario"] == "m&a_decision"
-    assert record.created_at is not None
+        self.assertEqual(record.judgment_id, "judgment_001")
+        self.assertEqual(record.decision, "Proceed with acquisition")
+        self.assertTrue(record.rationale.startswith("Strong strategic fit"))
+        self.assertEqual(record.context["scenario"], "m&a_decision")
+        self.assertIsNotNone(record.created_at)
 
-    with pytest.raises(Exception):
-        record.decision = "Reverse decision"
+        with self.assertRaises(Exception):
+            record.decision = "Reverse decision"
+
+
+if __name__ == "__main__":
+    unittest.main()

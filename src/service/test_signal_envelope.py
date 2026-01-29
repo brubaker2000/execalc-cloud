@@ -1,14 +1,18 @@
+import unittest
+
 from src.service.signal_envelope import SignalEnvelope
-import pytest
 
 
-def test_signal_envelope_is_immutable_and_complete():
-    envelope = SignalEnvelope(
-        outputs={"result": "ok"},
-    )
+class TestSignalEnvelope(unittest.TestCase):
+    def test_signal_envelope_is_immutable_and_complete(self):
+        envelope = SignalEnvelope(outputs={"result": "ok"})
 
-    assert envelope.outputs["result"] == "ok"
-    assert envelope.meta == {}
+        self.assertEqual(envelope.outputs["result"], "ok")
+        self.assertEqual(envelope.meta, {})
 
-    with pytest.raises(Exception):
-        envelope.outputs = {}
+        with self.assertRaises(Exception):
+            envelope.outputs = {}
+
+
+if __name__ == "__main__":
+    unittest.main()
