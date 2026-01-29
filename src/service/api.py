@@ -1,5 +1,6 @@
 import logging
 from flask import Flask, jsonify
+from src.service.ingress_runner import execute_ingress
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -12,8 +13,10 @@ def status():
     # Log the incoming request
     logging.info("Received status request")
     
-    # Return an empty, valid response
-    return jsonify({"status": "OK"}), 200
+    # Example usage of the ingress runner
+    raw_input = {"tenant_id": "tenant_test_001"}
+    result = execute_ingress(raw_input, user_id="u1", role="viewer", fn=lambda: {"status": "OK"})
+    return jsonify(result.result["data"]), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
