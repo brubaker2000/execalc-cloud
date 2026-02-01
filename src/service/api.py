@@ -103,3 +103,33 @@ def ingress():
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     app.run(host="127.0.0.1", port=port, debug=True)
+
+# --- Integrations (connectors) ---
+from src.service.integrations.bootstrap import default_registry
+from src.service.integrations.connector import ConnectorContext
+from src.service.integrations.registry import ConnectorRegistryError
+
+
+_CONNECTOR_REGISTRY = default_registry()
+
+
+@app.get("/integrations")
+def list_integrations():
+    return {"ok": True, "connectors": list(_CONNECTOR_REGISTRY.list())}
+
+
+@app.post("/integrations/<name>/healthcheck")
+def connector_healthcheck(name: str):
+    body = request.get_json(force=True, silent=False) or {}
+    tenant_id = body.get("tenant_id")
+    if not tenant_id or not isinstance(tenant_id, str):
+        return {"ok": False, "error": "tenant_id is required"}, 400
+
+    try:
+        connector = _CONNECTOR_REGISTRY.get(name)
+    except ConnectorRegistryError as e:
+        return {"ok": False, "error": str(e)}, 404
+
+    ctx = ConnectorContext(tenant_id=tenant_id)
+    data = connector.healthcheck(ctx)
+    return {"ok": True, "data": data}
