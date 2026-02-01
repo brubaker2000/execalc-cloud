@@ -135,3 +135,23 @@ if __name__ == "__main__":
     import os
     port = int(os.getenv("PORT", "5000"))
     app.run(host="127.0.0.1", port=port, debug=True)
+
+
+@app.post("/integrations/<name>/fetch")
+def connector_fetch(name: str):
+    body = request.get_json(force=True, silent=False) or {}
+    tenant_id = body.get("tenant_id")
+    if not tenant_id or not isinstance(tenant_id, str):
+        return {"ok": False, "error": "tenant_id is required"}, 400
+
+    query = body.get("query") or {}
+    if not isinstance(query, dict):
+        return {"ok": False, "error": "query must be an object"}, 400
+
+    try:
+        connector = _CONNECTOR_REGISTRY.get(name)
+        ctx = ConnectorContext(tenant_id=tenant_id)
+        data = connector.fetch(ctx, query)
+        return {"ok": True, "data": data}
+    except ConnectorRegistryError as e:
+        return {"ok": False, "error": str(e)}, 404
