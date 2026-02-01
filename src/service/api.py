@@ -100,9 +100,6 @@ def ingress():
     return jsonify(response), status_code
 
 
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", "5000"))
-    app.run(host="127.0.0.1", port=port, debug=True)
 
 # --- Integrations (connectors) ---
 from src.service.integrations.bootstrap import default_registry
@@ -133,3 +130,8 @@ def connector_healthcheck(name: str):
     ctx = ConnectorContext(tenant_id=tenant_id)
     data = connector.healthcheck(ctx)
     return {"ok": True, "data": data}
+
+if __name__ == "__main__":
+    import os
+    port = int(os.getenv("PORT", "5000"))
+    app.run(host="127.0.0.1", port=port, debug=True)
