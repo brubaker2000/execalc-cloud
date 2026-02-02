@@ -54,6 +54,24 @@ def _persist_execution(record) -> dict:
         return {"persisted": False, "persist_table": "execution_records", "persist_error": str(e)}
 
 
+
+def _enforce_tenant_access(required_tenant_id: str):
+    """
+    DEV HARNESS ONLY.
+    In production, tenant and role must come from real auth (session/JWT/IAP), not headers.
+    """
+    hdr_tenant = request.headers.get("X-Tenant-Id")
+    role = (request.headers.get("X-Role") or "").strip().lower()
+
+    if not hdr_tenant or hdr_tenant != required_tenant_id:
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+
+    if role not in ("admin", "operator"):
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+
+    return True, None
+
+
 def _connector_ctx_from_body(body: dict) -> ConnectorContext:
     tenant_id = body.get("tenant_id")
     if not tenant_id or not isinstance(tenant_id, str):
@@ -214,6 +232,10 @@ def get_execution(envelope_id: str):
     tenant_id = request.args.get("tenant_id")
     if not tenant_id or not isinstance(tenant_id, str):
         return {"ok": False, "error": "tenant_id query param is required"}, 400
+
+    allowed, denial = _enforce_tenant_access(tenant_id)
+    if not allowed:
+        return denial
 
     if get_execution_record is None:
         return {"ok": False, "error": "db module not available"}, 500
