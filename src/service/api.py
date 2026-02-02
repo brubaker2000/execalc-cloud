@@ -256,6 +256,10 @@ def db_info():
     Dev/ops diagnostic endpoint.
     Reports whether DB persistence is enabled and what tables exist in the target DB.
     """
+    role = (request.headers.get("X-Role") or "").strip().lower()
+    if role != "admin":
+        return {"ok": False, "error": "forbidden"}, 403
+
     info = {
         "ok": True,
         "persist_enabled": _persist_enabled(),
