@@ -227,11 +227,11 @@ def connector_fetch(name: str):
 def get_execution(envelope_id: str):
     """
     Tenant-scoped retrieval of an execution record.
-    Requires tenant_id query param.
+    Requires X-Tenant-Id header.
     """
-    tenant_id = request.args.get("tenant_id")
+    tenant_id = request.headers.get("X-Tenant-Id")
     if not tenant_id or not isinstance(tenant_id, str):
-        return {"ok": False, "error": "tenant_id query param is required"}, 400
+        return {"ok": False, "error": "X-Tenant-Id header is required"}, 400
 
     allowed, denial = _enforce_tenant_access(tenant_id)
     if not allowed:
