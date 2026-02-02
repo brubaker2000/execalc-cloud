@@ -39,7 +39,7 @@ def _persist_execution(record) -> dict:
         return {"persisted": False}
 
     if insert_execution_record is None:
-        return {"persisted": False, "persist_error": "db module not available"}
+        return {"persisted": False, "persist_table": "execution_records", "persist_error": "db module not available"}
 
     try:
         insert_execution_record(
@@ -47,10 +47,10 @@ def _persist_execution(record) -> dict:
             envelope_id=record.envelope_id,
             result=record.result,
         )
-        return {"persisted": True}
+        return {"persisted": True, "persist_table": "execution_records"}
     except Exception as e:
         logging.exception("Failed to persist execution record")
-        return {"persisted": False, "persist_error": str(e)}
+        return {"persisted": False, "persist_table": "execution_records", "persist_error": str(e)}
 
 
 def _connector_ctx_from_body(body: dict) -> ConnectorContext:
