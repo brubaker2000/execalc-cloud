@@ -8,10 +8,11 @@ from src.service.tenant.errors import InvalidTenantPayload
 
 # Optional DB persistence (enabled via env var)
 try:
-    from src.service.db.postgres import get_conn, insert_execution_record
+    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record
 except Exception:
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
+    get_execution_record = None  # type: ignore
 
 # Integrations
 from src.service.integrations.bootstrap import default_registry
@@ -201,6 +202,30 @@ def connector_fetch(name: str):
     data = connector.fetch(ctx, query)
     return {"ok": True, "data": data}
 
+
+
+
+@app.get("/executions/<envelope_id>")
+def get_execution(envelope_id: str):
+    """
+    Tenant-scoped retrieval of an execution record.
+    Requires tenant_id query param.
+    """
+    tenant_id = request.args.get("tenant_id")
+    if not tenant_id or not isinstance(tenant_id, str):
+        return {"ok": False, "error": "tenant_id query param is required"}, 400
+
+    if get_execution_record is None:
+        return {"ok": False, "error": "db module not available"}, 500
+
+    try:
+        rec = get_execution_record(tenant_id=tenant_id, envelope_id=envelope_id)
+        if rec is None:
+            return {"ok": False, "error": "not found"}, 404
+        return {"ok": True, "data": rec}
+    except Exception as e:
+        logging.exception("Unhandled error in /executions/<envelope_id>")
+        return {"ok": False, "error_type": e.__class__.__name__, "error": str(e)}, 500
 
 
 @app.get("/db-info")

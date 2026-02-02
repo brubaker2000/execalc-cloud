@@ -80,3 +80,34 @@ def insert_execution_record(
             )
     finally:
         conn.close()
+
+
+def get_execution_record(*, tenant_id: str, envelope_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Fetch a single execution record by (tenant_id, envelope_id).
+    Returns None if not found.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT tenant_id, envelope_id, ok, result, created_at
+                FROM execution_records
+                WHERE tenant_id = %s AND envelope_id = %s
+                """,
+                (tenant_id, envelope_id),
+            )
+            row = cur.fetchone()
+            if not row:
+                return None
+            t_id, e_id, ok, result, created_at = row
+            return {
+                "tenant_id": t_id,
+                "envelope_id": e_id,
+                "ok": bool(ok),
+                "result": result,
+                "created_at": created_at.isoformat(),
+            }
+    finally:
+        conn.close()
