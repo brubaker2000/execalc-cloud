@@ -1,5 +1,18 @@
 # Execalc Cloud v1
 
+## Execalc Build Doctrine
+
+Execalc is not a conventional web application. It is a governed cognition layer that must remain auditable, tenant-safe, and security-first as it scales.
+
+**Non-negotiables**
+- **Governance-first architecture:** Capabilities must be policy-aware by default (deny-by-default where applicable). “Helpful” is not sufficient; behavior must be correct under governance constraints.
+- **Multi-tenant isolation as a core property:** Every read/write path must be tenant-scoped, with explicit enforcement that prevents cross-tenant access by construction.
+- **Security posture designed for high assurance:** Assume adversarial and misconfiguration scenarios. Diagnostic surfaces are privileged surfaces and must be guarded.
+- **Trust is the product:** Correctness includes determinism, explainability, and auditability. We optimize for repeatable, provable behavior over clever output.
+- **Upgradeable auth model:** Development harnesses may use headers for tenant/role to validate flows, but production must derive identity/tenant from real authentication (JWT/IAP/session) without architectural rewrites.
+- **Change discipline:** Each increment should be testable, evidenced (logs/persistence), and documented. Fixes become repeatable playbooks, not tribal knowledge.
+- **Tooling resilience:** When platform tooling becomes unstable, we isolate state, re-baseline quickly, and codify recovery procedures to reduce fragility over time.
+
 Execalc is an executive-grade cognition platform designed to sit above large language models and govern their use through structured judgment, principled constraints, and auditable decision logic.
 
 This repository is the canonical Cloud v1 trunk.
