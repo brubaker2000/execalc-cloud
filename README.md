@@ -76,3 +76,22 @@ Add to `~/.bashrc`:
 - `export CLOUDSDK_CONFIG=$HOME/.config/gcloud-execalc-clean`
 
 If you previously set `CLOUDSDK_CONFIG` to a temporary directory (like `/tmp/...`), remove that old export and replace it with the persistent path above.
+
+## Execalc Build Doctrine
+
+Execalc is built as a governed, multi-tenant execution engine — not a demo app and not a thin wrapper around an LLM.
+This repository is intentionally structured to compound correctness, security, and operational proof over time.
+
+### Design commitments
+- Cloud-first deployment: containerized service built from source and run on managed infrastructure.
+- Multi-tenant by design: tenant context is explicit, enforced, and persisted in a tenant-scoped data model.
+- Governance-first execution: policies (allowlists, scopes, role gates) are enforced in the request path.
+- Best-effort persistence and auditability: executions are recorded to durable storage and retrievable by tenant scope.
+- Operational proof over folklore: runbooks, decision records, and doctrine live in-repo as the canonical memory.
+
+### Engineering operating rules
+- Small diffs, one purpose per commit.
+- Every change includes a verification step (compile/tests) before deploy.
+- No secrets in git, ever (use environment variables and secret management).
+- Admin/diagnostic endpoints are explicitly gated.
+- If a failure mode repeats, it becomes a runbook or a test.
