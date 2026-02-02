@@ -8,8 +8,9 @@ from src.service.tenant.errors import InvalidTenantPayload
 
 # Optional DB persistence (enabled via env var)
 try:
-    from src.service.db.postgres import insert_execution_record
+    from src.service.db.postgres import get_conn, insert_execution_record
 except Exception:
+    get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
 
 # Integrations
@@ -199,6 +200,56 @@ def connector_fetch(name: str):
 
     data = connector.fetch(ctx, query)
     return {"ok": True, "data": data}
+
+
+
+@app.get("/db-info")
+def db_info():
+    """
+    Dev/ops diagnostic endpoint.
+    Reports whether DB persistence is enabled and what tables exist in the target DB.
+    """
+    info = {
+        "ok": True,
+        "persist_enabled": _persist_enabled(),
+        "db_module_available": get_conn is not None,
+        "target_table": "execution_records",
+    }
+
+    if get_conn is None:
+        return info
+
+    try:
+        conn = get_conn()
+        try:
+            with conn, conn.cursor() as cur:
+                cur.execute(
+                    "SELECT table_schema, table_name "
+                    "FROM information_schema.tables "
+                    "WHERE table_schema NOT IN ('pg_catalog','information_schema') "
+                    "ORDER BY table_schema, table_name;"
+                )
+                rows = cur.fetchall()
+                info["tables"] = [{"schema": r[0], "name": r[1]} for r in rows]
+
+                cur.execute(
+                    "SELECT ordinal_position, column_name, data_type "
+                    "FROM information_schema.columns "
+                    "WHERE table_schema='public' AND table_name='execution_records' "
+                    "ORDER BY ordinal_position;"
+                )
+                cols = cur.fetchall()
+                if cols:
+                    info["execution_records_columns"] = [
+                        {"pos": c[0], "name": c[1], "type": c[2]} for c in cols
+                    ]
+        finally:
+            conn.close()
+    except Exception as e:
+        logging.exception("Unhandled error in /db-info")
+        return {"ok": False, "error_type": e.__class__.__name__, "error": str(e)}, 500
+
+    return info
 
 
 if __name__ == "__main__":
