@@ -25,8 +25,8 @@ jobs:
       - name: Run integrations smoke test (Cloud Run)
         env:
           SERVICE_URL: ${{ vars.EXECALC_SERVICE_URL }}
-          TENANT_ID: tenant_demo_999
-          ROLE: operator
+          TENANT_ID: ${{ vars.EXECALC_SMOKE_TENANT_ID }}
+          ROLE: ${{ vars.EXECALC_SMOKE_ROLE }}
         run: |
           chmod +x scripts/smoke_integrations.sh
           ./scripts/smoke_integrations.sh
