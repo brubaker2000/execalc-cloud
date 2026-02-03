@@ -1,0 +1,31 @@
+name: Smoke - Integrations Gates
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    # Do not run on pull requests from forks (prevents external abuse against your Cloud Run URL).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run integrations smoke test (Cloud Run)
+        env:
+          SERVICE_URL: https://execalc-api-1052039536917.us-east1.run.app
+          TENANT_ID: tenant_demo_999
+          ROLE: operator
+        run: |
+          chmod +x scripts/smoke_integrations.sh
+          ./scripts/smoke_integrations.sh
