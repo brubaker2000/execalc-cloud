@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .echo_connector import EchoConnector
 from .null_connector import NullConnector
 from .registry import ConnectorRegistry
 
@@ -16,4 +17,5 @@ def default_registry() -> ConnectorRegistry:
     """
     registry = ConnectorRegistry.empty()
     registry.register(NullConnector())
+    registry.register(EchoConnector())
     return registry
