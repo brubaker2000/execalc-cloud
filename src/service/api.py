@@ -73,9 +73,19 @@ def _enforce_tenant_access(required_tenant_id: str):
 
 
 def _connector_ctx_from_body(body: dict) -> ConnectorContext:
-    tenant_id = body.get("tenant_id")
-    if not tenant_id or not isinstance(tenant_id, str):
-        raise ValueError("tenant_id is required")
+    hdr_tenant = request.headers.get("X-Tenant-Id")
+    if not hdr_tenant or not isinstance(hdr_tenant, str):
+        raise ValueError("X-Tenant-Id header is required")
+
+    body_tenant = body.get("tenant_id")
+    if body_tenant is not None and not isinstance(body_tenant, str):
+        raise ValueError("tenant_id must be a string")
+
+    # If body includes tenant_id, it must match header.
+    if body_tenant and body_tenant != hdr_tenant:
+        raise ValueError("tenant_id mismatch (header vs body)")
+
+    tenant_id = hdr_tenant
 
     actor_id = body.get("actor_id")
     if actor_id is not None and not isinstance(actor_id, str):
@@ -149,23 +159,27 @@ def ingress():
 @app.get("/integrations")
 def list_integrations():
     """
-    If tenant_id is provided, returns only connectors enabled for that tenant.
-    Otherwise returns all available connectors (for ops/diagnostics use).
+    If X-Tenant-Id is provided, returns only connectors enabled for that tenant.
+    If X-Tenant-Id is NOT provided, requires X-Role: admin and returns all connectors (ops/diagnostics).
     """
     available = list(_CONNECTOR_REGISTRY.list())
-    tenant_id = request.args.get("tenant_id")
 
-    if tenant_id:
-        if not isinstance(tenant_id, str):
-            return {"ok": False, "error": "tenant_id must be a string"}, 400
+    hdr_tenant = request.headers.get("X-Tenant-Id")
+    if hdr_tenant:
+        allowed, denial = _enforce_tenant_access(hdr_tenant)
+        if not allowed:
+            return denial
         try:
-            allowed = _CONNECTOR_POLICY.allowed_connectors(tenant_id, available)
-            return {"ok": True, "connectors": allowed}
+            allowed_connectors = _CONNECTOR_POLICY.allowed_connectors(hdr_tenant, available)
+            return {"ok": True, "connectors": allowed_connectors}
         except ConnectorPolicyError as e:
             return {"ok": False, "error": str(e)}, 500
 
-    return {"ok": True, "connectors": available}
+    role = (request.headers.get("X-Role") or "").strip().lower()
+    if role != "admin":
+        return {"ok": False, "error": "forbidden"}, 403
 
+    return {"ok": True, "connectors": available}
 
 @app.post("/integrations/<name>/healthcheck")
 def connector_healthcheck(name: str):
@@ -173,6 +187,10 @@ def connector_healthcheck(name: str):
 
     try:
         ctx = _connector_ctx_from_body(body)
+
+        allowed, denial = _enforce_tenant_access(ctx.tenant_id)
+        if not allowed:
+            return denial
     except ValueError as e:
         return {"ok": False, "error": str(e)}, 400
 
@@ -198,6 +216,10 @@ def connector_fetch(name: str):
 
     try:
         ctx = _connector_ctx_from_body(body)
+
+        allowed, denial = _enforce_tenant_access(ctx.tenant_id)
+        if not allowed:
+            return denial
     except ValueError as e:
         return {"ok": False, "error": str(e)}, 400
 
