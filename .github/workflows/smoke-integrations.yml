@@ -24,7 +24,7 @@ jobs:
 
       - name: Run integrations smoke test (Cloud Run)
         env:
-          SERVICE_URL: https://execalc-api-1052039536917.us-east1.run.app
+          SERVICE_URL: ${{ vars.EXECALC_SERVICE_URL }}
           TENANT_ID: tenant_demo_999
           ROLE: operator
         run: |
