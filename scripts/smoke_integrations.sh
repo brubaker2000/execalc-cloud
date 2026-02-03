@@ -74,3 +74,12 @@ require "correct scope returns 200" "$code" "200"
 body_matches '"ok"[[:space:]]*:[[:space:]]*true'
 
 echo "ALL PASS: integrations scope gate is enforced."
+
+# --- allowlist/unknown connector negative test ---
+bad_endpoint="$SERVICE_URL/integrations/not-a-connector/healthcheck"
+code="$(http_status -X POST "$bad_endpoint" \
+  -H "Content-Type: application/json" \
+  -H "X-Tenant-Id: $TENANT_ID" \
+  -H "X-Role: $ROLE" \
+  -d '{"scopes":["null.readonly"]}')"
+require "unknown connector returns 404" "$code" "404"
