@@ -88,13 +88,21 @@ def _connector_ctx_from_body(body: dict) -> ConnectorContext:
     tenant_id = hdr_tenant
 
     actor_id = body.get("actor_id")
+
+    # Scopes are not accepted in the request body (caller-controlled).
+    # Use X-Scopes header in dev harness; in production this comes from verified auth claims.
+    if "scopes" in body:
+        raise ValueError("scopes must be provided via X-Scopes header")
     if actor_id is not None and not isinstance(actor_id, str):
         raise ValueError("actor_id must be a string")
 
-    scopes = body.get("scopes")
-    if scopes is not None:
-        if not isinstance(scopes, list) or not all(isinstance(x, str) for x in scopes):
-            raise ValueError("scopes must be a list of strings")
+    # Scopes must NOT be caller-asserted in the request body.
+    # Dev harness: scopes supplied via X-Scopes header (comma-separated).
+    # Production: scopes derived from verified auth claims (JWT/IAP), not caller input.
+    scopes_hdr = request.headers.get("X-Scopes")
+    scopes = None
+    if scopes_hdr is not None and scopes_hdr.strip() != "":
+        scopes = [x.strip() for x in scopes_hdr.split(",") if x.strip()]
 
     return ConnectorContext(tenant_id=tenant_id, actor_id=actor_id, scopes=scopes)
 
