@@ -179,7 +179,13 @@ def list_integrations():
     if role != "admin":
         return {"ok": False, "error": "forbidden"}, 403
 
-    return {"ok": True, "connectors": available}
+    policy_summary = {
+        "allowlist_set": _CONNECTOR_POLICY.allowlist_by_tenant is not None,
+        "allowlist_entries": 0 if _CONNECTOR_POLICY.allowlist_by_tenant is None else len(_CONNECTOR_POLICY.allowlist_by_tenant),
+        "required_scopes_set": _CONNECTOR_POLICY.required_scopes_by_connector is not None,
+        "required_scopes_entries": 0 if _CONNECTOR_POLICY.required_scopes_by_connector is None else len(_CONNECTOR_POLICY.required_scopes_by_connector),
+    }
+    return {"ok": True, "connectors": available, "policy": policy_summary}
 
 @app.post("/integrations/<name>/healthcheck")
 def connector_healthcheck(name: str):
