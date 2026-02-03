@@ -83,3 +83,38 @@ code="$(http_status -X POST "$bad_endpoint" \
   -H "X-Role: $ROLE" \
   -d '{"scopes":["null.readonly"]}')"
 require "unknown connector returns 404" "$code" "404"
+
+# --- list + fetch route gates ---
+list_endpoint="$SERVICE_URL/integrations"
+
+code="$(http_status "$list_endpoint")"
+require "list without headers returns 403" "$code" "403"
+body_contains "\"forbidden\""
+
+code="$(http_status "$list_endpoint" -H "X-Role: admin")"
+require "list with admin returns 200" "$code" "200"
+body_contains "\"null\""
+
+code="$(http_status "$list_endpoint" -H "X-Tenant-Id: $TENANT_ID" -H "X-Role: $ROLE")"
+require "list with tenant+role returns 200" "$code" "200"
+body_contains "\"null\""
+
+fetch_endpoint="$SERVICE_URL/integrations/null/fetch"
+
+code="$(http_status -X POST "$fetch_endpoint" \
+  -H "Content-Type: application/json" \
+  -H "X-Tenant-Id: $TENANT_ID" \
+  -H "X-Role: $ROLE" \
+  -d '{"query":{"ping":true}}')"
+require "fetch missing scope returns 403" "$code" "403"
+body_contains "Missing required scopes"
+
+code="$(http_status -X POST "$fetch_endpoint" \
+  -H "Content-Type: application/json" \
+  -H "X-Tenant-Id: $TENANT_ID" \
+  -H "X-Role: $ROLE" \
+  -d '{"scopes":["null.readonly"],"query":{"ping":true}}')"
+require "fetch with correct scope returns 200" "$code" "200"
+body_contains "\"ping\""
+
+echo "ALL PASS: integrations list+fetch gates are enforced."
