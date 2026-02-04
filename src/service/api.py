@@ -18,6 +18,7 @@ except Exception:
 from src.service.integrations.bootstrap import default_registry
 from src.service.integrations.connector import ConnectorContext
 from src.service.integrations.policy import ConnectorPolicy, ConnectorPolicyError
+from src.service.integrations.credentials import EnvCredentialStore, CredentialStoreError
 from src.service.integrations.registry import ConnectorRegistryError
 
 
@@ -26,6 +27,18 @@ logging.basicConfig(level=logging.INFO)
 
 _CONNECTOR_REGISTRY = default_registry()
 _CONNECTOR_POLICY = ConnectorPolicy.from_env()
+
+_CREDENTIAL_STORE_ERROR = None
+try:
+    _CREDENTIAL_STORE = EnvCredentialStore.from_env()
+except CredentialStoreError as e:
+    logging.exception("Failed to load credential store from env")
+    _CREDENTIAL_STORE = None
+    _CREDENTIAL_STORE_ERROR = str(e)
+except Exception as e:
+    logging.exception("Failed to load credential store from env")
+    _CREDENTIAL_STORE = None
+    _CREDENTIAL_STORE_ERROR = f"unexpected_error: {e}"
 
 
 def _persist_enabled() -> bool:
@@ -179,7 +192,26 @@ def list_integrations():
             return denial
         try:
             allowed_connectors = _CONNECTOR_POLICY.allowed_connectors(hdr_tenant, available)
-            return {"ok": True, "connectors": allowed_connectors}
+
+            credentials = {}
+            credentials_error = None
+
+            if _CREDENTIAL_STORE is None:
+                credentials_error = _CREDENTIAL_STORE_ERROR
+            else:
+                for cname in allowed_connectors:
+                    try:
+                        st = _CREDENTIAL_STORE.status(hdr_tenant, cname)
+                        credentials[cname] = {"configured": st.configured}
+                    except CredentialStoreError as e:
+                        credentials_error = str(e)
+                        break
+
+            resp = {"ok": True, "connectors": allowed_connectors, "credentials": credentials}
+            if credentials_error:
+                resp["credentials_error"] = credentials_error
+            return resp
+
         except ConnectorPolicyError as e:
             return {"ok": False, "error": str(e)}, 500
 
