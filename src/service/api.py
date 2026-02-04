@@ -18,7 +18,7 @@ except Exception:
 from src.service.integrations.bootstrap import default_registry
 from src.service.integrations.connector import ConnectorContext
 from src.service.integrations.policy import ConnectorPolicy, ConnectorPolicyError
-from src.service.integrations.credentials import EnvCredentialStore, CredentialStoreError
+from src.service.integrations.credentials import EnvCredentialStore, CredentialStoreError, CredentialRequirementPolicy
 from src.service.integrations.registry import ConnectorRegistryError
 
 
@@ -39,6 +39,18 @@ except Exception as e:
     logging.exception("Failed to load credential store from env")
     _CREDENTIAL_STORE = None
     _CREDENTIAL_STORE_ERROR = f"unexpected_error: {e}"
+
+_CREDENTIAL_REQ_POLICY_ERROR = None
+try:
+    _CREDENTIAL_REQ_POLICY = CredentialRequirementPolicy.from_env()
+except CredentialStoreError as e:
+    logging.exception("Failed to load credential requirement policy from env")
+    _CREDENTIAL_REQ_POLICY = CredentialRequirementPolicy(required_by_tenant=None)
+    _CREDENTIAL_REQ_POLICY_ERROR = str(e)
+except Exception as e:
+    logging.exception("Failed to load credential requirement policy from env")
+    _CREDENTIAL_REQ_POLICY = CredentialRequirementPolicy(required_by_tenant=None)
+    _CREDENTIAL_REQ_POLICY_ERROR = f"unexpected_error: {e}"
 
 
 def _persist_enabled() -> bool:
@@ -118,6 +130,37 @@ def _connector_ctx_from_body(body: dict) -> ConnectorContext:
         scopes = [x.strip() for x in scopes_hdr.split(",") if x.strip()]
 
     return ConnectorContext(tenant_id=tenant_id, actor_id=actor_id, scopes=scopes)
+
+
+def _require_credentials_or_error(connector_name: str, ctx: ConnectorContext):
+    """Enforce per-tenant credential requirements for a connector.
+
+    Returns None if allowed, otherwise returns a (payload, http_status) tuple.
+    """
+    try:
+        required = _CREDENTIAL_REQ_POLICY.requires_credentials(ctx.tenant_id, connector_name)
+    except Exception as e:
+        logging.exception("Credential requirement evaluation failed")
+        return {"ok": False, "error": f"credential_requirement_eval_failed: {e}"}, 500
+
+    if not required:
+        return None
+
+    if _CREDENTIAL_STORE is None:
+        payload = {"ok": False, "error": f"Credentials required for '{connector_name}' but credential store unavailable"}
+        if _CREDENTIAL_STORE_ERROR:
+            payload["credential_store_error"] = _CREDENTIAL_STORE_ERROR
+        return payload, 500
+
+    try:
+        st = _CREDENTIAL_STORE.status(ctx.tenant_id, connector_name)
+    except CredentialStoreError as e:
+        return {"ok": False, "error": f"credential_store_error: {e}"}, 500
+
+    if not st.configured:
+        return {"ok": False, "error": f"Credentials required for '{connector_name}' but not configured"}, 412
+
+    return None
 
 
 @app.route("/status", methods=["GET"])
@@ -201,8 +244,9 @@ def list_integrations():
             else:
                 for cname in allowed_connectors:
                     try:
+                        required = _CREDENTIAL_REQ_POLICY.requires_credentials(hdr_tenant, cname)
                         st = _CREDENTIAL_STORE.status(hdr_tenant, cname)
-                        credentials[cname] = {"configured": st.configured}
+                        credentials[cname] = {"configured": st.configured, "required": required}
                     except CredentialStoreError as e:
                         credentials_error = str(e)
                         break
@@ -252,6 +296,10 @@ def connector_healthcheck(name: str):
     except PermissionError as e:
         return {"ok": False, "error": str(e)}, 403
 
+    cred_denial = _require_credentials_or_error(name, ctx)
+    if cred_denial is not None:
+        return cred_denial
+
     data = connector.healthcheck(ctx)
     return {"ok": True, "data": data}
 
@@ -284,6 +332,10 @@ def connector_fetch(name: str):
         return {"ok": False, "error": str(e)}, 500
     except PermissionError as e:
         return {"ok": False, "error": str(e)}, 403
+
+    cred_denial = _require_credentials_or_error(name, ctx)
+    if cred_denial is not None:
+        return cred_denial
 
     data = connector.fetch(ctx, query)
     return {"ok": True, "data": data}
