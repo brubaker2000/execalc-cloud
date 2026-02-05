@@ -127,7 +127,10 @@ def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
                 INSERT INTO tenants (tenant_id, tenant_name, created_at)
                 VALUES (%s, %s, now())
                 ON CONFLICT (tenant_id) DO UPDATE
-                SET tenant_name = EXCLUDED.tenant_name
+                SET tenant_name = CASE
+                    WHEN tenants.tenant_name = tenants.tenant_id THEN EXCLUDED.tenant_name
+                    ELSE tenants.tenant_name
+                END
                 """,
                 (tenant_id, tenant_name),
             )
