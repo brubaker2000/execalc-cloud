@@ -111,3 +111,25 @@ def get_execution_record(*, tenant_id: str, envelope_id: str) -> Optional[Dict[s
             }
     finally:
         conn.close()
+
+
+def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
+    """
+    Ensure a tenant row exists in Postgres.
+
+    This prevents FK failures when persisting execution_records.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO tenants (tenant_id, tenant_name, created_at)
+                VALUES (%s, %s, now())
+                ON CONFLICT (tenant_id) DO UPDATE
+                SET tenant_name = EXCLUDED.tenant_name
+                """,
+                (tenant_id, tenant_name),
+            )
+    finally:
+        conn.close()

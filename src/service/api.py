@@ -8,7 +8,7 @@ from src.service.tenant.errors import InvalidTenantPayload
 
 # Optional DB persistence (enabled via env var)
 try:
-    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record
+    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, upsert_tenant, upsert_tenant
 except Exception:
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
@@ -68,6 +68,8 @@ def _persist_execution(record) -> dict:
         return {"persisted": False, "persist_table": "execution_records", "persist_error": "db module not available"}
 
     try:
+        # Ensure tenant exists to satisfy FK before writing execution_records.
+        upsert_tenant(tenant_id=record.tenant_id, tenant_name=record.tenant_id)
         insert_execution_record(
             tenant_id=record.tenant_id,
             envelope_id=record.envelope_id,
