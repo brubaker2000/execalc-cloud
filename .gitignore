@@ -17,3 +17,4 @@ scratch/
 # SQLite runtime artifacts
 **/tenants.db
 **/tenant.db
+logs/
