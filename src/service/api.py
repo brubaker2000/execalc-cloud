@@ -178,6 +178,7 @@ def status():
             user_id="u1",
             role="viewer",
             fn=lambda: {"status": "OK"},
+            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
@@ -205,6 +206,7 @@ def ingress():
             user_id="u1",
             role="viewer",
             fn=lambda: {"received": True},
+            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
