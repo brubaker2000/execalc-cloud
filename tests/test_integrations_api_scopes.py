@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT))
 
 
 def _load_app(monkeypatch):
+    monkeypatch.setenv("EXECALC_DEV_HARNESS", "1")
     # Policy: echo is allowlisted and requires echo.readonly scope.
     monkeypatch.setenv("EXECALC_CONNECTOR_ALLOWLIST", '{"*":["echo","null"]}')
     monkeypatch.setenv("EXECALC_CONNECTOR_REQUIRED_SCOPES", '{"echo":["echo.readonly"],"null":["null.readonly"]}')
