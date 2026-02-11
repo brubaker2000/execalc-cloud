@@ -188,7 +188,11 @@ def status():
     if denial:
         return denial
 
-    tenant_id = request.args.get("tenant_id") or "tenant_test_001"
+    tenant_q = request.args.get("tenant_id")
+    if claims.tenant_id and tenant_q and tenant_q != claims.tenant_id:
+        return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": "tenant_id mismatch (claims vs query)"}), 400
+
+    tenant_id = claims.tenant_id or tenant_q or "tenant_test_001"
     raw_input = {"tenant_id": tenant_id}
 
     try:
