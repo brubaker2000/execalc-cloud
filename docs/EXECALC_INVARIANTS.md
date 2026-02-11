@@ -74,3 +74,45 @@ Execalc is a governed judgment system that enables organizations to use advanced
 ## 10) Operating Principle
 
 Early rigor prevents downstream defects. Prefer preventive structure at ingress and enforcement boundaries over reactive patching.
+
+## 11) Authority and Responsibility Model (Hard Requirement)
+
+Execalc is a governed system, not an “LLM app.” The model is a language engine. The platform owns authority.
+
+### 11.1 The four roles (and what each is allowed to do)
+
+A) Security & Isolation (code + infrastructure; non-negotiable)
+- Owns: tenant isolation, authentication, role-based authorization, encryption, audit logging, rate limiting, safe defaults.
+- Rule: enforced by deterministic code/platform policy. The language model cannot be trusted with it.
+
+B) Orchestration Authority (middleware governor; the platform “controls the keys”)
+- Owns: workflow selection, policy gates, tool allow/deny, memory allow/deny, output blocking/redaction/rewriting, and end-to-end logging.
+- Rule: anything that changes permissions, data access, memory admission, external actions, or “what workflow runs” is decided here.
+
+C) Governed Logic Assets (versioned configuration/content)
+- Owns: scenarios, triggers, carats, rubrics (Prime Directive checks), routing policies, prompt templates, output schemas, “thinker attribution” rules.
+- Rule: stored as version-controlled assets that middleware loads/enforces (diffable, testable, auditable).
+
+D) Language Work (the LLM)
+- Owns: drafting, summarization, qualitative synthesis, explanation, structured writing, and proposing options/scores/rationales.
+- Rule: the model may propose; it may not decide access, isolation, tool permissions, or high-risk side effects.
+
+### 11.2 The authority test (where a new capability belongs)
+
+1) Does it change what data we can access, what actions we can take, what we store, or who can see it?
+- If yes: enforce in Security/Isolation or Orchestration Authority (deterministic code).
+
+2) Is it a new reasoning template, lens set, rubric, scenario, trigger, routing rule, or output schema?
+- If yes: implement as a Governed Logic Asset (versioned registry entry), enforced by middleware.
+
+3) Is it just wording/formatting?
+- If yes: implement in prompts/output schemas, not enforcement code.
+
+### 11.3 “The platform dominates the model” (made precise)
+
+The platform controls:
+- Inputs (tenant-scoped context, approved docs, tool availability by policy)
+- Process (workflow selection, gating passes, required checks)
+- Outputs (schema validation, policy checks, redaction/blocking, logging)
+- Side effects (memory writes, connector/tool actions, notifications) only after gates clear
+

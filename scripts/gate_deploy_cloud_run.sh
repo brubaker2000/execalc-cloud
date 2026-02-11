@@ -42,18 +42,19 @@ curl_json_retry() {
 # to exercise /status, /db-info, /executions, and integrations endpoints, then restores it.
 DEV_HARNESS_CHANGED=0
 
-restore_dev_harness() {
+close_dev_harness() {
   if [[ "${DEV_HARNESS_CHANGED}" == "1" ]]; then
     echo "[gate cleanup] restore EXECALC_DEV_HARNESS=0"
     gcloud run services update "$SERVICE" --region "$REGION" --project "$PROJECT"       --update-env-vars EXECALC_DEV_HARNESS=0 --quiet >/dev/null 2>&1 || true
+      DEV_HARNESS_CHANGED=0
   fi
 }
-trap restore_dev_harness EXIT
+trap close_dev_harness EXIT
 
-echo "[gate 1/5] predeploy (compile + tests)"
+echo "[gate 1/6] predeploy (compile + tests)"
 ./scripts/gate_predeploy.sh
 
-echo "[gate 2/5] deploy Cloud Run"
+echo "[gate 2/6] deploy Cloud Run"
 gcloud run deploy "$SERVICE" --source . --region "$REGION" --project "$PROJECT" --update-env-vars EXECALC_DEV_HARNESS=1 --quiet
   DEV_HARNESS_CHANGED=1
 
@@ -61,7 +62,7 @@ BASE_URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --project
 [[ -n "$BASE_URL" ]] || die "could not resolve service URL after deploy"
 echo "BASE_URL=$BASE_URL"
 
-echo "[gate 3/5] db-info (admin)"
+echo "[gate 3/6] db-info (admin)"
 DBINFO="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: admin" "$BASE_URL/db-info")"
 echo "$DBINFO" | python3 -m json.tool
 DBINFO="$DBINFO" python3 - <<'PY'
@@ -74,7 +75,7 @@ assert o.get("ok") is True, o
 assert o.get("db_module_available") is True, o
 PY
 
-echo "[gate 4/5] status -> persisted -> executions fetch (tenant autocreate path)"
+echo "[gate 4/6] status -> persisted -> executions fetch (tenant autocreate path)"
 TID="tenant_gate_$(date +%s)"
 STATUS="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: operator" "$BASE_URL/status?tenant_id=$TID")"
 echo "$STATUS" | python3 -m json.tool
@@ -107,7 +108,25 @@ assert d.get("envelope_id"), o
 assert d.get("ok") is True, o
 PY
 
-echo "[gate 5/5] integrations smoke (uses configured integration tenant)"
+echo "[gate 5/6] integrations smoke (uses configured integration tenant)"
 BASE_URL="$BASE_URL" TENANT_ID="$INTEGRATION_TENANT_ID" ROLE="$INTEGRATION_ROLE" USER_ID="$GATE_USER_ID" bash scripts/smoke_integrations.sh
+
+
+echo "[gate 6/6] verify dev harness closed"
+close_dev_harness
+
+tries="${CURL_TRIES:-10}"
+delay="${CURL_DELAY_SECONDS:-2}"
+code=""
+for ((i=1; i<=tries; i++)); do
+  code="$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status?tenant_id=tenant_test_001" || true)"
+  if [[ "$code" == "403" ]]; then
+    echo "[gate] dev harness closed"
+    break
+  fi
+  echo "[gate] wait for harness close (got $code) ${i}/${tries}" 1>&2
+  sleep "$delay"
+done
+[[ "$code" == "403" ]] || die "dev harness did not close (got $code)"
 
 echo "gate_deploy_ok"
