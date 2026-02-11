@@ -3,12 +3,14 @@ import os
 
 from flask import Flask, jsonify, request
 
+from src.service.auth.claims import AuthError, VerifiedClaims, claims_from_request
+
 from src.service.ingress_runner import execute_ingress
 from src.service.tenant.errors import InvalidTenantPayload
 
 # Optional DB persistence (enabled via env var)
 try:
-    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, upsert_tenant, upsert_tenant
+    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, upsert_tenant
 except Exception:
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
@@ -64,6 +66,14 @@ def _require_dev_harness():
         return False, ({"ok": False, "error": "forbidden"}, 403)
     return True, None
 
+def _claims_or_denial():
+    """Return (claims, denial) where denial is a (payload, status) tuple."""
+    try:
+        return claims_from_request(request), None
+    except AuthError as e:
+        return None, ({"ok": False, "error": str(e)}, 403)
+
+
 def _persist_enabled() -> bool:
     return os.getenv("EXECALC_PERSIST_EXECUTIONS", "0").strip().lower() in ("1", "true", "yes", "on")
 
@@ -110,39 +120,29 @@ def _enforce_tenant_access(required_tenant_id: str):
     return True, None
 
 
-def _connector_ctx_from_body(body: dict) -> ConnectorContext:
-    hdr_tenant = request.headers.get("X-Tenant-Id")
-    if not hdr_tenant or not isinstance(hdr_tenant, str):
-        raise ValueError("X-Tenant-Id header is required")
+def _connector_ctx_from_body(body: dict, claims: VerifiedClaims) -> ConnectorContext:
+    """Build ConnectorContext from verified claims + sanitized request body."""
+    tenant_id = claims.tenant_id
+    if not tenant_id:
+        raise ValueError("tenant_id claim is required")
 
     body_tenant = body.get("tenant_id")
     if body_tenant is not None and not isinstance(body_tenant, str):
         raise ValueError("tenant_id must be a string")
+    if body_tenant and body_tenant != tenant_id:
+        raise ValueError("tenant_id mismatch (claims vs body)")
 
-    # If body includes tenant_id, it must match header.
-    if body_tenant and body_tenant != hdr_tenant:
-        raise ValueError("tenant_id mismatch (header vs body)")
-
-    tenant_id = hdr_tenant
-
-    actor_id = body.get("actor_id")
-
-    # Scopes are not accepted in the request body (caller-controlled).
-    # Use X-Scopes header in dev harness; in production this comes from verified auth claims.
-    if "scopes" in body:
-        raise ValueError("scopes must be provided via X-Scopes header")
-    if actor_id is not None and not isinstance(actor_id, str):
+    body_actor = body.get("actor_id")
+    if body_actor is not None and not isinstance(body_actor, str):
         raise ValueError("actor_id must be a string")
+    if body_actor and body_actor != claims.user_id:
+        raise ValueError("actor_id mismatch (claims vs body)")
 
-    # Scopes must NOT be caller-asserted in the request body.
-    # Dev harness: scopes supplied via X-Scopes header (comma-separated).
-    # Production: scopes derived from verified auth claims (JWT/IAP), not caller input.
-    scopes_hdr = request.headers.get("X-Scopes")
-    scopes = None
-    if scopes_hdr is not None and scopes_hdr.strip() != "":
-        scopes = [x.strip() for x in scopes_hdr.split(",") if x.strip()]
+    if "scopes" in body:
+        raise ValueError("scopes must not be provided in request body; use X-Scopes header")
 
-    return ConnectorContext(tenant_id=tenant_id, actor_id=actor_id, scopes=scopes)
+    return ConnectorContext(tenant_id=tenant_id, actor_id=claims.user_id, scopes=claims.scopes)
+
 
 
 def _require_credentials_or_error(connector_name: str, ctx: ConnectorContext):
@@ -184,16 +184,20 @@ def status():
     if not allowed:
         return denial
 
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+
     tenant_id = request.args.get("tenant_id") or "tenant_test_001"
     raw_input = {"tenant_id": tenant_id}
 
     try:
         record = execute_ingress(
             raw_input,
-            user_id="u1",
-            role="viewer",
+            user_id=claims.user_id,
+            role=claims.role,
             fn=lambda: {"status": "OK"},
-            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
+            resolved_tenant_id=claims.tenant_id,
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
@@ -217,15 +221,19 @@ def ingress():
     if not allowed:
         return denial
 
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+
     raw_input = request.get_json(silent=True) or {}
 
     try:
         record = execute_ingress(
             raw_input,
-            user_id="u1",
-            role="viewer",
+            user_id=claims.user_id,
+            role=claims.role,
             fn=lambda: {"received": True},
-            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
+            resolved_tenant_id=claims.tenant_id,
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
@@ -246,22 +254,25 @@ def ingress():
 @app.get("/integrations")
 def list_integrations():
     """
-    If X-Tenant-Id is provided, returns only connectors enabled for that tenant.
-    If X-Tenant-Id is NOT provided, requires X-Role: admin and returns all connectors (ops/diagnostics).
+    If tenant claim is present, returns only connectors enabled for that tenant.
+    If tenant claim is NOT present, requires role=admin and returns all connectors (ops/diagnostics).
     """
     allowed, denial = _require_dev_harness()
     if not allowed:
         return denial
 
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+
     available = list(_CONNECTOR_REGISTRY.list())
 
-    hdr_tenant = request.headers.get("X-Tenant-Id")
-    if hdr_tenant:
-        allowed, denial = _enforce_tenant_access(hdr_tenant)
-        if not allowed:
-            return denial
+    if claims.tenant_id:
+        if claims.role not in ("admin", "operator"):
+            return {"ok": False, "error": "forbidden"}, 403
+        tenant_id = claims.tenant_id
         try:
-            allowed_connectors = _CONNECTOR_POLICY.allowed_connectors(hdr_tenant, available)
+            allowed_connectors = _CONNECTOR_POLICY.allowed_connectors(tenant_id, available)
 
             credentials = {}
             credentials_error = None
@@ -271,8 +282,8 @@ def list_integrations():
             else:
                 for cname in allowed_connectors:
                     try:
-                        required = _CREDENTIAL_REQ_POLICY.requires_credentials(hdr_tenant, cname)
-                        st = _CREDENTIAL_STORE.status(hdr_tenant, cname)
+                        required = _CREDENTIAL_REQ_POLICY.requires_credentials(tenant_id, cname)
+                        st = _CREDENTIAL_STORE.status(tenant_id, cname)
                         credentials[cname] = {"configured": st.configured, "required": required}
                     except CredentialStoreError as e:
                         credentials_error = str(e)
@@ -286,8 +297,7 @@ def list_integrations():
         except ConnectorPolicyError as e:
             return {"ok": False, "error": str(e)}, 500
 
-    role = (request.headers.get("X-Role") or "").strip().lower()
-    if role != "admin":
+    if claims.role != "admin":
         return {"ok": False, "error": "forbidden"}, 403
 
     policy_summary = {
@@ -298,20 +308,23 @@ def list_integrations():
     }
     return {"ok": True, "connectors": available, "policy": policy_summary}
 
+
 @app.post("/integrations/<name>/healthcheck")
 def connector_healthcheck(name: str):
     allowed, denial = _require_dev_harness()
     if not allowed:
         return denial
 
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
     body = request.get_json(force=True, silent=False) or {}
 
     try:
-        ctx = _connector_ctx_from_body(body)
-
-        allowed, denial = _enforce_tenant_access(ctx.tenant_id)
-        if not allowed:
-            return denial
+        ctx = _connector_ctx_from_body(body, claims)
     except ValueError as e:
         return {"ok": False, "error": str(e)}, 400
 
@@ -341,14 +354,16 @@ def connector_fetch(name: str):
     if not allowed:
         return denial
 
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
     body = request.get_json(force=True, silent=False) or {}
 
     try:
-        ctx = _connector_ctx_from_body(body)
-
-        allowed, denial = _enforce_tenant_access(ctx.tenant_id)
-        if not allowed:
-            return denial
+        ctx = _connector_ctx_from_body(body, claims)
     except ValueError as e:
         return {"ok": False, "error": str(e)}, 400
 
@@ -376,26 +391,25 @@ def connector_fetch(name: str):
     return {"ok": True, "data": data}
 
 
-
-
 @app.get("/executions/<envelope_id>")
 def get_execution(envelope_id: str):
     """
     Tenant-scoped retrieval of an execution record.
-    Requires X-Tenant-Id header.
+    Requires tenant claim.
     """
-
     allowed, denial = _require_dev_harness()
     if not allowed:
         return denial
 
-    tenant_id = request.headers.get("X-Tenant-Id")
-    if not tenant_id or not isinstance(tenant_id, str):
-        return {"ok": False, "error": "X-Tenant-Id header is required"}, 400
-
-    allowed, denial = _enforce_tenant_access(tenant_id)
-    if not allowed:
+    claims, denial = _claims_or_denial()
+    if denial:
         return denial
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id claim is required"}, 400
+
+    tenant_id = claims.tenant_id
 
     if get_execution_record is None:
         return {"ok": False, "error": "db module not available"}, 500
@@ -416,13 +430,14 @@ def db_info():
     Dev/ops diagnostic endpoint.
     Reports whether DB persistence is enabled and what tables exist in the target DB.
     """
-
     allowed, denial = _require_dev_harness()
     if not allowed:
         return denial
 
-    role = (request.headers.get("X-Role") or "").strip().lower()
-    if role != "admin":
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if claims.role != "admin":
         return {"ok": False, "error": "forbidden"}, 403
 
     info = {
