@@ -10,9 +10,33 @@ PROJECT="${PROJECT:-execalc-core}"
 INTEGRATION_TENANT_ID="${INTEGRATION_TENANT_ID:-tenant_test_001}"
 INTEGRATION_ROLE="${INTEGRATION_ROLE:-operator}"
 
+GATE_USER_ID="${GATE_USER_ID:-gate}"
+
 die() { echo "ERROR: $*" 1>&2; exit 1; }
 
 curl_json() { curl -sSf "$@"; }
+
+
+curl_json_retry() {
+  local tries="${CURL_TRIES:-10}"
+  local delay="${CURL_DELAY_SECONDS:-2}"
+  local i
+  local out
+  local rc
+  for ((i=1; i<=tries; i++)); do
+    set +e
+    out="$(curl -sSf "$@")"
+    rc="$?"
+    set -e
+    if [[ "$rc" == "0" ]]; then
+      echo "$out"
+      return 0
+    fi
+    echo "[gate] retry ${i}/${tries} (curl rc=${rc})" 1>&2
+    sleep "$delay"
+  done
+  return 1
+}
 
 # Dev harness is deny-by-default in production. The deploy gate temporarily enables it
 # to exercise /status, /db-info, /executions, and integrations endpoints, then restores it.
@@ -38,7 +62,7 @@ BASE_URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --project
 echo "BASE_URL=$BASE_URL"
 
 echo "[gate 3/5] db-info (admin)"
-DBINFO="$(curl_json -H "X-Role: admin" "$BASE_URL/db-info")"
+DBINFO="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: admin" "$BASE_URL/db-info")"
 echo "$DBINFO" | python3 -m json.tool
 DBINFO="$DBINFO" python3 - <<'PY'
 import json, os
@@ -52,7 +76,7 @@ PY
 
 echo "[gate 4/5] status -> persisted -> executions fetch (tenant autocreate path)"
 TID="tenant_gate_$(date +%s)"
-STATUS="$(curl_json "$BASE_URL/status?tenant_id=$TID")"
+STATUS="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: operator" "$BASE_URL/status?tenant_id=$TID")"
 echo "$STATUS" | python3 -m json.tool
 
 EID="$(STATUS="$STATUS" python3 - <<'PY'
@@ -68,7 +92,7 @@ print(o["envelope_id"])
 PY
 )"
 
-EXEC="$(curl_json -H "X-Tenant-Id: $TID" -H "X-Role: operator" "$BASE_URL/executions/$EID")"
+EXEC="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Tenant-Id: $TID" -H "X-Role: operator" "$BASE_URL/executions/$EID")"
 echo "$EXEC" | python3 -m json.tool
 EXEC="$EXEC" python3 - <<'PY'
 import json, os
@@ -84,6 +108,6 @@ assert d.get("ok") is True, o
 PY
 
 echo "[gate 5/5] integrations smoke (uses configured integration tenant)"
-BASE_URL="$BASE_URL" TENANT_ID="$INTEGRATION_TENANT_ID" ROLE="$INTEGRATION_ROLE" bash scripts/smoke_integrations.sh
+BASE_URL="$BASE_URL" TENANT_ID="$INTEGRATION_TENANT_ID" ROLE="$INTEGRATION_ROLE" USER_ID="$GATE_USER_ID" bash scripts/smoke_integrations.sh
 
 echo "gate_deploy_ok"
