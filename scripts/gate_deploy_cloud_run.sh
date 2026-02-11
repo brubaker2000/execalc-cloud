@@ -14,11 +14,24 @@ die() { echo "ERROR: $*" 1>&2; exit 1; }
 
 curl_json() { curl -sSf "$@"; }
 
+# Dev harness is deny-by-default in production. The deploy gate temporarily enables it
+# to exercise /status, /db-info, /executions, and integrations endpoints, then restores it.
+DEV_HARNESS_CHANGED=0
+
+restore_dev_harness() {
+  if [[ "${DEV_HARNESS_CHANGED}" == "1" ]]; then
+    echo "[gate cleanup] restore EXECALC_DEV_HARNESS=0"
+    gcloud run services update "$SERVICE" --region "$REGION" --project "$PROJECT"       --update-env-vars EXECALC_DEV_HARNESS=0 --quiet >/dev/null 2>&1 || true
+  fi
+}
+trap restore_dev_harness EXIT
+
 echo "[gate 1/5] predeploy (compile + tests)"
 ./scripts/gate_predeploy.sh
 
 echo "[gate 2/5] deploy Cloud Run"
-gcloud run deploy "$SERVICE" --source . --region "$REGION" --project "$PROJECT" --quiet
+gcloud run deploy "$SERVICE" --source . --region "$REGION" --project "$PROJECT" --update-env-vars EXECALC_DEV_HARNESS=1 --quiet
+  DEV_HARNESS_CHANGED=1
 
 BASE_URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format='value(status.url)')"
 [[ -n "$BASE_URL" ]] || die "could not resolve service URL after deploy"
