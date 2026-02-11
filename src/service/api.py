@@ -53,6 +53,17 @@ except Exception as e:
     _CREDENTIAL_REQ_POLICY_ERROR = f"unexpected_error: {e}"
 
 
+
+
+def _dev_harness_enabled() -> bool:
+    return os.getenv("EXECALC_DEV_HARNESS", "0").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _require_dev_harness():
+    if not _dev_harness_enabled():
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+    return True, None
+
 def _persist_enabled() -> bool:
     return os.getenv("EXECALC_PERSIST_EXECUTIONS", "0").strip().lower() in ("1", "true", "yes", "on")
 
@@ -169,6 +180,10 @@ def _require_credentials_or_error(connector_name: str, ctx: ConnectorContext):
 def status():
     logging.info("Received status request")
 
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     tenant_id = request.args.get("tenant_id") or "tenant_test_001"
     raw_input = {"tenant_id": tenant_id}
 
@@ -178,6 +193,7 @@ def status():
             user_id="u1",
             role="viewer",
             fn=lambda: {"status": "OK"},
+            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
@@ -197,6 +213,10 @@ def status():
 
 @app.route("/ingress", methods=["POST"])
 def ingress():
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     raw_input = request.get_json(silent=True) or {}
 
     try:
@@ -205,6 +225,7 @@ def ingress():
             user_id="u1",
             role="viewer",
             fn=lambda: {"received": True},
+            resolved_tenant_id=request.headers.get("X-Tenant-Id"),
         )
     except InvalidTenantPayload as e:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": str(e)}), 400
@@ -228,6 +249,10 @@ def list_integrations():
     If X-Tenant-Id is provided, returns only connectors enabled for that tenant.
     If X-Tenant-Id is NOT provided, requires X-Role: admin and returns all connectors (ops/diagnostics).
     """
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     available = list(_CONNECTOR_REGISTRY.list())
 
     hdr_tenant = request.headers.get("X-Tenant-Id")
@@ -275,6 +300,10 @@ def list_integrations():
 
 @app.post("/integrations/<name>/healthcheck")
 def connector_healthcheck(name: str):
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     body = request.get_json(force=True, silent=False) or {}
 
     try:
@@ -308,6 +337,10 @@ def connector_healthcheck(name: str):
 
 @app.post("/integrations/<name>/fetch")
 def connector_fetch(name: str):
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     body = request.get_json(force=True, silent=False) or {}
 
     try:
@@ -351,6 +384,11 @@ def get_execution(envelope_id: str):
     Tenant-scoped retrieval of an execution record.
     Requires X-Tenant-Id header.
     """
+
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     tenant_id = request.headers.get("X-Tenant-Id")
     if not tenant_id or not isinstance(tenant_id, str):
         return {"ok": False, "error": "X-Tenant-Id header is required"}, 400
@@ -378,6 +416,11 @@ def db_info():
     Dev/ops diagnostic endpoint.
     Reports whether DB persistence is enabled and what tables exist in the target DB.
     """
+
+    allowed, denial = _require_dev_harness()
+    if not allowed:
+        return denial
+
     role = (request.headers.get("X-Role") or "").strip().lower()
     if role != "admin":
         return {"ok": False, "error": "forbidden"}, 403

@@ -31,6 +31,7 @@ def execute_ingress(
     kwargs: Optional[Dict[str, Any]] = None,
     tenant_name: Optional[str] = None,
     envelope_id: Optional[str] = None,
+    resolved_tenant_id: Optional[str] = None,
 ) -> ExecutionRecord:
     """
     Execute a tenant-scoped callable from external input in a canonical way.
@@ -42,9 +43,24 @@ def execute_ingress(
     """
     if not isinstance(raw_input, dict):
         raise InvalidTenantPayload("raw_input must be a dict.")
-    tenant_id = raw_input.get("tenant_id")
+
+    input_tenant_id = raw_input.get("tenant_id")
+    if input_tenant_id is not None and not isinstance(input_tenant_id, str):
+        raise InvalidTenantPayload("tenant_id must be a string.")
+
+    # Trusted tenant binding wins (production: verified claims; dev harness: gated headers).
+    tenant_id = resolved_tenant_id or input_tenant_id
     if not tenant_id:
         raise InvalidTenantPayload("Missing tenant_id at ingress.")
+
+    # If both are present, they must match.
+    if resolved_tenant_id and input_tenant_id and input_tenant_id != resolved_tenant_id:
+        raise InvalidTenantPayload("tenant_id mismatch (resolved vs payload).")
+
+    # Ensure downstream always sees tenant_id in the envelope dict.
+    if resolved_tenant_id and not input_tenant_id:
+        raw_input = dict(raw_input)
+        raw_input["tenant_id"] = resolved_tenant_id
 
     args = args or ()
     kwargs = kwargs or {}

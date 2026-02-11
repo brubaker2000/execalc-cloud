@@ -32,3 +32,16 @@ class TestIngressClearsTenantContext(unittest.TestCase):
         # Verify result payload shape
         self.assertTrue(record.result.get("ok"))
         self.assertEqual(record.result.get("data"), {"status": "OK"})
+
+
+    def test_execute_ingress_rejects_payload_tenant_mismatch(self):
+        # resolved tenant is authoritative; payload must match if provided
+        with self.assertRaises(Exception) as ctx:
+            execute_ingress(
+                {"tenant_id": "tenant_payload_001"},
+                user_id="u1",
+                role="viewer",
+                fn=lambda: {"status": "OK"},
+                resolved_tenant_id="tenant_resolved_999",
+            )
+        self.assertIn("tenant_id mismatch", str(ctx.exception))
