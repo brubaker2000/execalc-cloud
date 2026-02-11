@@ -28,6 +28,7 @@ def test_scopes_from_header_allows(monkeypatch):
         "/integrations/echo/healthcheck",
         json={"actor_id": "u1"},
         headers={
+            "X-User-Id": "u1",
             "X-Tenant-Id": "tenant_test_001",
             "X-Role": "operator",
             "X-Scopes": "echo.readonly",
@@ -48,6 +49,7 @@ def test_scopes_in_body_is_rejected(monkeypatch):
         "/integrations/echo/healthcheck",
         json={"actor_id": "u1", "scopes": ["echo.readonly"]},
         headers={
+            "X-User-Id": "u1",
             "X-Tenant-Id": "tenant_test_001",
             "X-Role": "operator",
         },
@@ -67,6 +69,7 @@ def test_missing_scope_still_denied(monkeypatch):
         "/integrations/echo/healthcheck",
         json={"actor_id": "u1"},
         headers={
+            "X-User-Id": "u1",
             "X-Tenant-Id": "tenant_test_001",
             "X-Role": "operator",
         },
