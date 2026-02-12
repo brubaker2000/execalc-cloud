@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from typing import Dict, Any, Optional
 
 from src.service.tenant.injector import inject_tenant_context
+from src.service.tenant.registry import ensure_tenant_registered
 from src.service.tenant.actor_context import set_actor_context, clear_actor_context
 from src.service.tenant.context import clear_tenant_context
 
@@ -28,6 +29,7 @@ def request_context(
     """
     try:
         inject_tenant_context(envelope)
+        ensure_tenant_registered(envelope["tenant_id"])
         set_actor_context(user_id=user_id, role=role, metadata=metadata)
         yield
     finally:
