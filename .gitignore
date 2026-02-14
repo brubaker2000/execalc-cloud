@@ -18,3 +18,4 @@ scratch/
 **/tenants.db
 **/tenant.db
 logs/
+.venv/

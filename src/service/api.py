@@ -7,6 +7,7 @@ from src.service.auth.claims import AuthError, VerifiedClaims, claims_from_reque
 
 from src.service.ingress_runner import execute_ingress
 from src.service.tenant.errors import InvalidTenantPayload
+from src.service.tenant.registry import ensure_tenant_registered, enforcement_enabled
 
 # Optional DB persistence (enabled via env var)
 try:
@@ -89,14 +90,20 @@ def _persist_execution(record) -> dict:
         return {"persisted": False, "persist_table": "execution_records", "persist_error": "db module not available"}
 
     try:
-        # Ensure tenant exists to satisfy FK before writing execution_records.
-        upsert_tenant(tenant_id=record.tenant_id, tenant_name=record.tenant_id)
+        # If canonical tenant registry enforcement is enabled, persistence must not create tenants.
+        if enforcement_enabled():
+            ensure_tenant_registered(record.tenant_id)
+        else:
+            # Enforcement disabled: best-effort ensure tenant exists to satisfy FK.
+            upsert_tenant(tenant_id=record.tenant_id, tenant_name=record.tenant_id)
+
         insert_execution_record(
             tenant_id=record.tenant_id,
             envelope_id=record.envelope_id,
             result=record.result,
         )
         return {"persisted": True, "persist_table": "execution_records"}
+
     except Exception as e:
         logging.exception("Failed to persist execution record")
         return {"persisted": False, "persist_table": "execution_records", "persist_error": str(e)}
