@@ -184,6 +184,36 @@ def _require_credentials_or_error(connector_name: str, ctx: ConnectorContext):
     return None
 
 
+
+@app.get("/healthz")
+def healthz():
+    """
+    Production-safe liveness endpoint.
+    - No auth
+    - No tenant context
+    - No persistence
+    """
+    return jsonify({"ok": True, "service": "execalc-api"}), 200
+
+
+@app.get("/readyz")
+def readyz():
+    """
+    Production-safe readiness endpoint.
+    - No auth
+    - No tenant context
+    - If persistence is enabled, verify DB connectivity.
+    """
+    if _persist_enabled() and get_conn is not None:
+        try:
+            conn = get_conn()
+            conn.close()
+        except Exception as e:
+            return jsonify({"ok": False, "error": "db_unavailable", "detail": str(e)}), 503
+
+    return jsonify({"ok": True, "ready": True}), 200
+
+
 @app.route("/status", methods=["GET"])
 def status():
     logging.info("Received status request")
