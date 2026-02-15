@@ -16,6 +16,7 @@ except Exception:
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
     get_execution_record = None  # type: ignore
+    upsert_tenant = None  # type: ignore
 
 # Integrations
 from src.service.integrations.bootstrap import default_registry
