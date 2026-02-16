@@ -21,7 +21,7 @@
   - Service: execalc-api
   - Project: execalc-core
   - Region: us-east1
-  - Revision deployed: execalc-api-00063-9vr
+  - Revision deployed: execalc-api-00076-tsl
 - DB:
   - persist_enabled: true
   - tables: execution_records, tenants
@@ -35,3 +35,11 @@
 1) Tranche 2: Tenant Persistence Service (full lifecycle + fail-closed tenant validation)
 2) Ship Track: Login boundary for Cloud Run (IAP or equivalent) without weakening tenant isolation
 3) Repo Truth Kit expansion: ADRs + TRUE_NORTH page + one-command Makefile targets
+
+## Deploy Record — 2026-02-15 (America/New_York)
+- Service: execalc-api
+- Region: us-east1
+- Project: execalc-core
+- Latest ready revision: execalc-api-00076-tsl
+- Traffic: 100% -> execalc-api-00076-tsl
+- URL: https://execalc-api-7f42ijydqa-ue.a.run.app
