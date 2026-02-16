@@ -5,7 +5,7 @@ Tranche: 2 — Tenant Lifecycle & Isolation Authority
 Subphase: Enforcement hardening
 
 ## Last Verified Gate
-Revision: execalc-api-00080-s6t
+Revision: execalc-api-00082-s5s
 Gate Script: PASS
 Dev Harness: Closed
 Tenant Registry Enforcement: Enabled
