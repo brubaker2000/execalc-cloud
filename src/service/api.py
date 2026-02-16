@@ -1,5 +1,6 @@
 import logging
 import os
+import secrets
 
 from flask import Flask, jsonify, request
 
@@ -67,6 +68,31 @@ def _require_dev_harness():
     if not _dev_harness_enabled():
         return False, ({"ok": False, "error": "forbidden"}, 403)
     return True, None
+
+def _api_key_configured() -> bool:
+    v = os.getenv("EXECALC_API_KEY", "").strip()
+    return bool(v)
+
+
+def _require_api_key_or_dev_harness():
+    """
+    Production gate:
+      - If dev harness enabled: allow (dev/test only)
+      - Else: require X-Api-Key header to match EXECALC_API_KEY (from Secret Manager env)
+    """
+    if _dev_harness_enabled():
+        return True, None
+
+    expected = os.getenv("EXECALC_API_KEY", "").strip()
+    if not expected:
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+
+    provided = (request.headers.get("X-Api-Key") or "").strip()
+    if not provided or not secrets.compare_digest(provided, expected):
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+
+    return True, None
+
 
 def _claims_or_denial():
     """Return (claims, denial) where denial is a (payload, status) tuple."""
@@ -270,15 +296,26 @@ def status():
 
 @app.route("/ingress", methods=["POST"])
 def ingress():
-    allowed, denial = _require_dev_harness()
+    # Production: require API key (or dev harness).
+    allowed, denial = _require_api_key_or_dev_harness()
     if not allowed:
         return denial
 
-    claims, denial = _claims_or_denial()
-    if denial:
-        return denial
-
     raw_input = request.get_json(silent=True) or {}
+
+    # Dev harness path (headers -> claims) remains supported for local/test.
+    if _dev_harness_enabled():
+        claims, denial = _claims_or_denial()
+        if denial:
+            return denial
+    else:
+        # Production API-key path: derive minimal verified claims.
+        tenant_id = raw_input.get('tenant_id')
+        if tenant_id is not None and not isinstance(tenant_id, str):
+            return jsonify({'ok': False, 'error_type': 'InvalidTenantPayload', 'error': 'tenant_id must be a string'}), 400
+        if not tenant_id:
+            return jsonify({'ok': False, 'error_type': 'InvalidTenantPayload', 'error': 'tenant_id is required'}), 400
+        claims = VerifiedClaims(user_id='api_key', role='operator', tenant_id=tenant_id, scopes=None)
 
     try:
         record = execute_ingress(
