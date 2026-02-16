@@ -40,6 +40,10 @@
 - Service: execalc-api
 - Region: us-east1
 - Project: execalc-core
-- Latest ready revision: execalc-api-00076-tsl
-- Traffic: 100% -> execalc-api-00076-tsl
+- Latest ready revision: execalc-api-00079-hnt
+- Traffic: 100% -> execalc-api-00079-hnt
 - URL: https://execalc-api-7f42ijydqa-ue.a.run.app
+- Security:
+  - Dev harness: EXECALC_DEV_HARNESS=0 (prod-locked)
+  - Ingress: requires X-Api-Key (403 without; 200 with)
+  - Status: /status remains closed (403)
