@@ -196,6 +196,17 @@ def healthz():
     return jsonify({"ok": True, "service": "execalc-api"}), 200
 
 
+
+@app.get("/livez")
+def livez():
+    """
+    Production-safe liveness endpoint (Cloud Run friendly).
+    - No auth
+    - No tenant context
+    - No persistence
+    """
+    return jsonify({"ok": True, "service": "execalc-api"}), 200
+
 @app.get("/readyz")
 def readyz():
     """
