@@ -21,7 +21,7 @@
   - Service: execalc-api
   - Project: execalc-core
   - Region: us-east1
-  - Revision deployed: execalc-api-00079-hnt
+  - Revision deployed: execalc-api-00080-s6t
 - DB:
   - persist_enabled: true
   - tables: execution_records, tenants
@@ -40,8 +40,8 @@
 - Service: execalc-api
 - Region: us-east1
 - Project: execalc-core
-- Latest ready revision: execalc-api-00079-hnt
-- Traffic: 100% -> execalc-api-00079-hnt
+- Latest ready revision: execalc-api-00080-s6t
+- Traffic: 100% -> execalc-api-00080-s6t
 - URL: https://execalc-api-7f42ijydqa-ue.a.run.app
 - Security:
   - Dev harness: EXECALC_DEV_HARNESS=0 (prod-locked)
