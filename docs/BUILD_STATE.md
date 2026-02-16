@@ -16,12 +16,12 @@
 
 ## Last Verified Gate Run
 - Gate: scripts/gate_deploy_cloud_run.sh → PASS (gate_deploy_ok)
-- Tests: 20 passed
+- Tests: 71 passed
 - Cloud Run:
   - Service: execalc-api
   - Project: execalc-core
   - Region: us-east1
-  - Revision deployed: execalc-api-00076-tsl
+  - Revision deployed: execalc-api-00079-hnt
 - DB:
   - persist_enabled: true
   - tables: execution_records, tenants
