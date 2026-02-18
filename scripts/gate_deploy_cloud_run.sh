@@ -87,7 +87,7 @@ ING="$ING" python3 - <<'PY'
 import json, os
 o = json.loads(os.environ["ING"])
 assert o.get("ok") is True, o
-assert o.get("received") is True, o
+assert (o.get("data") or {}).get("received") is True, o
 assert o.get("tenant_id"), o
 assert o.get("envelope_id"), o
 PY
