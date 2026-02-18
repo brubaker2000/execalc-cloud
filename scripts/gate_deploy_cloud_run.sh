@@ -80,7 +80,7 @@ echo "$ENVLIST" | grep -q "EXECALC_API_KEY" || die "EXECALC_API_KEY not configur
 echo "[gate 5/6] production ingress (API key path)"
 API_KEY="$(gcloud secrets versions access latest --secret=execalc-api-key --project "$PROJECT")"
 [[ -n "$API_KEY" ]] || die "could not read execalc-api-key secret"
-TID="tenant_gate_$(date +%s)"
+TID="tenant_test_001"
 ING="$(curl_json_retry -H "X-Api-Key: $API_KEY" -H "Content-Type: application/json" -d "{\"tenant_id\":\"$TID\",\"message\":\"ping\"}" "$BASE_URL/ingress")"
 echo "$ING" | python3 -m json.tool
 ING="$ING" python3 - <<'PY'
