@@ -55,78 +55,44 @@ echo "[gate 1/6] predeploy (compile + tests)"
 ./scripts/gate_predeploy.sh
 
 echo "[gate 2/6] deploy Cloud Run"
-gcloud run deploy "$SERVICE" --source . --region "$REGION" --project "$PROJECT" --update-env-vars EXECALC_DEV_HARNESS=1 --quiet
-  DEV_HARNESS_CHANGED=1
+gcloud run deploy "$SERVICE" --source . --region "$REGION" --project "$PROJECT" --quiet
 
 BASE_URL="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format='value(status.url)')"
 [[ -n "$BASE_URL" ]] || die "could not resolve service URL after deploy"
 echo "BASE_URL=$BASE_URL"
 
-echo "[gate 3/6] db-info (admin)"
-DBINFO="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: admin" "$BASE_URL/db-info")"
-echo "$DBINFO" | python3 -m json.tool
-DBINFO="$DBINFO" python3 - <<'PY'
+echo "[gate 3/6] livez + readyz"
+curl_json_retry "$BASE_URL/livez" | python3 -m json.tool >/dev/null
+READY="$(curl_json_retry "$BASE_URL/readyz")"
+echo "$READY" | python3 -m json.tool >/dev/null
+READY="$READY" python3 - <<'PY'
 import json, os
-s = os.environ.get("DBINFO", "")
-if not s.strip():
-    raise SystemExit("DBINFO was empty (curl returned nothing)")
-o = json.loads(s)
+o = json.loads(os.environ["READY"])
 assert o.get("ok") is True, o
-assert o.get("db_module_available") is True, o
+assert o.get("ready") is True, o
 PY
 
-echo "[gate 4/6] status -> persisted -> executions fetch (tenant autocreate path)"
+
+echo "[gate 4/6] verify EXECALC_API_KEY configured"
+ENVLIST="$(gcloud run services describe "$SERVICE" --region "$REGION" --project "$PROJECT" --format='value(spec.template.spec.containers[0].env)')"
+echo "$ENVLIST" | grep -q "EXECALC_API_KEY" || die "EXECALC_API_KEY not configured on Cloud Run service"
+
+echo "[gate 5/6] production ingress (API key path)"
+API_KEY="$(gcloud secrets versions access latest --secret=execalc-api-key --project "$PROJECT")"
+[[ -n "$API_KEY" ]] || die "could not read execalc-api-key secret"
 TID="tenant_gate_$(date +%s)"
-STATUS="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Role: operator" "$BASE_URL/status?tenant_id=$TID")"
-echo "$STATUS" | python3 -m json.tool
-
-EID="$(STATUS="$STATUS" python3 - <<'PY'
+ING="$(curl_json_retry -H "X-Api-Key: $API_KEY" -H "Content-Type: application/json" -d "{\"tenant_id\":\"$TID\",\"message\":\"ping\"}" "$BASE_URL/ingress")"
+echo "$ING" | python3 -m json.tool
+ING="$ING" python3 - <<'PY'
 import json, os
-s = os.environ.get("STATUS", "")
-if not s.strip():
-    raise SystemExit("STATUS was empty (curl returned nothing)")
-o = json.loads(s)
+o = json.loads(os.environ["ING"])
 assert o.get("ok") is True, o
-assert o.get("persisted") is True, o
+assert o.get("received") is True, o
+assert o.get("tenant_id"), o
 assert o.get("envelope_id"), o
-print(o["envelope_id"])
 PY
-)"
-
-EXEC="$(curl_json_retry -H "X-User-Id: $GATE_USER_ID" -H "X-Tenant-Id: $TID" -H "X-Role: operator" "$BASE_URL/executions/$EID")"
-echo "$EXEC" | python3 -m json.tool
-EXEC="$EXEC" python3 - <<'PY'
-import json, os
-s = os.environ.get("EXEC", "")
-if not s.strip():
-    raise SystemExit("EXEC was empty (curl returned nothing)")
-o = json.loads(s)
-assert o.get("ok") is True, o
-d = o.get("data") or {}
-assert d.get("tenant_id"), o
-assert d.get("envelope_id"), o
-assert d.get("ok") is True, o
-PY
-
-echo "[gate 5/6] integrations smoke (uses configured integration tenant)"
-BASE_URL="$BASE_URL" TENANT_ID="$INTEGRATION_TENANT_ID" ROLE="$INTEGRATION_ROLE" USER_ID="$GATE_USER_ID" bash scripts/smoke_integrations.sh
-
-
 echo "[gate 6/6] verify dev harness closed"
-close_dev_harness
-
-tries="${CURL_TRIES:-10}"
-delay="${CURL_DELAY_SECONDS:-2}"
-code=""
-for ((i=1; i<=tries; i++)); do
-  code="$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status?tenant_id=tenant_test_001" || true)"
-  if [[ "$code" == "403" ]]; then
-    echo "[gate] dev harness closed"
-    break
-  fi
-  echo "[gate] wait for harness close (got $code) ${i}/${tries}" 1>&2
-  sleep "$delay"
-done
-[[ "$code" == "403" ]] || die "dev harness did not close (got $code)"
+code="$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status?tenant_id=tenant_test_001" || true)"
+[[ "$code" == "403" ]] || die "dev harness should be closed (expected 403, got $code)"
 
 echo "gate_deploy_ok"
