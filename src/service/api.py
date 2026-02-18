@@ -30,6 +30,13 @@ from src.service.integrations.registry import ConnectorRegistryError
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
+# Safety invariant: never allow dev harness to run on Cloud Run.
+# Cloud Run sets K_SERVICE for the service name.
+if os.getenv("K_SERVICE"):
+    v = os.getenv("EXECALC_DEV_HARNESS", "0").strip().lower()
+    if v in ("1", "true", "yes", "on"):
+        raise RuntimeError("EXECALC_DEV_HARNESS must be disabled on Cloud Run")
+
 _CONNECTOR_REGISTRY = default_registry()
 _CONNECTOR_POLICY = ConnectorPolicy.from_env()
 
