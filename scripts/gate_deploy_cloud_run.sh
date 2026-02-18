@@ -38,18 +38,6 @@ curl_json_retry() {
   return 1
 }
 
-# Dev harness is deny-by-default in production. The deploy gate temporarily enables it
-# to exercise /status, /db-info, /executions, and integrations endpoints, then restores it.
-DEV_HARNESS_CHANGED=0
-
-close_dev_harness() {
-  if [[ "${DEV_HARNESS_CHANGED}" == "1" ]]; then
-    echo "[gate cleanup] restore EXECALC_DEV_HARNESS=0"
-    gcloud run services update "$SERVICE" --region "$REGION" --project "$PROJECT"       --update-env-vars EXECALC_DEV_HARNESS=0 --quiet >/dev/null 2>&1 || true
-      DEV_HARNESS_CHANGED=0
-  fi
-}
-trap close_dev_harness EXIT
 
 echo "[gate 1/6] predeploy (compile + tests)"
 ./scripts/gate_predeploy.sh
@@ -91,7 +79,7 @@ assert (o.get("data") or {}).get("received") is True, o
 assert o.get("tenant_id"), o
 assert o.get("envelope_id"), o
 PY
-echo "[gate 6/6] verify dev harness closed"
+echo "[gate 6/6] verify /status forbidden (dev harness off)"
 code="$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/status?tenant_id=tenant_test_001" || true)"
 [[ "$code" == "403" ]] || die "dev harness should be closed (expected 403, got $code)"
 
