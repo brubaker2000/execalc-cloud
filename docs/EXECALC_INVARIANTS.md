@@ -1,5 +1,9 @@
 # Execalc Invariants (Non-Negotiable Build Contracts)
 
+## Invariants (True North)
+All cloud build decisions must conform to the binding architectural invariants:
+- `docs/invariants/README.md`
+
 This document is the source of truth for Execalc's true north. If code behavior conflicts with any invariant below, the code is wrong and must be corrected.
 
 ## 1) Product Purpose (North Star)

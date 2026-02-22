@@ -1,5 +1,9 @@
 # Execalc Cloud v1 — Governance Invariants
 
+## Invariants (True North)
+All cloud build decisions must conform to the binding architectural invariants:
+- `docs/invariants/README.md`
+
 This document defines the non-negotiable governance constraints for Execalc Cloud Version 1.
 All implementation, infrastructure, and feature decisions must conform to these invariants.
 
