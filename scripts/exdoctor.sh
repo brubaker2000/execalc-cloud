@@ -12,6 +12,13 @@ python3 --version || true
 echo "[exdoctor] git:"
 git --version || true
 
+echo "[exdoctor] ripgrep (rg):"
+if command -v rg >/dev/null 2>&1; then
+  rg --version | head -n 1
+else
+  echo "rg_missing"
+fi
+
 echo "[exdoctor] gcloud:"
 if command -v gcloud >/dev/null 2>&1; then
   echo "gcloud_ok"
