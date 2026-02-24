@@ -24,19 +24,19 @@ jobs:
 
       - name: Validate required variables
         env:
-          SERVICE_URL: ${{ vars.EXECALC_SERVICE_URL }}
+          BASE_URL: ${{ vars.EXECALC_SERVICE_URL }}
           TENANT_ID: ${{ vars.EXECALC_SMOKE_TENANT_ID }}
           ROLE: ${{ vars.EXECALC_SMOKE_ROLE }}
         run: |
           set -euo pipefail
-          if [ -z "${SERVICE_URL:-}" ]; then echo "Missing repo variable: EXECALC_SERVICE_URL"; exit 1; fi
+          if [ -z "${BASE_URL:-}" ]; then echo "Missing repo variable: EXECALC_SERVICE_URL"; exit 1; fi
           if [ -z "${TENANT_ID:-}" ]; then echo "Missing repo variable: EXECALC_SMOKE_TENANT_ID"; exit 1; fi
           if [ -z "${ROLE:-}" ]; then echo "Missing repo variable: EXECALC_SMOKE_ROLE"; exit 1; fi
           echo "Smoke vars present."
 
       - name: Run integrations smoke test (Cloud Run)
         env:
-          SERVICE_URL: ${{ vars.EXECALC_SERVICE_URL }}
+          BASE_URL: ${{ vars.EXECALC_SERVICE_URL }}
           TENANT_ID: ${{ vars.EXECALC_SMOKE_TENANT_ID }}
           ROLE: ${{ vars.EXECALC_SMOKE_ROLE }}
         run: |
