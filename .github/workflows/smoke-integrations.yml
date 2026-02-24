@@ -27,11 +27,13 @@ jobs:
           BASE_URL: ${{ vars.EXECALC_SERVICE_URL }}
           TENANT_ID: ${{ vars.EXECALC_SMOKE_TENANT_ID }}
           ROLE: ${{ vars.EXECALC_SMOKE_ROLE }}
+          SMOKE_KEY: ${{ secrets.EXECALC_SMOKE_KEY }}
         run: |
           set -euo pipefail
           if [ -z "${BASE_URL:-}" ]; then echo "Missing repo variable: EXECALC_SERVICE_URL"; exit 1; fi
           if [ -z "${TENANT_ID:-}" ]; then echo "Missing repo variable: EXECALC_SMOKE_TENANT_ID"; exit 1; fi
           if [ -z "${ROLE:-}" ]; then echo "Missing repo variable: EXECALC_SMOKE_ROLE"; exit 1; fi
+          if [ -z "${SMOKE_KEY:-}" ]; then echo "Missing repo secret: EXECALC_SMOKE_KEY"; exit 1; fi
           echo "Smoke vars present."
 
       - name: Run integrations smoke test (Cloud Run)
@@ -39,6 +41,7 @@ jobs:
           BASE_URL: ${{ vars.EXECALC_SERVICE_URL }}
           TENANT_ID: ${{ vars.EXECALC_SMOKE_TENANT_ID }}
           ROLE: ${{ vars.EXECALC_SMOKE_ROLE }}
+          SMOKE_KEY: ${{ secrets.EXECALC_SMOKE_KEY }}
         run: |
           chmod +x scripts/smoke_integrations.sh
           ./scripts/smoke_integrations.sh

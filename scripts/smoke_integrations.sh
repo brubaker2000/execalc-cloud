@@ -5,12 +5,14 @@ BASE_URL="${BASE_URL:?BASE_URL is required}"
 TENANT_ID="${TENANT_ID:-tenant_test_001}"
 ROLE="${ROLE:-operator}"
 USER_ID="${USER_ID:-u1}"
+SMOKE_KEY="${SMOKE_KEY:?SMOKE_KEY is required}"
 
 echo "[1/4] list integrations (tenant-scoped)"
 LIST="$(curl -sS \
   -H "X-User-Id: $USER_ID" \
   -H "X-Tenant-Id: $TENANT_ID" \
   -H "X-Role: $ROLE" \
+  -H "X-Smoke-Key: $SMOKE_KEY" \
   "$BASE_URL/integrations")"
 echo "$LIST" | python3 -m json.tool
 LIST="$LIST" python3 - <<'PY'
@@ -26,6 +28,7 @@ NO_SCOPE="$(curl -sS \
   -H "X-User-Id: $USER_ID" \
   -H "X-Tenant-Id: $TENANT_ID" \
   -H "X-Role: $ROLE" \
+  -H "X-Smoke-Key: $SMOKE_KEY" \
   -d "{\"actor_id\":\"$USER_ID\"}" \
   "$BASE_URL/integrations/echo/healthcheck")"
 echo "$NO_SCOPE" | python3 -m json.tool
@@ -43,6 +46,7 @@ YES_SCOPE="$(curl -sS \
   -H "X-User-Id: $USER_ID" \
   -H "X-Tenant-Id: $TENANT_ID" \
   -H "X-Role: $ROLE" \
+  -H "X-Smoke-Key: $SMOKE_KEY" \
   -H "X-Scopes: echo.readonly" \
   -d "{\"actor_id\":\"$USER_ID\"}" \
   "$BASE_URL/integrations/echo/healthcheck")"
@@ -59,6 +63,7 @@ FETCH="$(curl -sS \
   -H "X-User-Id: $USER_ID" \
   -H "X-Tenant-Id: $TENANT_ID" \
   -H "X-Role: $ROLE" \
+  -H "X-Smoke-Key: $SMOKE_KEY" \
   -H "X-Scopes: echo.readonly" \
   -d '{"actor_id":"'"$USER_ID"'","query":{"n":1,"ping":"pong"}}' \
   "$BASE_URL/integrations/echo/fetch")"
