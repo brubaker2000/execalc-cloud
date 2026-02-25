@@ -71,7 +71,7 @@ def _dev_harness_enabled() -> bool:
     return os.getenv("EXECALC_DEV_HARNESS", "0").strip().lower() in ("1", "true", "yes", "on")
 
 
-def _require_dev_harness():
+def _require_dev_harness_or_smoke_harness():
     if not _dev_harness_enabled():
         return False, ({"ok": False, "error": "forbidden"}, 403)
     return True, None
@@ -262,7 +262,7 @@ def readyz():
 def status():
     logging.info("Received status request")
 
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
@@ -354,7 +354,7 @@ def list_integrations():
     If tenant claim is present, returns only connectors enabled for that tenant.
     If tenant claim is NOT present, requires role=admin and returns all connectors (ops/diagnostics).
     """
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
@@ -408,7 +408,7 @@ def list_integrations():
 
 @app.post("/integrations/<name>/healthcheck")
 def connector_healthcheck(name: str):
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
@@ -447,7 +447,7 @@ def connector_healthcheck(name: str):
 
 @app.post("/integrations/<name>/fetch")
 def connector_fetch(name: str):
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
@@ -494,7 +494,7 @@ def get_execution(envelope_id: str):
     Tenant-scoped retrieval of an execution record.
     Requires tenant claim.
     """
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
@@ -527,7 +527,7 @@ def db_info():
     Dev/ops diagnostic endpoint.
     Reports whether DB persistence is enabled and what tables exist in the target DB.
     """
-    allowed, denial = _require_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
