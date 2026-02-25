@@ -30,10 +30,10 @@
 /pytest.ini @brubaker2000
 
 # Runtime enforcement (tenant + auth + ingress)
-#/src/service/auth/** @brubaker2000
-#/src/service/tenant/** @brubaker2000
-#/src/service/ingress_runner.py @brubaker2000
-#/src/service/api.py @brubaker2000
+/src/service/auth/** @brubaker2000
+/src/service/tenant/** @brubaker2000
+/src/service/ingress_runner.py @brubaker2000
+/src/service/api.py @brubaker2000
 
 # NOTE:
 # The src/ paths above are commented out initially to avoid over-blocking while we confirm exact layout.
