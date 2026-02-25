@@ -1,4 +1,4 @@
-name: Tenant Kernel Unit Tests
+name: Python - Tenant Unit Tests
 
 on:
   push:
