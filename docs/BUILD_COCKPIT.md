@@ -38,6 +38,8 @@ These must remain true after every change:
 
 Practical checks:
 - find . -name "*.db" -o -name "__pycache__" -o -name "*.pyc" | head
+- git ls-files "*.db" || true
+- git ls-files "*.db" || true
 - git check-ignore -v src/service/tenant/tenants.db
 
 ## Change Discipline Loop (Repeat Per Change)
