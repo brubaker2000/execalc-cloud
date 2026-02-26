@@ -1,3 +1,6 @@
+## Permanent Protocols
+- Editor-only development (no terminal editors): see `docs/EDITOR_ONLY_DEV_PROTOCOL.md`.
+
 # Stage Map (Pointer)
 
 Canonical stage map lives here:
