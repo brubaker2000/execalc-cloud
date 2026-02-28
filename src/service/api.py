@@ -72,8 +72,23 @@ def _dev_harness_enabled() -> bool:
 
 
 def _require_dev_harness_or_smoke_harness():
-    if not _dev_harness_enabled():
+    """Gate for dev-only and smoke-only endpoints.
+
+    Allowed when:
+      - EXECALC_DEV_HARNESS is enabled (dev/test only), OR
+      - X-Smoke-Key matches EXECALC_SMOKE_KEY (secret injected in runtime env)
+    """
+    if _dev_harness_enabled():
+        return True, None
+
+    expected = (os.getenv("EXECALC_SMOKE_KEY") or "").strip()
+    if not expected:
         return False, ({"ok": False, "error": "forbidden"}, 403)
+
+    provided = (request.headers.get("X-Smoke-Key") or "").strip()
+    if not provided or not secrets.compare_digest(provided, expected):
+        return False, ({"ok": False, "error": "forbidden"}, 403)
+
     return True, None
 
 def _api_key_configured() -> bool:
