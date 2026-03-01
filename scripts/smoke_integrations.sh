@@ -7,7 +7,7 @@ ROLE="${ROLE:-operator}"
 USER_ID="${USER_ID:-u1}"
 SMOKE_KEY="${SMOKE_KEY:?SMOKE_KEY is required}"
 
-echo "[1/4] list integrations (tenant-scoped), ROLE: , TENANT_ID: "
+echo "[1/4] list integrations (tenant-scoped)"
 LIST="$(curl -sS \
   -H "X-User-Id: $USER_ID" \
   -H "X-Tenant-Id: $TENANT_ID" \
