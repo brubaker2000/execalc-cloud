@@ -46,3 +46,7 @@ Last updated: 2026-02-23 (America/New_York)
 - Any UI work
 - Any vector database expansion beyond clearly scoped semantic fields
 
+## 2026-03-01
+- Cloud Run: set EXECALC_CONNECTOR_CREDENTIAL_REQUIRED to {"*":[]}
+- Reason: allow echo connector smoke tests to run without credentials; credential gating reserved for real connectors
+
