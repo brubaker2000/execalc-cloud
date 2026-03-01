@@ -23,6 +23,17 @@ def _dev_harness_enabled() -> bool:
     return os.getenv("EXECALC_DEV_HARNESS", "0").strip().lower() in ("1", "true", "yes", "on")
 
 
+def _smoke_harness_enabled() -> bool:
+    return os.getenv("EXECALC_SMOKE_HARNESS", "0").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _smoke_key_ok(req: Request) -> bool:
+    expected = (os.getenv("EXECALC_SMOKE_KEY") or "").strip()
+    if not expected:
+        return False
+    provided = (req.headers.get("X-Smoke-Key") or "").strip()
+    return bool(provided) and provided == expected
+
 def claims_from_request(req: Request) -> VerifiedClaims:
     """
     Verified-claims entrypoint.
@@ -33,7 +44,11 @@ def claims_from_request(req: Request) -> VerifiedClaims:
     Production:
       - This will be replaced by real verified identity claims (JWT/IAP/etc.).
     """
-    if not _dev_harness_enabled():
+    # Smoke harness: allows CI to exercise protected endpoints without enabling dev harness globally.
+    # Enabled only when EXECALC_SMOKE_HARNESS=1 and X-Smoke-Key matches EXECALC_SMOKE_KEY.
+    if _smoke_harness_enabled() and _smoke_key_ok(req):
+        pass
+    elif not _dev_harness_enabled():
         raise AuthError("verified claims provider not configured")
 
     user_id = (req.headers.get("X-User-Id") or "").strip()
@@ -45,6 +60,12 @@ def claims_from_request(req: Request) -> VerifiedClaims:
         raise AuthError("X-Role header is required in dev harness")
 
     tenant_id = (req.headers.get("X-Tenant-Id") or "").strip() or None
+
+    # If smoke harness is enabled, optionally lock requests to a single configured tenant.
+    if _smoke_harness_enabled() and _smoke_key_ok(req):
+        locked = (os.getenv("EXECALC_SMOKE_TENANT_ID") or "").strip() or None
+        if locked and tenant_id != locked:
+            raise AuthError("smoke harness tenant mismatch")
 
     scopes_hdr = (req.headers.get("X-Scopes") or "").strip()
     scopes = None

@@ -19,3 +19,10 @@ scratch/
 **/tenant.db
 logs/
 .venv/
+
+# Local runtime artifacts (must never be committed)
+*.db
+*.sqlite
+*.sqlite3
+__pycache__/
+*.pyc

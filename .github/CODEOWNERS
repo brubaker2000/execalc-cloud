@@ -1,0 +1,40 @@
+# Execalc CODEOWNERS
+# Purpose: enforce review/approval on sensitive governance, security, tenancy, and deployment paths.
+# Default rule: anything not explicitly listed below is not protected by CODEOWNERS (branch protection + CI still apply).
+
+# You should replace "@brubaker2000" with your actual GitHub username or org team after this file is created.
+# Example: @jeffbrubaker or @playerscapitalgroup/execalc-owners
+* @brubaker2000
+
+# Canon / governance / invariants
+/docs/CANON.md @brubaker2000
+/docs/TRUE_NORTH_STATUS.md @brubaker2000
+/docs/BUILD_STATE.md @brubaker2000
+/docs/EXECALC_INVARIANTS.md @brubaker2000
+/docs/invariants/** @brubaker2000
+/docs/cloud-v1-governance.md @brubaker2000
+/docs/cloud-v1-multi-tenancy.md @brubaker2000
+/docs/canon/** @brubaker2000
+/docs/cloud-run/** @brubaker2000
+/docs/db/** @brubaker2000
+
+# CI / automation
+/.github/workflows/** @brubaker2000
+/.github/dependabot.yml @brubaker2000
+
+# Deployment / infra / gates
+/infra/** @brubaker2000
+/scripts/** @brubaker2000
+/Dockerfile @brubaker2000
+/requirements.txt @brubaker2000
+/pytest.ini @brubaker2000
+
+# Runtime enforcement (tenant + auth + ingress)
+/src/service/auth/** @brubaker2000
+/src/service/tenant/** @brubaker2000
+/src/service/ingress_runner.py @brubaker2000
+/src/service/api.py @brubaker2000
+
+# NOTE:
+# The src/ paths above are commented out initially to avoid over-blocking while we confirm exact layout.
+# After we verify your auth/tenant module paths, we will uncomment and tighten these.
