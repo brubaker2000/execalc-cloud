@@ -632,14 +632,31 @@ def decision_run():
     if not isinstance(scenario_in, dict):
         return {"ok": False, "error": "scenario must be an object"}, 400
 
+    facts = scenario_in.get("facts") or {}
+    constraints = scenario_in.get("constraints") or {}
+    if not isinstance(facts, dict):
+        return {"ok": False, "error": "facts must be an object"}, 400
+    if not isinstance(constraints, dict):
+        return {"ok": False, "error": "constraints must be an object"}, 400
+
     scenario = Scenario(
         scenario_type=str(scenario_in.get("scenario_type") or "feasibility"),
         governing_objective=str(scenario_in.get("governing_objective") or "unspecified_objective"),
         prompt=str(scenario_in.get("prompt") or ""),
-        facts=scenario_in.get("facts") or {},
-        constraints=scenario_in.get("constraints") or {},
+        facts=facts,
+        constraints=constraints,
         requested_depth=str(scenario_in.get("requested_depth") or "standard"),
     )
 
     report = run_decision_loop(tenant_id=claims.tenant_id, user_id=claims.user_id, scenario=scenario)
-    return report.to_dict(), 200
+
+    # Stage 4B: best-effort persistence (tenant-scoped)
+    envelope_id = secrets.token_hex(16)
+    persisted = _persist_execution(type("ExecRecord", (), {"tenant_id": claims.tenant_id, "envelope_id": envelope_id, "result": report.to_dict()})())
+
+    out = report.to_dict()
+    out["audit"] = dict(out.get("audit") or {})
+    out["audit"]["envelope_id"] = envelope_id
+    out["audit"]["persist"] = persisted
+
+    return out, 200

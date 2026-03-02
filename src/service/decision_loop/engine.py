@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import os
 from typing import Dict, List
 
 from src.service.decision_loop.models import DecisionReport, Scenario, SensitivityVariable
@@ -106,7 +107,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
         "scenario_type": scenario.scenario_type,
         "governing_objective": scenario.governing_objective,
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "version": "stage4a",
+        "version": os.getenv("EXECALC_BUILD_SHA") or os.getenv("GIT_SHA") or "dev",
     }
 
     return DecisionReport(
