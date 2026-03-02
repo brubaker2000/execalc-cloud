@@ -63,6 +63,8 @@ G) Audit Metadata (non-sensitive)
 - governing_objective
 - timestamp
 - version
+- envelope_id (request trace id)
+- persist (best-effort persistence status + error detail when applicable)
 
 ---
 
