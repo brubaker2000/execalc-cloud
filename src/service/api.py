@@ -720,7 +720,7 @@ def decision_recent():
     - Tenant-scoped timeline of recent decisions (envelope_ids)
     - Convenience endpoint (returns empty list when persistence disabled)
     """
-    allowed, denial = _require_api_key_or_dev_harness()
+    allowed, denial = _require_dev_harness_or_smoke_harness()
     if not allowed:
         return denial
 
