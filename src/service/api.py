@@ -660,3 +660,54 @@ def decision_run():
     out["audit"]["persist"] = persisted
 
     return out, 200
+
+
+
+@app.get("/decision/<envelope_id>")
+def decision_get(envelope_id: str):
+    """
+    Stage 5A:
+    - Tenant-scoped retrieval by envelope_id
+    - Requires auth claims and operator/admin role
+    - Returns persisted decision payload when available
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    # Basic sanity: envelope_id should be hex (we generate token_hex(16) today)
+    eid = (envelope_id or "").strip().lower()
+    if not eid or any(c not in "0123456789abcdef" for c in eid) or len(eid) < 16:
+        return {"ok": False, "error": "invalid envelope_id"}, 400
+
+    # If persistence is disabled, we have nothing to retrieve.
+    if not _persist_enabled():
+        return {"ok": False, "error": "not_found"}, 404
+
+    if get_execution_record is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    try:
+        rec = get_execution_record(tenant_id=claims.tenant_id, envelope_id=eid)
+    except Exception as e:
+        logging.exception("Failed to fetch execution record")
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    if not rec:
+        return {"ok": False, "error": "not_found"}, 404
+
+    # Return the stored payload plus non-sensitive record metadata
+    return {
+        "ok": True,
+        "envelope_id": rec.get("envelope_id"),
+        "created_at": rec.get("created_at"),
+        "result": rec.get("result"),
+    }, 200
