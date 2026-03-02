@@ -598,3 +598,48 @@ def db_info():
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     app.run(host="127.0.0.1", port=port, debug=True)
+
+
+# ------------------------------
+# Stage 4: Decision Loop Engine
+# ------------------------------
+
+from src.service.decision_loop.engine import run_decision_loop
+from src.service.decision_loop.models import Scenario
+
+
+@app.post("/decision/run")
+def decision_run():
+    """
+    Stage 4A:
+    - Tenant-scoped, role-restricted endpoint
+    - Returns a structured executive-grade report shape
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    scenario_in = body.get("scenario") or {}
+    if not isinstance(scenario_in, dict):
+        return {"ok": False, "error": "scenario must be an object"}, 400
+
+    scenario = Scenario(
+        scenario_type=str(scenario_in.get("scenario_type") or "feasibility"),
+        governing_objective=str(scenario_in.get("governing_objective") or "unspecified_objective"),
+        prompt=str(scenario_in.get("prompt") or ""),
+        facts=scenario_in.get("facts") or {},
+        constraints=scenario_in.get("constraints") or {},
+        requested_depth=str(scenario_in.get("requested_depth") or "standard"),
+    )
+
+    report = run_decision_loop(tenant_id=claims.tenant_id, user_id=claims.user_id, scenario=scenario)
+    return report.to_dict(), 200
