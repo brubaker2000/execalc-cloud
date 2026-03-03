@@ -178,39 +178,3 @@ def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
         conn.close()
 
 
-def list_execution_records(*, tenant_id: str, limit: int = 25):
-    """
-    List recent execution records for a tenant (most recent first).
-    Returns minimal metadata for timeline display.
-    """
-    if limit < 1:
-        limit = 1
-    if limit > 100:
-        limit = 100
-
-    conn = get_conn()
-    try:
-        with conn, conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT envelope_id, ok, created_at
-                FROM execution_records
-                WHERE tenant_id = %s
-                ORDER BY created_at DESC
-                LIMIT %s
-                """,
-                (tenant_id, limit),
-            )
-            rows = cur.fetchall() or []
-            out = []
-            for envelope_id, ok, created_at in rows:
-                out.append(
-                    {
-                        "envelope_id": envelope_id,
-                        "ok": bool(ok),
-                        "created_at": created_at.isoformat(),
-                    }
-                )
-            return out
-    finally:
-        conn.close()
