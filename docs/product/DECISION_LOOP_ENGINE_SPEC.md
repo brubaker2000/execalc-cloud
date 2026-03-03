@@ -12,13 +12,6 @@ Non-Goals (Stage 4A):
 
 ---
 
-## 0) Endpoints
-
-- POST `/decision/run` — run a decision loop and return an executive report (optionally persisted).
-- GET `/decision/<envelope_id>` — retrieve a persisted decision result by envelope_id (tenant-scoped; requires persistence enabled).
-
----
-
 ## 1) Input Contract (Scenario Envelope)
 
 A Decision Loop request MUST provide:
@@ -70,8 +63,6 @@ G) Audit Metadata (non-sensitive)
 - governing_objective
 - timestamp
 - version
-- envelope_id (request trace id)
-- persist (best-effort persistence status + error detail when applicable)
 
 ---
 
