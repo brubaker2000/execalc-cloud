@@ -113,6 +113,46 @@ def get_execution_record(*, tenant_id: str, envelope_id: str) -> Optional[Dict[s
         conn.close()
 
 
+
+def list_execution_records(*, tenant_id: str, limit: int = 25):
+    """
+    List recent execution records for a tenant, newest first.
+    Returns list of dicts with minimal metadata (no result payload).
+    """
+    if limit < 1:
+        limit = 1
+    if limit > 100:
+        limit = 100
+
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT tenant_id, envelope_id, ok, created_at
+                FROM execution_records
+                WHERE tenant_id = %s
+                ORDER BY created_at DESC
+                LIMIT %s
+                """,
+                (tenant_id, limit),
+            )
+            rows = cur.fetchall() or []
+            out = []
+            for t_id, e_id, ok, created_at in rows:
+                out.append(
+                    {
+                        "tenant_id": t_id,
+                        "envelope_id": e_id,
+                        "ok": bool(ok),
+                        "created_at": created_at.isoformat(),
+                    }
+                )
+            return out
+    finally:
+        conn.close()
+
+
 def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
     """
     Ensure a tenant row exists in Postgres.
@@ -134,5 +174,43 @@ def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
                 """,
                 (tenant_id, tenant_name),
             )
+    finally:
+        conn.close()
+
+
+def list_execution_records(*, tenant_id: str, limit: int = 25):
+    """
+    List recent execution records for a tenant (most recent first).
+    Returns minimal metadata for timeline display.
+    """
+    if limit < 1:
+        limit = 1
+    if limit > 100:
+        limit = 100
+
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT envelope_id, ok, created_at
+                FROM execution_records
+                WHERE tenant_id = %s
+                ORDER BY created_at DESC
+                LIMIT %s
+                """,
+                (tenant_id, limit),
+            )
+            rows = cur.fetchall() or []
+            out = []
+            for envelope_id, ok, created_at in rows:
+                out.append(
+                    {
+                        "envelope_id": envelope_id,
+                        "ok": bool(ok),
+                        "created_at": created_at.isoformat(),
+                    }
+                )
+            return out
     finally:
         conn.close()

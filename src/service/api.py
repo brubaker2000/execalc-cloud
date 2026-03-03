@@ -12,11 +12,12 @@ from src.service.tenant.registry import ensure_tenant_registered, enforcement_en
 
 # Optional DB persistence (enabled via env var)
 try:
-    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, upsert_tenant
+    from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, list_execution_records, upsert_tenant
 except Exception:
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
     get_execution_record = None  # type: ignore
+    list_execution_records = None  # type: ignore
     upsert_tenant = None  # type: ignore
 
 # Integrations
@@ -632,14 +633,125 @@ def decision_run():
     if not isinstance(scenario_in, dict):
         return {"ok": False, "error": "scenario must be an object"}, 400
 
+    facts = scenario_in.get("facts") or {}
+    constraints = scenario_in.get("constraints") or {}
+    if not isinstance(facts, dict):
+        return {"ok": False, "error": "facts must be an object"}, 400
+    if not isinstance(constraints, dict):
+        return {"ok": False, "error": "constraints must be an object"}, 400
+
     scenario = Scenario(
         scenario_type=str(scenario_in.get("scenario_type") or "feasibility"),
         governing_objective=str(scenario_in.get("governing_objective") or "unspecified_objective"),
         prompt=str(scenario_in.get("prompt") or ""),
-        facts=scenario_in.get("facts") or {},
-        constraints=scenario_in.get("constraints") or {},
+        facts=facts,
+        constraints=constraints,
         requested_depth=str(scenario_in.get("requested_depth") or "standard"),
     )
 
     report = run_decision_loop(tenant_id=claims.tenant_id, user_id=claims.user_id, scenario=scenario)
-    return report.to_dict(), 200
+
+    # Stage 4B: best-effort persistence (tenant-scoped)
+    envelope_id = secrets.token_hex(16)
+    persisted = _persist_execution(type("ExecRecord", (), {"tenant_id": claims.tenant_id, "envelope_id": envelope_id, "result": report.to_dict()})())
+
+    out = report.to_dict()
+    out["audit"] = dict(out.get("audit") or {})
+    out["audit"]["envelope_id"] = envelope_id
+    out["audit"]["persist"] = persisted
+
+    return out, 200
+
+
+
+@app.get("/decision/<envelope_id>")
+def decision_get(envelope_id: str):
+    """
+    Stage 5A:
+    - Tenant-scoped retrieval by envelope_id
+    - Requires auth claims and operator/admin role
+    - Returns persisted decision payload when available
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    # Basic sanity: envelope_id should be hex (we generate token_hex(16) today)
+    eid = (envelope_id or "").strip().lower()
+    if not eid or any(c not in "0123456789abcdef" for c in eid) or len(eid) < 16:
+        return {"ok": False, "error": "invalid envelope_id"}, 400
+
+    # If persistence is disabled, we have nothing to retrieve.
+    if not _persist_enabled():
+        return {"ok": False, "error": "not_found"}, 404
+
+    if get_execution_record is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    try:
+        rec = get_execution_record(tenant_id=claims.tenant_id, envelope_id=eid)
+    except Exception as e:
+        logging.exception("Failed to fetch execution record")
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    if not rec:
+        return {"ok": False, "error": "not_found"}, 404
+
+    # Return the stored payload plus non-sensitive record metadata
+    return {
+        "ok": True,
+        "envelope_id": rec.get("envelope_id"),
+        "created_at": rec.get("created_at"),
+        "result": rec.get("result"),
+    }, 200
+
+@app.get("/decision/recent")
+def decision_recent():
+    """
+    Stage 5B:
+    - Tenant-scoped timeline of recent decisions (envelope_ids)
+    - Convenience endpoint (returns empty list when persistence disabled)
+    """
+    allowed, denial = _require_dev_harness_or_smoke_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    raw = (request.args.get("limit") or "").strip()
+    try:
+        limit = int(raw) if raw else 25
+    except ValueError:
+        return {"ok": False, "error": "limit must be an integer"}, 400
+    if limit < 1:
+        limit = 1
+    if limit > 100:
+        limit = 100
+
+    if not _persist_enabled():
+        return {"ok": True, "records": [], "persist_enabled": False}, 200
+
+    if list_execution_records is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    try:
+        rows = list_execution_records(tenant_id=claims.tenant_id, limit=limit)
+    except Exception as e:
+        logging.exception("Failed to list execution records")
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    return {"ok": True, "records": rows, "persist_enabled": True}, 200
