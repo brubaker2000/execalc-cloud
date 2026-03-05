@@ -6,47 +6,40 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-02-23 (America/New_York)
+Last updated: 2026-03-05 (America/New_York)
+
+Source of truth for completion claims:
+- docs/product/STAGE_STATUS.md
 
 ---
 
 ## NOW (1–3 items only)
 
-1) Stage 3 Delegation Guardrails — enforce PR-only merges, CODEOWNERS for sensitive paths, and required CI checks.
-   - Deliverables:
-     - .github/CODEOWNERS finalized (replace placeholder handle, include src/ enforcement paths)
-     - GitHub branch protection configured for main (PR required, status checks required, no force push)
-     - CI workflows confirmed as required checks
+1) Stage 6 — Persistence hardening + operational defaults
+   - Wire persistence in a way that is tenant-safe, testable, and operationally predictable.
+   - Deliverables (minimum):
+     - Clear enable/disable rules (env flags) with safe defaults
+     - Local runbook alignment (docs/product/LOCAL_PERSISTENCE_RUNBOOK.md)
+     - CI-safe tests (unit tests do not require DB env vars)
+     - Tight tenant scoping guarantees for all read/write paths
 
-2) Stage 2 Completion Hygiene — eliminate any remaining non-production-path smoke/test dependencies.
-   - Deliverables:
-     - smoke scripts use known registered tenant(s) only
-     - gates rely on /livez and /readyz (production posture)
-     - no dev harness required for deploy validation
-
-3) Boot & Handoff Protocol — make daily chat resets deterministic and auditable.
-   - Deliverables:
-     - documented Mouse shift handoff template (PR description format)
-     - repo boot packet command(s) identified and documented (exsync + canon reads)
+2) Documentation hygiene (keep repo as source of truth)
+   - Keep stage-map pointer files clean (no conflict markers)
+   - Ensure NEXT_ACTIONS aligns with STAGE_STATUS at all times
 
 ---
 
 ## NEXT (Queued)
 
-- Add docs/decisions/ADR-0001-delegation-guardrails.md summarizing the delegation/merge policy.
-- Add scripts/boot_packet.sh to print canonical "rehydration" docs in one command.
-- Tighten CODEOWNERS to include src/service/auth/** and src/service/tenant/** after confirming exact paths.
+- Decide whether persistence hardening lands as:
+  - a single Stage 6 PR, or
+  - 6A/6B/6C sub-stages (recommended if scope expands)
+- Add a small “boot packet” script to print canonical rehydration docs in one command.
 
 ---
 
 ## LATER (Explicitly not now)
 
-- Stage 4 Reflex classification scaffold
-- Stage 5 Executive Knowledge Engine wiring
 - Any UI work
-- Any vector database expansion beyond clearly scoped semantic fields
-
-## 2026-03-01
-- Cloud Run: set EXECALC_CONNECTOR_CREDENTIAL_REQUIRED to {"*":[]}
-- Reason: allow echo connector smoke tests to run without credentials; credential gating reserved for real connectors
-
+- Any vector DB expansion beyond explicitly scoped semantic fields
+- Any new feature surface not required by Stage 6 persistence hardening
