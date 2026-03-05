@@ -1,7 +1,15 @@
-import psycopg2
+from __future__ import annotations
+
+from typing import Any, List, Optional, Tuple
+
 from src.service.db.postgres import get_conn
 
-def save_decision_entry(tenant_id, user_id, decision_data):
+
+def save_decision_entry(tenant_id: str, user_id: str, decision_data: Any) -> str:
+    """
+    Persist a decision journal entry and return its id.
+    Note: actual DB wiring is optional elsewhere in the system; tests should mock get_conn().
+    """
     conn = get_conn()
     cursor = conn.cursor()
     insert_query = """
@@ -14,7 +22,8 @@ def save_decision_entry(tenant_id, user_id, decision_data):
     cursor.close()
     return entry_id
 
-def get_decision_entry(entry_id):
+
+def get_decision_entry(entry_id: str) -> Optional[Tuple[Any, ...]]:
     conn = get_conn()
     cursor = conn.cursor()
     select_query = "SELECT * FROM decision_journal WHERE id = %s;"
@@ -23,7 +32,8 @@ def get_decision_entry(entry_id):
     cursor.close()
     return entry
 
-def get_all_decisions_for_tenant(tenant_id):
+
+def get_all_decisions_for_tenant(tenant_id: str) -> List[Tuple[Any, ...]]:
     conn = get_conn()
     cursor = conn.cursor()
     select_query = "SELECT * FROM decision_journal WHERE tenant_id = %s ORDER BY timestamp DESC;"
