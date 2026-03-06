@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-04
-Last verified commit: 5c6689f
+Last updated: 2026-03-06
+Last verified state: Stage 6 merged to main; local tests passing
 
 ## Stage 4A–4C: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -28,5 +28,24 @@ Last verified commit: 5c6689f
 - /decision/recent accessible via smoke harness when enabled
 - Test: tests/test_decision_recent_smoke_harness.py
 
+## Stage 6: Persistence Hardening + Operational Defaults (COMPLETE)
+- Persistence requested vs enabled semantics separated
+- Strict persistence gating for readiness and enabled-state reporting
+- Best-effort execution persistence preserved for request paths
+- Unit tests do not require DB env vars
+- Tenant-scoped persistence behavior preserved
+- Main branch verification:
+  - python -m compileall -q src/service
+  - pytest -q
+  - local /decision/run check with persistence off
+
 ## Next
-- Define and implement Stage 6 (persistence wiring hardening + operational defaults), or update the build plan docs to reflect the next milestone.
+## Stage 7: Comparative Decision Memory
+Suggested sequence:
+- 7A: Journal hardening in real use
+- 7B: `/decision/compare`
+- 7C: Multi-objective comparison logic
+
+## Future Layer Awareness
+- Intelligent Front Door is now recognized as a future architectural layer.
+- It is not current build scope and should follow sufficient stabilization of the decision journal and comparative reasoning layer.

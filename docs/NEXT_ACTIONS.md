@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-03-05 (America/New_York)
+Last updated: 2026-03-06 (America/New_York)
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,31 +15,33 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Stage 6 — Persistence hardening + operational defaults
-   - Wire persistence in a way that is tenant-safe, testable, and operationally predictable.
-   - Deliverables (minimum):
-     - Clear enable/disable rules (env flags) with safe defaults
-     - Local runbook alignment (docs/product/LOCAL_PERSISTENCE_RUNBOOK.md)
-     - CI-safe tests (unit tests do not require DB env vars)
-     - Tight tenant scoping guarantees for all read/write paths
+1) Stage 7 definition and sequencing
+   - Lock Stage 7 as Comparative Decision Memory.
+   - Preserve the doctrine that plumbing and cognition advance together.
+   - Keep scope tight and testable.
 
-2) Documentation hygiene (keep repo as source of truth)
-   - Keep stage-map pointer files clean (no conflict markers)
-   - Ensure NEXT_ACTIONS aligns with STAGE_STATUS at all times
+2) Stage 7A planning — Journal hardening in real use
+   - Confirm the real-use workflow for decision retrieval and replay.
+   - Ensure journal behavior is stable before broader cognitive expansion.
+
+3) Repo hygiene as institutional memory
+   - Keep doctrine, stage status, and next actions aligned.
+   - Do not allow future build sequencing to drift from repo truth.
 
 ---
 
 ## NEXT (Queued)
 
-- Decide whether persistence hardening lands as:
-  - a single Stage 6 PR, or
-  - 6A/6B/6C sub-stages (recommended if scope expands)
-- Add a small “boot packet” script to print canonical rehydration docs in one command.
+- Stage 7B: `/decision/compare`
+- Stage 7C: multi-objective comparison logic
+- Refine the decision artifact into a comparable executive memory unit
 
 ---
 
 ## LATER (Explicitly not now)
 
+- Intelligent Front Door implementation
+- Bridges / subscriber-to-subscriber operability
 - Any UI work
 - Any vector DB expansion beyond explicitly scoped semantic fields
-- Any new feature surface not required by Stage 6 persistence hardening
+- Any new feature surface that outruns the current operational rails
