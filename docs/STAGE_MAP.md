@@ -5,14 +5,7 @@
 
 Canonical stage map lives here:
 
-- docs/vision/STAGE_MAP.md
+- `docs/vision/STAGE_MAP.md`
 
 This file exists to prevent continuity drift in boot packets and handoff instructions.
-<<<<<<< HEAD
-## Stage 3: Delegation Guardrails + Canon Spine (Complete)
-- **Environment Config Change**: Cloud Run: set EXECALC_CONNECTOR_CREDENTIAL_REQUIRED to {"*":[]} to allow smoke test without credentials for echo connector
-- **Smoke Test Success**: Smoke gate now passes after revision deploy
-- All checks green for PR #9
-
-=======
->>>>>>> origin/main
+Do not add stage details here; update the canonical stage map instead.
