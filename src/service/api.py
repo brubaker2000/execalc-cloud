@@ -125,15 +125,32 @@ def _claims_or_denial():
         return None, ({"ok": False, "error": str(e)}, 403)
 
 
-def _persist_enabled() -> bool:
+def _persist_requested() -> bool:
     return os.getenv("EXECALC_PERSIST_EXECUTIONS", "0").strip().lower() in ("1", "true", "yes", "on")
 
+def _db_env_configured() -> bool:
+    # Required DB env vars for Postgres connectivity.
+    required = ("EXECALC_DB_HOST", "EXECALC_DB_NAME", "EXECALC_DB_USER", "EXECALC_DB_PASSWORD")
+    for k in required:
+        v = (os.getenv(k) or "").strip()
+        if not v:
+            return False
+    return True
+
+def _persist_enabled() -> bool:
+    # Enabled only when requested AND DB module importable AND DB env present.
+    return _persist_requested() and (get_conn is not None) and _db_env_configured()
 
 def _persist_execution(record) -> dict:
     """
-    Best-effort persistence. Never breaks the request path unless you explicitly want it to.
+    Best-effort persistence. Never breaks the request path.
+    
+    Important:
+    - _persist_enabled() is strict (used for /readyz and persist_enabled flags).
+    - _persist_execution() is best-effort and may still attempt inserts when tests monkeypatch
+      insert_execution_record without requiring DB env vars.
     """
-    if not _persist_enabled():
+    if not _persist_requested():
         return {"persisted": False}
 
     if insert_execution_record is None:
@@ -264,7 +281,7 @@ def readyz():
     - No tenant context
     - If persistence is enabled, verify DB connectivity.
     """
-    if _persist_enabled() and get_conn is not None:
+    if _persist_enabled():
         try:
             conn = get_conn()
             conn.close()
