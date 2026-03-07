@@ -10,13 +10,8 @@ All configuration comes from environment variables.
 
 from __future__ import annotations
 
-import json
 import os
-from dataclasses import asdict
 from typing import Any, Dict, Optional
-
-import psycopg2
-from psycopg2.extras import Json
 
 
 def _env(name: str, default: Optional[str] = None) -> str:
@@ -26,19 +21,32 @@ def _env(name: str, default: Optional[str] = None) -> str:
     return val
 
 
+def _load_psycopg2():
+    try:
+        import psycopg2  # type: ignore
+        from psycopg2.extras import Json  # type: ignore
+    except ImportError as e:
+        raise RuntimeError(
+            "psycopg2 is not available. Install the Postgres client dependency before using DB persistence."
+        ) from e
+    return psycopg2, Json
+
+
 def get_conn():
     """
     Connect to Postgres using env vars.
 
     Required:
-      EXECALC_DB_HOST
-      EXECALC_DB_NAME
-      EXECALC_DB_USER
-      EXECALC_DB_PASSWORD
+    EXECALC_DB_HOST
+    EXECALC_DB_NAME
+    EXECALC_DB_USER
+    EXECALC_DB_PASSWORD
 
     Optional:
-      EXECALC_DB_PORT (default 5432)
+    EXECALC_DB_PORT (default 5432)
     """
+    psycopg2, _Json = _load_psycopg2()
+
     host = _env("EXECALC_DB_HOST")
     dbname = _env("EXECALC_DB_NAME")
     user = _env("EXECALC_DB_USER")
@@ -65,6 +73,7 @@ def insert_execution_record(
 
     The DB schema enforces tenant_id FK integrity and (tenant_id, envelope_id) uniqueness.
     """
+    _psycopg2, Json = _load_psycopg2()
     ok = bool(result.get("ok"))
 
     conn = get_conn()
@@ -111,7 +120,6 @@ def get_execution_record(*, tenant_id: str, envelope_id: str) -> Optional[Dict[s
             }
     finally:
         conn.close()
-
 
 
 def list_execution_records(*, tenant_id: str, limit: int = 25):
@@ -176,5 +184,3 @@ def upsert_tenant(*, tenant_id: str, tenant_name: str) -> None:
             )
     finally:
         conn.close()
-
-
