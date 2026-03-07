@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-03-06 (America/New_York)
+Last updated: 2026-03-07 (America/New_York)
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,18 +15,18 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Stage 7 definition and sequencing
-   - Lock Stage 7 as Comparative Decision Memory.
+1) Stage 7A integration-test slice
+   - Add a DB-available integration-test path for local Postgres persistence.
+   - Skip cleanly when local Postgres is not available.
+   - Cover `/decision/run`, `/decision/<envelope_id>`, and `/decision/recent`.
+
+2) Repo truth alignment
+   - Keep Stage 7A status, runbook, and next actions synchronized.
    - Preserve the doctrine that plumbing and cognition advance together.
-   - Keep scope tight and testable.
 
-2) Stage 7A planning — Journal hardening in real use
-   - Confirm the real-use workflow for decision retrieval and replay.
-   - Ensure journal behavior is stable before broader cognitive expansion.
-
-3) Repo hygiene as institutional memory
-   - Keep doctrine, stage status, and next actions aligned.
-   - Do not allow future build sequencing to drift from repo truth.
+3) Protect workstation reliability
+   - Prefer short, verifiable commands in this shell environment.
+   - Avoid fragile long heredocs and long quoted command chains where possible.
 
 ---
 

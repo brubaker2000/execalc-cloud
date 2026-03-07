@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-06
-Last verified state: Stage 6 merged to main; local tests passing
+Last updated: 2026-03-07
+Last verified state: Stage 7A local Postgres happy path proven on workstation
 
 ## Stage 4A–4C: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -40,11 +40,26 @@ Last verified state: Stage 6 merged to main; local tests passing
   - local /decision/run check with persistence off
 
 ## Next
-## Stage 7: Comparative Decision Memory
-Suggested sequence:
-- 7A: Journal hardening in real use
-- 7B: `/decision/compare`
-- 7C: Multi-objective comparison logic
+### Stage 7A status (live verified on 2026-03-07)
+- Lazy-loaded Postgres driver so unit tests no longer fail on eager import
+- Persistence-enabled paths covered for:
+  - GET /decision/<envelope_id>
+  - GET /decision/recent?limit=N
+- Local persistence runbook aligned to current env contract
+- Local Postgres happy path proven:
+  - Docker container started locally
+  - Canonical schema applied
+  - OS-level `libpq5` dependency installed so `psycopg2` can load
+  - `/decision/run` persists successfully to `execution_records`
+  - `/decision/<envelope_id>` successfully reads back the stored record
+  - `/decision/recent?limit=N` returns tenant-scoped recent records
+- Workstation posture note:
+  - Shell has `noclobber` behavior; `rm -f` may be needed before redirecting to existing files
+  - Long heredocs and long quoted commands are fragile in this environment; prefer simpler, verifiable steps
+
+## Next
+- Add a DB-available integration-test slice for Stage 7A (skipped when local Postgres is not available)
+- Then move to Stage 7B `/decision/compare` once the journal behavior is stable
 
 ## Future Layer Awareness
 - Intelligent Front Door is now recognized as a future architectural layer.
