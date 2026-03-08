@@ -1,43 +1,46 @@
 from __future__ import annotations
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-from src.service.db.postgres import get_conn
+from src.service.db.postgres import (
+    insert_execution_record,
+    get_execution_record,
+    list_execution_records,
+)
 
 
 def save_decision_entry(tenant_id: str, user_id: str, decision_data: Any) -> str:
     """
-    Persist a decision journal entry and return its id.
-    Note: actual DB wiring is optional elsewhere in the system; tests should mock get_conn().
+    Compatibility wrapper over canonical execution_records persistence.
+
+    Persists the supplied decision payload as an execution record and returns
+    the generated envelope_id, which acts as the durable retrieval key.
     """
-    conn = get_conn()
-    cursor = conn.cursor()
-    insert_query = """
-    INSERT INTO decision_journal (tenant_id, user_id, decision_data)
-    VALUES (%s, %s, %s) RETURNING id;
+    payload: Dict[str, Any]
+    if isinstance(decision_data, dict):
+        payload = dict(decision_data)
+    else:
+        payload = {"value": decision_data}
+
+    envelope_id = str(payload.get("envelope_id") or f"decision-{tenant_id}-{user_id}")
+    insert_execution_record(
+        tenant_id=tenant_id,
+        envelope_id=envelope_id,
+        result=payload,
+    )
+    return envelope_id
+
+
+def get_decision_entry(entry_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
     """
-    cursor.execute(insert_query, (tenant_id, user_id, decision_data))
-    conn.commit()
-    entry_id = cursor.fetchone()[0]
-    cursor.close()
-    return entry_id
+    Compatibility wrapper that fetches a canonical execution record by
+    (tenant_id, envelope_id).
+    """
+    return get_execution_record(tenant_id=tenant_id, envelope_id=entry_id)
 
 
-def get_decision_entry(entry_id: str) -> Optional[Tuple[Any, ...]]:
-    conn = get_conn()
-    cursor = conn.cursor()
-    select_query = "SELECT * FROM decision_journal WHERE id = %s;"
-    cursor.execute(select_query, (entry_id,))
-    entry = cursor.fetchone()
-    cursor.close()
-    return entry
-
-
-def get_all_decisions_for_tenant(tenant_id: str) -> List[Tuple[Any, ...]]:
-    conn = get_conn()
-    cursor = conn.cursor()
-    select_query = "SELECT * FROM decision_journal WHERE tenant_id = %s ORDER BY timestamp DESC;"
-    cursor.execute(select_query, (tenant_id,))
-    entries = cursor.fetchall()
-    cursor.close()
-    return entries
+def get_all_decisions_for_tenant(tenant_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+    """
+    Compatibility wrapper that lists recent execution records for a tenant.
+    """
+    return list_execution_records(tenant_id=tenant_id, limit=limit)
