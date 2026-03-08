@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Literal
+from typing import Any, Dict, List, Literal
 
 Confidence = Literal["high", "medium", "low", "unknown"]
 
@@ -23,7 +23,13 @@ class SensitivityVariable:
 
 
 @dataclass(frozen=True)
-class DecisionReport:
+class DecisionArtifact:
+    """
+    Canonical structured runtime output for the current decision loop.
+
+    This is the implementation-facing bridge toward the broader runtime object
+    model, where DecisionArtifact is the named output object.
+    """
     executive_summary: str
     confidence: Confidence
     confidence_rationale: List[str]
@@ -47,3 +53,8 @@ class DecisionReport:
             },
             "audit": self.audit,
         }
+
+
+# Backward-compatible alias while callers and API surfaces still refer to the
+# stage-specific name.
+DecisionReport = DecisionArtifact
