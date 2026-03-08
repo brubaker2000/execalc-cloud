@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Literal
+from datetime import datetime, UTC
+from typing import Any, Dict, List, Literal, Optional
 
 Confidence = Literal["high", "medium", "low", "unknown"]
 
@@ -14,6 +15,15 @@ class Scenario:
     facts: Dict[str, Any] = field(default_factory=dict)
     constraints: Dict[str, Any] = field(default_factory=dict)
     requested_depth: str = "standard"
+
+    # Incremental alignment with the canonical runtime object model.
+    scenario_id: Optional[str] = None
+    tenant_id: Optional[str] = None
+    operator_id: Optional[str] = None
+    domain: Optional[str] = None
+    urgency: Optional[str] = None
+    source_surface: Optional[str] = None
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass(frozen=True)
