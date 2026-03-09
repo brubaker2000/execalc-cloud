@@ -1,53 +1,32 @@
-from __future__ import annotations
+from dataclasses import dataclass
+from typing import Any, Dict, List
 
-from dataclasses import dataclass, field
-from datetime import datetime, UTC
-from typing import Any, Dict, List, Literal, Optional
-
-Confidence = Literal["high", "medium", "low", "unknown"]
-
-
-@dataclass(frozen=True)
-class Scenario:
-    scenario_type: str
-    governing_objective: str
-    prompt: str
-    facts: Dict[str, Any] = field(default_factory=dict)
-    constraints: Dict[str, Any] = field(default_factory=dict)
-    requested_depth: str = "standard"
-
-    # Incremental alignment with the canonical runtime object model.
-    scenario_id: Optional[str] = None
-    tenant_id: Optional[str] = None
-    operator_id: Optional[str] = None
-    domain: Optional[str] = None
-    urgency: Optional[str] = None
-    source_surface: Optional[str] = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-
-
-@dataclass(frozen=True)
-class SensitivityVariable:
-    name: str
-    impact: str  # plain language directional impact
-
+# Other imports and code if necessary
 
 @dataclass(frozen=True)
 class DecisionArtifact:
     """
     Canonical structured runtime output for the current decision loop.
-
     This is the implementation-facing bridge toward the broader runtime object
     model, where DecisionArtifact is the named output object.
     """
+
+    # Existing fields in your schema (replace this with the original fields you already had)
     executive_summary: str
-    confidence: Confidence
+    confidence: str  # Adjust based on your type, assuming it's a string
     confidence_rationale: List[str]
     governing_objective: str
     tradeoffs: Dict[str, List[str]]  # keys: upside/downside/key_tradeoffs/asymmetry
-    sensitivity: List[SensitivityVariable]
+    sensitivity: List[str]  # Adjust based on your type, assuming it's a list of strings
     next_actions: List[str]
     audit: Dict[str, Any]
+
+    # New fields for Prime Directive & Balance Sheet Logic
+    value_assessment: str  # For value creation/destruction
+    risk_reward_assessment: str  # For risk/reward analysis
+    supply_demand_assessment: str  # For supply/demand dynamics
+    asset_assessment: str  # For asset evaluation
+    liability_assessment: str  # For liability evaluation
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -58,13 +37,13 @@ class DecisionArtifact:
                 "confidence_rationale": self.confidence_rationale,
                 "governing_objective": self.governing_objective,
                 "tradeoffs": self.tradeoffs,
-                "sensitivity": [{"name": s.name, "impact": s.impact} for s in self.sensitivity],
+                "sensitivity": self.sensitivity,
                 "next_actions": self.next_actions,
+                # New fields added for the Prime Directive logic
+                "value_assessment": self.value_assessment,
+                "risk_reward_assessment": self.risk_reward_assessment,
+                "supply_demand_assessment": self.supply_demand_assessment,
+                "asset_assessment": self.asset_assessment,
+                "liability_assessment": self.liability_assessment,
             },
-            "audit": self.audit,
         }
-
-
-# Backward-compatible alias while callers and API surfaces still refer to the
-# stage-specific name.
-DecisionReport = DecisionArtifact
