@@ -1,0 +1,38 @@
+name: Execalc CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Compile Python sources
+        run: |
+          python -m compileall -q src/service
+          echo compile_ok
+
+      - name: Run decision loop tests
+        run: |
+          python -m unittest -v src/service/decision_loop/test_decision_loop.py
+
+      - name: Run endpoint tests
+        run: |
+          python -m unittest -v tests/test_decision_run_endpoint.py
