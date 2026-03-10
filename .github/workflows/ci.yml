@@ -35,4 +35,4 @@ jobs:
 
       - name: Run endpoint tests
         run: |
-          python -m unittest -v tests/test_decision_run_endpoint.py
+          pytest -q tests/test_decision_run_endpoint.py
