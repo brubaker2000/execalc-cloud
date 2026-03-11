@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, Dict, List, Literal, Optional
 
 Confidence = Literal["high", "medium", "low", "unknown"]
@@ -33,7 +33,7 @@ class SensitivityVariable:
 
 
 @dataclass(frozen=True)
-class DecisionArtifact:
+class DecisionReport:
     """
     Canonical structured runtime output for the current decision loop.
 
@@ -49,6 +49,21 @@ class DecisionArtifact:
     next_actions: List[str]
     audit: Dict[str, Any]
 
+    # Prime Directive
+    value_assessment: str
+    risk_reward_assessment: str
+    supply_demand_assessment: str
+    asset_assessment: str
+    liability_assessment: str
+
+    # Polymorphia
+    actors: List[str]
+    incentives: List[str]
+    asymmetries: List[str]
+
+    # Support / execution trace
+    execution_trace: Dict[str, Any]
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "ok": True,
@@ -60,11 +75,20 @@ class DecisionArtifact:
                 "tradeoffs": self.tradeoffs,
                 "sensitivity": [{"name": s.name, "impact": s.impact} for s in self.sensitivity],
                 "next_actions": self.next_actions,
+                "value_assessment": self.value_assessment,
+                "risk_reward_assessment": self.risk_reward_assessment,
+                "supply_demand_assessment": self.supply_demand_assessment,
+                "asset_assessment": self.asset_assessment,
+                "liability_assessment": self.liability_assessment,
+                "actors": self.actors,
+                "incentives": self.incentives,
+                "asymmetries": self.asymmetries,
+                "execution_trace": self.execution_trace,
             },
             "audit": self.audit,
         }
 
 
-# Backward-compatible alias while callers and API surfaces still refer to the
-# stage-specific name.
-DecisionReport = DecisionArtifact
+# Backward-compatible aliases while callers and API surfaces still refer to the
+# stage-specific or older names.
+DecisionArtifact = DecisionReport

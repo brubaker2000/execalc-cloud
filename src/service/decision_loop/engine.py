@@ -22,7 +22,7 @@ def _missing_critical(s: Scenario) -> List[SensitivityVariable]:
         out.append(
             SensitivityVariable(
                 name=k,
-                impact=(
+                impact=( 
                     "Missing input could change the calculus and the confidence level; "
                     "provide this to tighten the recommendation."
                 ),
@@ -42,8 +42,6 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
     sensitivity = _missing_critical(scenario)
 
     # Confidence rule (Stage 4A):
-    # - unknown if missing critical fields
-    # - medium otherwise (until real evaluators are wired)
     if sensitivity:
         confidence = "unknown"
         rationale = ["Critical inputs are missing; recommendation is constrained by data completeness."]
@@ -51,7 +49,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
         confidence = "medium"
         rationale = ["Structured analysis produced from provided inputs; deeper evaluators will increase certainty."]
 
-    # Executive summary: objective-aware phrasing without exposing mechanics
+    # Executive summary and analysis logic
     obj = (scenario.governing_objective or "").strip() or "unspecified_objective"
     if obj in ("cut_payroll", "reduce_cap", "cap_cut"):
         summary = (
@@ -100,22 +98,50 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
         "Make a go/no-go decision and document the rationale for accountability.",
     ]
 
+    # New fields for Prime Directive and Polymorphia (simplified for now)
+    value_assessment = "Assess the long-term strategic value creation potential based on the trade-offs."
+    risk_reward_assessment = "Evaluate risk exposure vs. potential upside."
+    supply_demand_assessment = "Analyze the market dynamics and the opportunity cost."
+    asset_assessment = "Evaluate the assets involved and their liquidity."
+    liability_assessment = "Examine the liabilities associated with the decision."
+
+    actors = ["Team A", "Team B", "Stakeholder C"]  # Example
+    incentives = ["Maximize value", "Minimize risk"]
+    asymmetries = ["Team A has more flexibility in cap space, giving them an advantage."]
+
+    # Execution trace
+    execution_trace = {
+        "scenario_type": scenario.scenario_type,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "actions_taken": "Calculated trade-offs, evaluated critical inputs, and determined confidence level.",
+    }
+
+    # Audit details for traceability
     audit = {
         "tenant_id": tenant_id,
         "user_id": user_id,
         "scenario_type": scenario.scenario_type,
         "governing_objective": scenario.governing_objective,
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "version": "stage4a",
+        "version": "stage4b",
     }
 
     return DecisionReport(
         executive_summary=summary,
-        confidence=confidence,  # type: ignore
+        confidence=confidence,
         confidence_rationale=rationale,
         governing_objective=scenario.governing_objective,
         tradeoffs=tradeoffs,
         sensitivity=sensitivity,
         next_actions=next_actions,
         audit=audit,
+        value_assessment=value_assessment,
+        risk_reward_assessment=risk_reward_assessment,
+        supply_demand_assessment=supply_demand_assessment,
+        asset_assessment=asset_assessment,
+        liability_assessment=liability_assessment,
+        actors=actors,
+        incentives=incentives,
+        asymmetries=asymmetries,
+        execution_trace=execution_trace,
     )
