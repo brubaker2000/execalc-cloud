@@ -54,7 +54,7 @@ Objectives:
 - install GitHub governance guardrails
 
 ### Phase 2 — Engine Hardening
-Status: Next active phase
+Status: In progress / materially advanced
 
 Objectives:
 - strengthen `DecisionArtifact` into the canonical governed judgment object
@@ -62,6 +62,14 @@ Objectives:
 - add structured Polymorphia fields
 - add execution trace / support metadata
 - preserve current report behavior while strengthening the runtime contract
+
+Completed in current rebuild segment:
+- strengthened decision runtime contract in `src/service/decision_loop/models.py`
+- strengthened decision engine behavior in `src/service/decision_loop/engine.py`
+- added direct orchestration layer in `src/service/decision_loop/service.py`
+- thinned `/decision/run` in `src/service/api.py` by delegating orchestration
+- added route-level decision API coverage in `src/service/test_decision_api.py`
+- verified broader `src/service` suite green in `.venv`
 
 ### Phase 3 — Core 7 Runtime Enforcement
 Status: Planned
@@ -106,15 +114,15 @@ Objectives:
 ## Immediate Next Architectural Move
 The next active target is:
 
-**DecisionArtifact runtime contract hardening**
+**Direct service-layer hardening and adjacent decision route alignment**
 
 Initial focus:
-- inspect `src/service/decision_loop/engine.py`
-- inspect `src/service/decision_loop/models.py`
-- inspect `src/service/decision_loop/test_decision_loop.py`
+- add direct unit coverage for `src/service/decision_loop/service.py`
+- inspect `/decision/<envelope_id>` and `/decision/recent` for architectural drift
+- continue closing enforcement gaps between runtime objects, orchestration, and route behavior
 
 Goal:
-- define the next strengthened `DecisionArtifact` contract before changing code
+- ensure the decision service boundary is directly tested and the adjacent decision routes are aligned to the normalized architecture
 
 ## Session Closure Standard
 A rebuild session is only considered complete when:

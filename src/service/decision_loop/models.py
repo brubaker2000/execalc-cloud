@@ -16,6 +16,13 @@ class Scenario:
     constraints: Dict[str, Any] = field(default_factory=dict)
     requested_depth: str = "standard"
 
+    # Expanded decision-context fields
+    decision_horizon: Optional[str] = None
+    stakeholder_scope: Optional[str] = None
+    risk_surface: Optional[str] = None
+    assumptions: Optional[str] = None
+    decision_notes: Optional[str] = None
+
     # Incremental alignment with the canonical runtime object model.
     scenario_id: Optional[str] = None
     tenant_id: Optional[str] = None
