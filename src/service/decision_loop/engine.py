@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from src.service.decision_loop.models import DecisionReport, Scenario, SensitivityVariable
+from src.service.decision_loop.support_stack import support_stack_trace
 
 
 CRITICAL_FIELDS_BY_SCENARIO: Dict[str, List[str]] = {
@@ -309,6 +310,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "generated tradeoff analysis",
             "generated prime directive assessments",
             "generated polymorphia fields",
+            "generated support stack trace",
         ],
         "context_used": {
             "decision_horizon": scenario.decision_horizon,
@@ -317,6 +319,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "assumptions_present": bool(scenario.assumptions),
             "decision_notes_present": bool(scenario.decision_notes),
         },
+        "support_stack": support_stack_trace(),
     }
 
     audit = {

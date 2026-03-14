@@ -85,6 +85,10 @@ class TestDecisionLoopEngine(unittest.TestCase):
         self.assertEqual(r.execution_trace.get("scenario_type"), "draft_trade")
         self.assertIn("timestamp", r.execution_trace)
         self.assertIn("actions_taken", r.execution_trace)
+        self.assertIn("support_stack", r.execution_trace)
+        self.assertIn("reflex_gate", r.execution_trace["support_stack"])
+        self.assertIn("procedure_plan", r.execution_trace["support_stack"])
+        self.assertIn("boundary_decision", r.execution_trace["support_stack"])
 
 
 if __name__ == "__main__":
