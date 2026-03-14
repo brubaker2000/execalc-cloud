@@ -98,8 +98,22 @@ def default_boundary_decision() -> BoundaryDecision:
     )
 
 
-def support_stack_trace() -> Dict[str, Any]:
-    registry = ReflexRegistry()
+
+def default_reflexes(*, missing_critical_fields: Optional[List[str]] = None) -> List[Reflex]:
+    reflexes: List[Reflex] = []
+    if missing_critical_fields:
+        reflexes.append(
+            Reflex(
+                name="missing_critical_input",
+                description="Detects missing critical inputs that materially reduce underwriting confidence.",
+                priority=10,
+            )
+        )
+    return reflexes
+
+
+def support_stack_trace(*, missing_critical_fields: Optional[List[str]] = None) -> Dict[str, Any]:
+    registry = ReflexRegistry(default_reflexes(missing_critical_fields=missing_critical_fields))
     gate = registry.gate()
     plan = default_procedure_plan()
     boundary = default_boundary_decision()

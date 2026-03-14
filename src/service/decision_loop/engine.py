@@ -319,7 +319,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "assumptions_present": bool(scenario.assumptions),
             "decision_notes_present": bool(scenario.decision_notes),
         },
-        "support_stack": support_stack_trace(),
+        "support_stack": support_stack_trace(missing_critical_fields=[s.name for s in sensitivity]),
     }
 
     audit = {
