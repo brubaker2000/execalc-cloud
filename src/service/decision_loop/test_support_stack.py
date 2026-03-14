@@ -80,5 +80,15 @@ class TestSupportStackScaffolding(unittest.TestCase):
         self.assertTrue(trace["boundary_decision"]["allowed"])
 
 
+    def test_support_stack_trace_activates_missing_critical_input_reflex(self):
+        trace = support_stack_trace(missing_critical_fields=["you_pick", "counterparty_pick"])
+
+        self.assertEqual(
+            trace["reflex_gate"]["allowed_reflexes"],
+            ["missing_critical_input"],
+        )
+        self.assertIn("phase1_default_allow", trace["reflex_gate"]["reasons"])
+
+
 if __name__ == "__main__":
     unittest.main()

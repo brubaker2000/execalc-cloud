@@ -61,6 +61,21 @@ class TestDecisionLoopEngine(unittest.TestCase):
         self.assertTrue(any(v.name == "you_pick" for v in r.sensitivity))
         self.assertTrue(any(v.name == "counterparty_pick" for v in r.sensitivity))
 
+
+    def test_missing_inputs_activate_missing_critical_input_reflex(self):
+        s = Scenario(
+            scenario_type="draft_trade",
+            governing_objective="cut_payroll",
+            prompt="Missing picks",
+            facts={},
+        )
+        r = run_decision_loop(tenant_id="t1", user_id="u1", scenario=s)
+
+        self.assertEqual(
+            r.execution_trace["support_stack"]["reflex_gate"]["allowed_reflexes"],
+            ["missing_critical_input"],
+        )
+
     def test_complete_inputs_sets_medium_confidence(self):
         s = Scenario(
             scenario_type="draft_trade",
