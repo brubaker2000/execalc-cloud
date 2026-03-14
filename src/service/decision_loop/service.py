@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional, Tuple
 import secrets
 
 from src.service.decision_loop.engine import run_decision_loop
@@ -68,3 +68,76 @@ def run_decision_service(
     out["audit"]["envelope_id"] = envelope_id
     out["audit"]["persist"] = persisted
     return out
+
+
+def get_decision_service(
+    *,
+    tenant_id: str,
+    envelope_id: str,
+    persist_enabled: bool,
+    get_record_fn: Optional[Callable[..., Optional[Dict[str, Any]]]],
+) -> Tuple[Dict[str, Any], int]:
+    """
+    Canonical orchestration layer for decision retrieval by envelope_id.
+    Returns an API-ready payload and status code.
+    """
+    eid = (envelope_id or "").strip().lower()
+    if not eid or any(c not in "0123456789abcdef" for c in eid) or len(eid) < 16:
+        return {"ok": False, "error": "invalid envelope_id"}, 400
+
+    if not persist_enabled:
+        return {"ok": False, "error": "not_found"}, 404
+
+    if get_record_fn is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    try:
+        rec = get_record_fn(tenant_id=tenant_id, envelope_id=eid)
+    except Exception as e:
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    if not rec:
+        return {"ok": False, "error": "not_found"}, 404
+
+    return {
+        "ok": True,
+        "envelope_id": rec.get("envelope_id"),
+        "created_at": rec.get("created_at"),
+        "result": rec.get("result"),
+    }, 200
+
+
+def list_recent_decisions_service(
+    *,
+    tenant_id: str,
+    raw_limit: str,
+    persist_enabled: bool,
+    list_records_fn: Optional[Callable[..., Any]],
+) -> Tuple[Dict[str, Any], int]:
+    """
+    Canonical orchestration layer for recent decision listing.
+    Returns an API-ready payload and status code.
+    """
+    raw = (raw_limit or "").strip()
+    try:
+        limit = int(raw) if raw else 25
+    except ValueError:
+        return {"ok": False, "error": "limit must be an integer"}, 400
+
+    if limit < 1:
+        limit = 1
+    if limit > 100:
+        limit = 100
+
+    if not persist_enabled:
+        return {"ok": True, "records": [], "persist_enabled": False}, 200
+
+    if list_records_fn is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    try:
+        rows = list_records_fn(tenant_id=tenant_id, limit=limit)
+    except Exception as e:
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    return {"ok": True, "records": rows, "persist_enabled": True}, 200

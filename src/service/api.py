@@ -622,7 +622,11 @@ if __name__ == "__main__":
 # Stage 4: Decision Loop Engine
 # ------------------------------
 
-from src.service.decision_loop.service import run_decision_service
+from src.service.decision_loop.service import (
+    get_decision_service,
+    list_recent_decisions_service,
+    run_decision_service,
+)
 
 
 @app.post("/decision/run")
@@ -683,34 +687,13 @@ def decision_get(envelope_id: str):
     if claims.role not in ("admin", "operator"):
         return {"ok": False, "error": "forbidden"}, 403
 
-    # Basic sanity: envelope_id should be hex (we generate token_hex(16) today)
-    eid = (envelope_id or "").strip().lower()
-    if not eid or any(c not in "0123456789abcdef" for c in eid) or len(eid) < 16:
-        return {"ok": False, "error": "invalid envelope_id"}, 400
-
-    # If persistence is disabled, we have nothing to retrieve.
-    if not _persist_enabled():
-        return {"ok": False, "error": "not_found"}, 404
-
-    if get_execution_record is None:
-        return {"ok": False, "error": "db_unavailable"}, 503
-
-    try:
-        rec = get_execution_record(tenant_id=claims.tenant_id, envelope_id=eid)
-    except Exception as e:
-        logging.exception("Failed to fetch execution record")
-        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
-
-    if not rec:
-        return {"ok": False, "error": "not_found"}, 404
-
-    # Return the stored payload plus non-sensitive record metadata
-    return {
-        "ok": True,
-        "envelope_id": rec.get("envelope_id"),
-        "created_at": rec.get("created_at"),
-        "result": rec.get("result"),
-    }, 200
+    out, status = get_decision_service(
+        tenant_id=claims.tenant_id,
+        envelope_id=envelope_id,
+        persist_enabled=_persist_enabled(),
+        get_record_fn=get_execution_record,
+    )
+    return out, status
 
 @app.get("/decision/recent")
 def decision_recent():
@@ -731,26 +714,10 @@ def decision_recent():
     if claims.role not in ("admin", "operator"):
         return {"ok": False, "error": "forbidden"}, 403
 
-    raw = (request.args.get("limit") or "").strip()
-    try:
-        limit = int(raw) if raw else 25
-    except ValueError:
-        return {"ok": False, "error": "limit must be an integer"}, 400
-    if limit < 1:
-        limit = 1
-    if limit > 100:
-        limit = 100
-
-    if not _persist_enabled():
-        return {"ok": True, "records": [], "persist_enabled": False}, 200
-
-    if list_execution_records is None:
-        return {"ok": False, "error": "db_unavailable"}, 503
-
-    try:
-        rows = list_execution_records(tenant_id=claims.tenant_id, limit=limit)
-    except Exception as e:
-        logging.exception("Failed to list execution records")
-        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
-
-    return {"ok": True, "records": rows, "persist_enabled": True}, 200
+    out, status = list_recent_decisions_service(
+        tenant_id=claims.tenant_id,
+        raw_limit=request.args.get("limit") or "",
+        persist_enabled=_persist_enabled(),
+        list_records_fn=list_execution_records,
+    )
+    return out, status
