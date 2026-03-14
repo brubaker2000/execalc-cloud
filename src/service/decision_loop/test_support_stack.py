@@ -49,6 +49,23 @@ class TestSupportStackScaffolding(unittest.TestCase):
             ],
         )
 
+
+    def test_default_procedure_plan_inserts_resolution_step_when_missing_input_reflex_active(self):
+        plan = default_procedure_plan(active_reflexes=["missing_critical_input"])
+
+        self.assertEqual(
+            plan.step_names(),
+            [
+                "validate_inputs",
+                "resolve_missing_critical_inputs",
+                "assign_confidence",
+                "generate_tradeoffs",
+                "apply_prime_directive",
+                "apply_polymorphia",
+                "build_artifact",
+            ],
+        )
+
     def test_default_boundary_decision_allows_with_placeholder_checks(self):
         decision = default_boundary_decision()
 
@@ -88,6 +105,18 @@ class TestSupportStackScaffolding(unittest.TestCase):
             ["missing_critical_input"],
         )
         self.assertIn("phase1_default_allow", trace["reflex_gate"]["reasons"])
+        self.assertEqual(
+            trace["procedure_plan"]["steps"],
+            [
+                "validate_inputs",
+                "resolve_missing_critical_inputs",
+                "assign_confidence",
+                "generate_tradeoffs",
+                "apply_prime_directive",
+                "apply_polymorphia",
+                "build_artifact",
+            ],
+        )
 
 
 if __name__ == "__main__":

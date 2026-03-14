@@ -77,10 +77,23 @@ class BoundaryDecision:
     checks: List[str] = field(default_factory=list)
 
 
-def default_procedure_plan() -> ProcedurePlan:
-    return ProcedurePlan(
-        steps=[
-            ProcedureStep("validate_inputs", "Validate scenario structure and critical fields."),
+def default_procedure_plan(*, active_reflexes: Optional[List[str]] = None) -> ProcedurePlan:
+    active_reflexes = list(active_reflexes or [])
+
+    steps = [
+        ProcedureStep("validate_inputs", "Validate scenario structure and critical fields."),
+    ]
+
+    if "missing_critical_input" in active_reflexes:
+        steps.append(
+            ProcedureStep(
+                "resolve_missing_critical_inputs",
+                "Identify and resolve missing critical inputs before final commitment.",
+            )
+        )
+
+    steps.extend(
+        [
             ProcedureStep("assign_confidence", "Assign initial confidence from data completeness."),
             ProcedureStep("generate_tradeoffs", "Generate structured tradeoff analysis."),
             ProcedureStep("apply_prime_directive", "Generate Prime Directive assessments."),
@@ -88,6 +101,8 @@ def default_procedure_plan() -> ProcedurePlan:
             ProcedureStep("build_artifact", "Assemble structured decision artifact output."),
         ]
     )
+
+    return ProcedurePlan(steps=steps)
 
 
 def default_boundary_decision() -> BoundaryDecision:
@@ -115,7 +130,7 @@ def default_reflexes(*, missing_critical_fields: Optional[List[str]] = None) -> 
 def support_stack_trace(*, missing_critical_fields: Optional[List[str]] = None) -> Dict[str, Any]:
     registry = ReflexRegistry(default_reflexes(missing_critical_fields=missing_critical_fields))
     gate = registry.gate()
-    plan = default_procedure_plan()
+    plan = default_procedure_plan(active_reflexes=gate.allowed_reflexes)
     boundary = default_boundary_decision()
 
     return {
