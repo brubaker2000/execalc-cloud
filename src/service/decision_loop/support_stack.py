@@ -105,11 +105,20 @@ def default_procedure_plan(*, active_reflexes: Optional[List[str]] = None) -> Pr
     return ProcedurePlan(steps=steps)
 
 
-def default_boundary_decision() -> BoundaryDecision:
+def default_boundary_decision(*, active_reflexes: Optional[List[str]] = None) -> BoundaryDecision:
+    active_reflexes = list(active_reflexes or [])
+
+    reasons = ["phase1_default_allow"]
+    checks = ["tenant_scope_placeholder", "authorization_placeholder"]
+
+    if "missing_critical_input" in active_reflexes:
+        reasons.append("missing_critical_inputs_detected")
+        checks.append("final_commitment_requires_input_resolution")
+
     return BoundaryDecision(
         allowed=True,
-        reasons=["phase1_default_allow"],
-        checks=["tenant_scope_placeholder", "authorization_placeholder"],
+        reasons=reasons,
+        checks=checks,
     )
 
 
@@ -131,7 +140,7 @@ def support_stack_trace(*, missing_critical_fields: Optional[List[str]] = None) 
     registry = ReflexRegistry(default_reflexes(missing_critical_fields=missing_critical_fields))
     gate = registry.gate()
     plan = default_procedure_plan(active_reflexes=gate.allowed_reflexes)
-    boundary = default_boundary_decision()
+    boundary = default_boundary_decision(active_reflexes=gate.allowed_reflexes)
 
     return {
         "reflex_gate": {
