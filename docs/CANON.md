@@ -275,3 +275,12 @@ This file is the top-level map of Execalc's durable operating canon.
 Its function is to make the constitutional spine of the system easy to find, easy to navigate, and harder to lose.
 
 If a future chat needs to know what is authoritative, this file should be one of the first places it looks.
+
+### UI Shell Doctrine
+
+Execalc is a governed multi-surface executive workspace, not a single chat interface.
+
+See:
+- docs/product/EXECALC_UI_SHELL_V1.md
+- docs/product/EXECALC_UI_IMPLEMENTATION_SPRINT_1.md
+
