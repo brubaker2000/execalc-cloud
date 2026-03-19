@@ -1,6 +1,10 @@
 import unittest
 
-from src.service.decision_loop.service import run_decision_service
+from src.service.decision_loop.service import (
+    get_decision_service,
+    list_recent_decisions_service,
+    run_decision_service,
+)
 from src.service.execution_record import ExecutionRecord
 
 
@@ -41,7 +45,10 @@ class TestDecisionService(unittest.TestCase):
 
         self.assertEqual(len(persisted_records), 1)
         self.assertEqual(persisted_records[0].tenant_id, "tenant_test_001")
-        self.assertEqual(persisted_records[0].result["report"]["governing_objective"], "cut_payroll")
+        self.assertEqual(
+            persisted_records[0].result["report"]["governing_objective"],
+            "cut_payroll",
+        )
 
     def test_run_decision_service_rejects_non_object_scenario(self):
         def persist_fn(record: ExecutionRecord):
@@ -75,6 +82,129 @@ class TestDecisionService(unittest.TestCase):
             )
 
         self.assertEqual(str(ctx.exception), "facts must be an object")
+
+    def test_get_decision_service_rejects_invalid_envelope_id(self):
+        out, status = get_decision_service(
+            tenant_id="tenant_test_001",
+            envelope_id="bad!",
+            persist_enabled=True,
+            get_record_fn=lambda **kwargs: None,
+        )
+
+        self.assertEqual(status, 400)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "invalid envelope_id")
+
+    def test_get_decision_service_returns_not_found_when_persistence_disabled(self):
+        out, status = get_decision_service(
+            tenant_id="tenant_test_001",
+            envelope_id="abcdef0123456789",
+            persist_enabled=False,
+            get_record_fn=lambda **kwargs: None,
+        )
+
+        self.assertEqual(status, 404)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "not_found")
+
+    def test_get_decision_service_returns_db_unavailable_when_reader_missing(self):
+        out, status = get_decision_service(
+            tenant_id="tenant_test_001",
+            envelope_id="abcdef0123456789",
+            persist_enabled=True,
+            get_record_fn=None,
+        )
+
+        self.assertEqual(status, 503)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "db_unavailable")
+
+    def test_get_decision_service_returns_record_payload(self):
+        def get_record_fn(**kwargs):
+            self.assertEqual(kwargs["tenant_id"], "tenant_test_001")
+            self.assertEqual(kwargs["envelope_id"], "abcdef0123456789")
+            return {
+                "tenant_id": "tenant_test_001",
+                "envelope_id": "abcdef0123456789",
+                "ok": True,
+                "result": {"ok": True, "report": {"governing_objective": "cut_payroll"}},
+                "created_at": "2026-03-12T00:00:00+00:00",
+            }
+
+        out, status = get_decision_service(
+            tenant_id="tenant_test_001",
+            envelope_id="abcdef0123456789",
+            persist_enabled=True,
+            get_record_fn=get_record_fn,
+        )
+
+        self.assertEqual(status, 200)
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["envelope_id"], "abcdef0123456789")
+        self.assertEqual(out["created_at"], "2026-03-12T00:00:00+00:00")
+        self.assertIn("result", out)
+
+    def test_list_recent_decisions_service_rejects_non_integer_limit(self):
+        out, status = list_recent_decisions_service(
+            tenant_id="tenant_test_001",
+            raw_limit="abc",
+            persist_enabled=True,
+            list_records_fn=lambda **kwargs: [],
+        )
+
+        self.assertEqual(status, 400)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "limit must be an integer")
+
+    def test_list_recent_decisions_service_returns_empty_when_persistence_disabled(self):
+        out, status = list_recent_decisions_service(
+            tenant_id="tenant_test_001",
+            raw_limit="25",
+            persist_enabled=False,
+            list_records_fn=lambda **kwargs: [{"unexpected": True}],
+        )
+
+        self.assertEqual(status, 200)
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["records"], [])
+        self.assertEqual(out["persist_enabled"], False)
+
+    def test_list_recent_decisions_service_returns_db_unavailable_when_reader_missing(self):
+        out, status = list_recent_decisions_service(
+            tenant_id="tenant_test_001",
+            raw_limit="25",
+            persist_enabled=True,
+            list_records_fn=None,
+        )
+
+        self.assertEqual(status, 503)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "db_unavailable")
+
+    def test_list_recent_decisions_service_clamps_limit_and_returns_rows(self):
+        def list_records_fn(**kwargs):
+            self.assertEqual(kwargs["tenant_id"], "tenant_test_001")
+            self.assertEqual(kwargs["limit"], 100)
+            return [
+                {
+                    "tenant_id": "tenant_test_001",
+                    "envelope_id": "entry_2",
+                    "ok": True,
+                    "created_at": "2026-03-12T00:00:00+00:00",
+                }
+            ]
+
+        out, status = list_recent_decisions_service(
+            tenant_id="tenant_test_001",
+            raw_limit="500",
+            persist_enabled=True,
+            list_records_fn=list_records_fn,
+        )
+
+        self.assertEqual(status, 200)
+        self.assertTrue(out["ok"])
+        self.assertEqual(len(out["records"]), 1)
+        self.assertEqual(out["persist_enabled"], True)
 
 
 if __name__ == "__main__":
