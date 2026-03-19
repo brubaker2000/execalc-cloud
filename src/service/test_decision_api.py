@@ -106,5 +106,36 @@ class TestDecisionAPI(unittest.TestCase):
         self.assertEqual(body["error"], "facts must be an object")
 
 
+    def test_decision_compare_requires_two_ids(self):
+        resp = self.client.post(
+            "/decision/compare",
+            headers=self.headers,
+            json={
+                "envelope_ids": ["abcdef0123456789"],
+                "comparison_objective": "cut_payroll",
+                "requested_depth": "standard",
+            },
+        )
+        self.assertEqual(resp.status_code, 400)
+        body = resp.get_json()
+        self.assertFalse(body["ok"])
+        self.assertEqual(body["error"], "at least two envelope_ids are required")
+
+    def test_decision_compare_requires_persistence(self):
+        resp = self.client.post(
+            "/decision/compare",
+            headers=self.headers,
+            json={
+                "envelope_ids": ["abcdef0123456789", "fedcba9876543210"],
+                "comparison_objective": "cut_payroll",
+                "requested_depth": "standard",
+            },
+        )
+        self.assertEqual(resp.status_code, 400)
+        body = resp.get_json()
+        self.assertFalse(body["ok"])
+        self.assertEqual(body["error"], "comparison_requires_persistence")
+
+
 if __name__ == "__main__":
     unittest.main()

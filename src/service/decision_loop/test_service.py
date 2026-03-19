@@ -1,6 +1,7 @@
 import unittest
 
 from src.service.decision_loop.service import (
+    compare_decisions_service,
     get_decision_service,
     list_recent_decisions_service,
     run_decision_service,
@@ -95,6 +96,7 @@ class TestDecisionService(unittest.TestCase):
         self.assertFalse(out["ok"])
         self.assertEqual(out["error"], "invalid envelope_id")
 
+
     def test_get_decision_service_returns_not_found_when_persistence_disabled(self):
         out, status = get_decision_service(
             tenant_id="tenant_test_001",
@@ -156,6 +158,7 @@ class TestDecisionService(unittest.TestCase):
         self.assertFalse(out["ok"])
         self.assertEqual(out["error"], "limit must be an integer")
 
+
     def test_list_recent_decisions_service_returns_empty_when_persistence_disabled(self):
         out, status = list_recent_decisions_service(
             tenant_id="tenant_test_001",
@@ -181,6 +184,7 @@ class TestDecisionService(unittest.TestCase):
         self.assertFalse(out["ok"])
         self.assertEqual(out["error"], "db_unavailable")
 
+
     def test_list_recent_decisions_service_clamps_limit_and_returns_rows(self):
         def list_records_fn(**kwargs):
             self.assertEqual(kwargs["tenant_id"], "tenant_test_001")
@@ -205,6 +209,127 @@ class TestDecisionService(unittest.TestCase):
         self.assertTrue(out["ok"])
         self.assertEqual(len(out["records"]), 1)
         self.assertEqual(out["persist_enabled"], True)
+
+    def test_compare_decisions_service_requires_two_ids(self):
+        out, status = compare_decisions_service(
+            tenant_id="tenant_test_001",
+            envelope_ids=["abcdef0123456789"],
+            comparison_objective="cut_payroll",
+            requested_depth="standard",
+            persist_enabled=True,
+            get_record_fn=lambda **kwargs: None,
+            compare_fn=lambda **kwargs: {"ok": True},
+        )
+
+        self.assertEqual(status, 400)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "at least two envelope_ids are required")
+
+
+    def test_compare_decisions_service_rejects_invalid_id(self):
+        out, status = compare_decisions_service(
+            tenant_id="tenant_test_001",
+            envelope_ids=["abcdef0123456789", "bad!"],
+            comparison_objective="cut_payroll",
+            requested_depth="standard",
+            persist_enabled=True,
+            get_record_fn=lambda **kwargs: None,
+            compare_fn=lambda **kwargs: {"ok": True},
+        )
+
+        self.assertEqual(status, 400)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "invalid envelope_id")
+
+
+    def test_compare_decisions_service_requires_persistence(self):
+        out, status = compare_decisions_service(
+            tenant_id="tenant_test_001",
+            envelope_ids=["abcdef0123456789", "fedcba9876543210"],
+            comparison_objective="cut_payroll",
+            requested_depth="standard",
+            persist_enabled=False,
+            get_record_fn=lambda **kwargs: None,
+            compare_fn=lambda **kwargs: {"ok": True},
+        )
+
+        self.assertEqual(status, 400)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "comparison_requires_persistence")
+
+
+    def test_compare_decisions_service_rejects_tenant_mismatch(self):
+        def get_record_fn(**kwargs):
+            return {
+                "tenant_id": "other_tenant",
+                "envelope_id": kwargs["envelope_id"],
+                "result": {"ok": True, "report": {"governing_objective": "cut_payroll"}},
+            }
+
+        out, status = compare_decisions_service(
+            tenant_id="tenant_test_001",
+            envelope_ids=["abcdef0123456789", "fedcba9876543210"],
+            comparison_objective="cut_payroll",
+            requested_depth="standard",
+            persist_enabled=True,
+            get_record_fn=get_record_fn,
+            compare_fn=lambda **kwargs: {"ok": True},
+        )
+
+        self.assertEqual(status, 403)
+        self.assertFalse(out["ok"])
+        self.assertEqual(out["error"], "tenant_mismatch")
+
+
+    def test_compare_decisions_service_returns_compare_payload(self):
+        def get_record_fn(**kwargs):
+            return {
+                "tenant_id": "tenant_test_001",
+                "envelope_id": kwargs["envelope_id"],
+                "result": {
+                    "ok": True,
+                    "report": {
+                        "governing_objective": "cut_payroll",
+                        "confidence": "medium",
+                        "tradeoffs": {
+                            "upside": [],
+                            "downside": [],
+                            "key_tradeoffs": [],
+                            "asymmetry": [],
+                        },
+                        "sensitivity": [],
+                        "next_actions": [],
+                    },
+                    "audit": {
+                        "tenant_id": "tenant_test_001",
+                        "scenario_type": "draft_trade",
+                    },
+                },
+            }
+
+        def compare_fn(**kwargs):
+            self.assertEqual(kwargs["tenant_id"], "tenant_test_001")
+            self.assertEqual(len(kwargs["artifacts"]), 2)
+            self.assertEqual(kwargs["comparison_objective"], "cut_payroll")
+            return {
+                "ok": True,
+                "comparison_report": {"comparison_summary": "test"},
+                "audit": {"tenant_id": "tenant_test_001"},
+            }
+
+        out, status = compare_decisions_service(
+            tenant_id="tenant_test_001",
+            envelope_ids=["abcdef0123456789", "fedcba9876543210"],
+            comparison_objective="cut_payroll",
+            requested_depth="standard",
+            persist_enabled=True,
+            get_record_fn=get_record_fn,
+            compare_fn=compare_fn,
+        )
+
+        self.assertEqual(status, 200)
+        self.assertTrue(out["ok"])
+        self.assertIn("comparison_report", out)
 
 
 if __name__ == "__main__":
