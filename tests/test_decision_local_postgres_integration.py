@@ -37,11 +37,12 @@ def test_local_postgres_happy_path(monkeypatch):
         "/decision/run",
         headers={"X-Tenant-Id": tenant_id, "X-User-Id": "u1", "X-Role": "operator"},
         json={
-            "situation": "Evaluate a vendor renewal under time pressure.",
-            "options": [
-                {"label": "renew", "description": "Renew the current vendor for one year."},
-                {"label": "rebid", "description": "Run a fast competitive rebid."},
-            ],
+            "scenario": {
+                "scenario_type": "draft_trade",
+                "governing_objective": "cut_payroll",
+                "prompt": "Pick 8 vs 18 trade-down scenario under payroll mandate",
+                "facts": {"you_pick": 8, "counterparty_pick": 18},
+            }
         },
     )
 
