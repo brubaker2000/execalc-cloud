@@ -622,7 +622,9 @@ if __name__ == "__main__":
 # Stage 4: Decision Loop Engine
 # ------------------------------
 
+from src.service.decision_loop.compare import compare_decision_artifacts
 from src.service.decision_loop.service import (
+    compare_decisions_service,
     get_decision_service,
     list_recent_decisions_service,
     run_decision_service,
@@ -719,5 +721,41 @@ def decision_recent():
         raw_limit=request.args.get("limit") or "",
         persist_enabled=_persist_enabled(),
         list_records_fn=list_execution_records,
+    )
+    return out, status
+
+
+@app.post("/decision/compare")
+def decision_compare():
+    """
+    Stage 7B:
+    - Tenant-scoped comparison of 2+ persisted decision artifacts
+    - Deterministic, structured comparison output
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    envelope_ids = body.get("envelope_ids") or []
+    comparison_objective = str(body.get("comparison_objective") or "")
+    requested_depth = str(body.get("requested_depth") or "standard")
+
+    out, status = compare_decisions_service(
+        tenant_id=claims.tenant_id,
+        envelope_ids=envelope_ids,
+        comparison_objective=comparison_objective,
+        requested_depth=requested_depth,
+        persist_enabled=_persist_enabled(),
+        get_record_fn=get_execution_record,
+        compare_fn=compare_decision_artifacts,
     )
     return out, status

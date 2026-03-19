@@ -140,3 +140,64 @@ def list_recent_decisions_service(
         return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
 
     return {"ok": True, "records": rows, "persist_enabled": True}, 200
+
+def compare_decisions_service(
+    *,
+    tenant_id: str,
+    envelope_ids: list[str],
+    comparison_objective: str,
+    requested_depth: str,
+    persist_enabled: bool,
+    get_record_fn: Callable[..., Any] | None,
+    compare_fn: Callable[..., Dict[str, Any]],
+) -> tuple[Dict[str, Any], int]:
+    """
+    Canonical orchestration layer for Stage 7B decision comparison.
+
+    First-cut scope:
+    - compare 2+ persisted decision artifacts
+    - same tenant only
+    - deterministic compare engine
+    """
+    if not isinstance(envelope_ids, list) or len(envelope_ids) < 2:
+        return {"ok": False, "error": "at least two envelope_ids are required"}, 400
+
+    normalized_ids: list[str] = []
+    for raw in envelope_ids:
+        eid = str(raw or "").strip().lower()
+        if not eid or any(c not in "0123456789abcdef" for c in eid) or len(eid) < 16:
+            return {"ok": False, "error": "invalid envelope_id"}, 400
+        normalized_ids.append(eid)
+
+    if len(set(normalized_ids)) < 2:
+        return {"ok": False, "error": "at least two unique envelope_ids are required"}, 400
+
+    if not persist_enabled:
+        return {"ok": False, "error": "comparison_requires_persistence"}, 400
+
+    if get_record_fn is None:
+        return {"ok": False, "error": "db_unavailable"}, 503
+
+    artifacts: list[Dict[str, Any]] = []
+    try:
+        for eid in normalized_ids:
+            rec = get_record_fn(tenant_id=tenant_id, envelope_id=eid)
+            if not rec:
+                return {"ok": False, "error": "not_found", "envelope_id": eid}, 404
+            if str(rec.get("tenant_id") or tenant_id) != tenant_id:
+                return {"ok": False, "error": "tenant_mismatch", "envelope_id": eid}, 403
+            artifacts.append(rec)
+    except Exception as e:
+        return {"ok": False, "error": "db_unavailable", "detail": str(e)}, 503
+
+    try:
+        out = compare_fn(
+            tenant_id=tenant_id,
+            artifacts=artifacts,
+            comparison_objective=(comparison_objective or "").strip(),
+            requested_depth=(requested_depth or "standard").strip() or "standard",
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+
+    return out, 200
