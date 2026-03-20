@@ -142,6 +142,11 @@ export default function ExecalcPage() {
     coreThesis: decision?.report?.executive_summary || MOCK_ARTIFACT.coreThesis,
     executiveBrief:
       decision?.report?.value_assessment || MOCK_ARTIFACT.executiveBrief,
+    keyInsights:
+      decision?.report?.tradeoffs?.key_tradeoffs &&
+      decision.report.tradeoffs.key_tradeoffs.length > 0
+        ? decision.report.tradeoffs.key_tradeoffs
+        : MOCK_ARTIFACT.keyInsights,
     decisionSignal: error
       ? `Decision failed: ${error}`
       : decision?.report
