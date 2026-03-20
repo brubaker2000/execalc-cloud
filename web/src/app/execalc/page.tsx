@@ -3,6 +3,27 @@
 import { useMemo, useState } from "react";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
+type ExecutiveArtifact = {
+  coreThesis: string;
+  executiveBrief: string;
+  keyInsights: string[];
+  decisionSignal: string;
+};
+
+const MOCK_ARTIFACT: ExecutiveArtifact = {
+  coreThesis:
+    "Execalc becomes materially more valuable when the interface preserves high-signal thinking in real time instead of forcing the operator to recover it from scrollback.",
+  executiveBrief:
+    "The current shell already supports a right-side rail, which makes it the cleanest place to prove the Real-Time Decision Artifact Engine in product. Instead of showing passive context only, the rail should act as a live executive layer that tracks what the conversation has actually concluded, what matters, and where judgment is heading.",
+  keyInsights: [
+    "The right rail is the first visible proof of Execalc's cognition layer.",
+    "The operator should be able to think from the rail while the chat is still unfolding.",
+    "This stub should be deterministic first, then wired to live scenario and decision logic.",
+  ],
+  decisionSignal:
+    "Structurally correct next move. Keep the first implementation mocked and visible, then wire it to live cognition after the UI shape is proven.",
+};
+
 type DecisionRunResponse = {
   ok: boolean;
   report?: {
@@ -118,9 +139,7 @@ export default function ExecalcPage() {
             Core Thesis
           </div>
           <p className="mt-2 text-sm leading-6 text-zinc-200">
-            Execalc becomes materially more valuable when the interface preserves
-            high-signal thinking in real time instead of forcing the operator to
-            recover it from scrollback.
+            {MOCK_ARTIFACT.coreThesis}
           </p>
         </div>
 
@@ -129,11 +148,7 @@ export default function ExecalcPage() {
             Executive Brief
           </div>
           <p className="mt-2 text-sm leading-6 text-zinc-300">
-            The current shell already supports a right-side rail, which makes it
-            the cleanest place to prove the Real-Time Decision Artifact Engine in
-            product. Instead of showing passive context only, the rail should act
-            as a live executive layer that tracks what the conversation has
-            actually concluded, what matters, and where judgment is heading.
+            {MOCK_ARTIFACT.executiveBrief}
           </p>
         </div>
 
@@ -142,11 +157,7 @@ export default function ExecalcPage() {
             Key Insights
           </div>
           <div className="mt-2 space-y-2">
-            {[
-              "The right rail is the first visible proof of Execalc's cognition layer.",
-              "The operator should be able to think from the rail while the chat is still unfolding.",
-              "This stub should be deterministic first, then wired to live scenario and decision logic.",
-            ].map((insight) => (
+            {MOCK_ARTIFACT.keyInsights.map((insight) => (
               <div
                 key={insight}
                 className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm leading-6 text-zinc-300"
@@ -162,9 +173,7 @@ export default function ExecalcPage() {
             Decision Signal
           </div>
           <p className="mt-2 text-sm leading-6 text-zinc-200">
-            Structurally correct next move. Keep the first implementation mocked
-            and visible, then wire it to live cognition after the UI shape is
-            proven.
+            {MOCK_ARTIFACT.decisionSignal}
           </p>
         </div>
       </div>
