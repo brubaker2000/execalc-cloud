@@ -140,6 +140,8 @@ export default function ExecalcPage() {
         ? "Updating"
         : MOCK_ARTIFACT.updatedAt,
     coreThesis: decision?.report?.executive_summary || MOCK_ARTIFACT.coreThesis,
+    executiveBrief:
+      decision?.report?.value_assessment || MOCK_ARTIFACT.executiveBrief,
     decisionSignal: error
       ? `Decision failed: ${error}`
       : decision?.report
