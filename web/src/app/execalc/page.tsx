@@ -5,6 +5,10 @@ import { LiveExecutiveBrief, type ExecutiveArtifact } from "@/components/shell/l
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
 const MOCK_ARTIFACT: ExecutiveArtifact = {
+  label: "Live Executive Brief",
+  updatedAt: "Stage 8",
+  sourceSurface: "Execalc Workspace",
+  status: "Mocked",
   coreThesis:
     "Execalc becomes materially more valuable when the interface preserves high-signal thinking in real time instead of forcing the operator to recover it from scrollback.",
   executiveBrief:

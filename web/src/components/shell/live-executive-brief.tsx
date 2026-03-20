@@ -1,4 +1,8 @@
 type ExecutiveArtifact = {
+  label?: string;
+  updatedAt?: string;
+  sourceSurface?: string;
+  status?: string;
   coreThesis: string;
   executiveBrief: string;
   keyInsights: string[];
@@ -15,8 +19,28 @@ export function LiveExecutiveBrief({
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
       <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        Live Executive Brief
+        {artifact.label || "Live Executive Brief"}
       </div>
+
+      {artifact.updatedAt || artifact.sourceSurface || artifact.status ? (
+        <div className="mt-3 flex flex-wrap gap-2 text-xs text-zinc-400">
+          {artifact.updatedAt ? (
+            <div className="rounded-full border border-zinc-800 bg-zinc-950 px-2 py-1">
+              Updated: {artifact.updatedAt}
+            </div>
+          ) : null}
+          {artifact.sourceSurface ? (
+            <div className="rounded-full border border-zinc-800 bg-zinc-950 px-2 py-1">
+              Surface: {artifact.sourceSurface}
+            </div>
+          ) : null}
+          {artifact.status ? (
+            <div className="rounded-full border border-zinc-800 bg-zinc-950 px-2 py-1">
+              Status: {artifact.status}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="mt-4 space-y-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
