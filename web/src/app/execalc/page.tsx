@@ -3,12 +3,6 @@
 import { useMemo, useState } from "react";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
-const signals = [
-  "Rising disagreement around pricing language",
-  "Emerging lender outreach opportunity",
-  "Cross-thread concern about execution burden",
-];
-
 type DecisionRunResponse = {
   ok: boolean;
   report?: {
@@ -115,50 +109,63 @@ export default function ExecalcPage() {
   const rightRail = (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
       <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-        Context
+        Live Executive Brief
       </div>
 
       <div className="mt-4 space-y-4">
-        <div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
           <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Active Project
+            Core Thesis
           </div>
-          <div className="mt-2 text-sm text-zinc-200">PCG Workspace</div>
+          <p className="mt-2 text-sm leading-6 text-zinc-200">
+            Execalc becomes materially more valuable when the interface preserves
+            high-signal thinking in real time instead of forcing the operator to
+            recover it from scrollback.
+          </p>
         </div>
 
-        <div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
           <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Current Thread
+            Executive Brief
           </div>
-          <div className="mt-2 text-sm text-zinc-200">
-            Stage 8 UI shell scaffold
-          </div>
+          <p className="mt-2 text-sm leading-6 text-zinc-300">
+            The current shell already supports a right-side rail, which makes it
+            the cleanest place to prove the Real-Time Decision Artifact Engine in
+            product. Instead of showing passive context only, the rail should act
+            as a live executive layer that tracks what the conversation has
+            actually concluded, what matters, and where judgment is heading.
+          </p>
         </div>
 
-        <div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
           <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Organizational Signals
+            Key Insights
           </div>
           <div className="mt-2 space-y-2">
-            {signals.map((signal) => (
+            {[
+              "The right rail is the first visible proof of Execalc's cognition layer.",
+              "The operator should be able to think from the rail while the chat is still unfolding.",
+              "This stub should be deterministic first, then wired to live scenario and decision logic.",
+            ].map((insight) => (
               <div
-                key={signal}
-                className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-300"
+                key={insight}
+                className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm leading-6 text-zinc-300"
               >
-                {signal}
+                {insight}
               </div>
             ))}
           </div>
         </div>
 
-        <div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
           <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Current Objective
+            Decision Signal
           </div>
-          <div className="mt-2 text-sm text-zinc-200">
-            Establish the first executable UI shell for the strategic operating
-            system.
-          </div>
+          <p className="mt-2 text-sm leading-6 text-zinc-200">
+            Structurally correct next move. Keep the first implementation mocked
+            and visible, then wire it to live cognition after the UI shape is
+            proven.
+          </p>
         </div>
       </div>
     </div>
