@@ -127,11 +127,25 @@ export default function ExecalcPage() {
 
   const artifact: ExecutiveArtifact = {
     ...MOCK_ARTIFACT,
-    status: decision?.report ? "Live" : MOCK_ARTIFACT.status,
-    updatedAt: decision?.report ? "Decision generated" : MOCK_ARTIFACT.updatedAt,
-    decisionSignal: decision?.report
-      ? `Decision ready: ${decision.report.confidence || "unknown"} confidence`
-      : MOCK_ARTIFACT.decisionSignal,
+    status: isSubmitting
+      ? "Converting"
+      : error
+        ? "Error"
+        : decision?.report
+          ? "Live"
+          : MOCK_ARTIFACT.status,
+    updatedAt: decision?.report
+      ? "Decision generated"
+      : isSubmitting
+        ? "Updating"
+        : MOCK_ARTIFACT.updatedAt,
+    decisionSignal: error
+      ? `Decision failed: ${error}`
+      : decision?.report
+        ? `Decision ready: ${decision.report.confidence || "unknown"} confidence`
+        : isSubmitting
+          ? "Decision conversion in progress"
+          : MOCK_ARTIFACT.decisionSignal,
   };
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
