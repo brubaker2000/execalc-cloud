@@ -125,7 +125,16 @@ export default function ExecalcPage() {
     }
   }
 
-  const rightRail = <LiveExecutiveBrief artifact={MOCK_ARTIFACT} />;
+  const artifact: ExecutiveArtifact = {
+    ...MOCK_ARTIFACT,
+    status: decision?.report ? "Live" : MOCK_ARTIFACT.status,
+    updatedAt: decision?.report ? "Decision generated" : MOCK_ARTIFACT.updatedAt,
+    decisionSignal: decision?.report
+      ? `Decision ready: ${decision.report.confidence || "unknown"} confidence`
+      : MOCK_ARTIFACT.decisionSignal,
+  };
+
+  const rightRail = <LiveExecutiveBrief artifact={artifact} />;
 
   return (
     <WorkspaceShell activeTab="Execalc" rightRail={rightRail}>
