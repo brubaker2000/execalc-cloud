@@ -1,9 +1,9 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-07
-Last verified state: Stage 7A local Postgres happy path proven on workstation
+Last updated: 2026-03-21
+Last verified state: Stage 4C–4E Execution Boundary Engine implemented, integrated, tested, and pushed on stage8/ui-shell-scaffold
 
-## Stage 4A–4C: Decision Loop Engine (COMPLETE)
+## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
 - Engine module:
   - src/service/decision_loop/engine.py
@@ -14,6 +14,46 @@ Last verified state: Stage 7A local Postgres happy path proven on workstation
 - Persistence metadata (response audit):
   - audit.envelope_id
   - audit.persist
+
+## Stage 4C: Action Proposal Contract (COMPLETE)
+- Spec: docs/product/EXECUTION_BOUNDARY_ENGINE_SPEC.md
+- Runtime models added to:
+  - src/service/decision_loop/models.py
+- New models:
+  - ActionProposal
+  - ExecutionSnapshot
+  - BoundaryDecision
+
+## Stage 4D: Execution Boundary Engine (COMPLETE)
+- Engine module:
+  - src/service/decision_loop/execution_boundary_engine.py
+- Deterministic outcomes:
+  - ALLOW
+  - BLOCK
+  - RECOMPUTE
+  - ESCALATE
+- Deterministic checks implemented for:
+  - proposal expiration
+  - missing authority
+  - execution window closed
+  - blocking policy flags
+  - blocking constraint flags
+  - missing required inputs
+  - material state change
+  - elevated risk posture
+  - manual review requirement
+- Unit test:
+  - src/service/decision_loop/test_execution_boundary_engine.py
+
+## Stage 4E: Execution Audit Trail (COMPLETE FOR CURRENT SERVICE PATH)
+- Boundary result now emitted in service response as:
+  - execution_boundary
+- Boundary result also mirrored into:
+  - audit.execution_boundary
+- Live service integration:
+  - src/service/decision_loop/service.py
+- Verified by service test:
+  - src/service/decision_loop/test_service.py
 
 ## Stage 5A: Decision Journal Retrieval (COMPLETE)
 - Endpoint: GET /decision/<envelope_id>
@@ -39,8 +79,7 @@ Last verified state: Stage 7A local Postgres happy path proven on workstation
   - pytest -q
   - local /decision/run check with persistence off
 
-## Next
-### Stage 7A status (live verified on 2026-03-07)
+## Stage 7A status (live verified on 2026-03-07)
 - Lazy-loaded Postgres driver so unit tests no longer fail on eager import
 - Persistence-enabled paths covered for:
   - GET /decision/<envelope_id>
@@ -57,10 +96,30 @@ Last verified state: Stage 7A local Postgres happy path proven on workstation
   - Shell has `noclobber` behavior; `rm -f` may be needed before redirecting to existing files
   - Long heredocs and long quoted commands are fragile in this environment; prefer simpler, verifiable steps
 
+## Current Architecture Reality
+Execalc is now operating as a decision-plus-execution-governance system, not merely a decision artifact generator.
+
+Current governed runtime path:
+- operator input
+- scenario construction
+- decision loop engine
+- action proposal
+- execution boundary engine
+- allow / block / recompute / escalate
+- execution or human review
+
+The Executive Rail remains a display surface.
+The decision service remains the current runtime spine.
+A future chat orchestration layer will sit above both.
+
 ## Next
-- Add a DB-available integration-test slice for Stage 7A (skipped when local Postgres is not available)
-- Then move to Stage 7B `/decision/compare` once the journal behavior is stable
+- Formalize the runtime architecture docs so the EBE is canon in the system map
+- Surface execution_boundary state in the UI Executive Rail
+- Define the chat orchestration layer that classifies turns into discuss / decide / action / execute
+- Introduce real execution adapters after orchestration exists
+- Deepen persistence so execution-boundary events can be queried independently over time
 
 ## Future Layer Awareness
 - Intelligent Front Door is now recognized as a future architectural layer.
-- It is not current build scope and should follow sufficient stabilization of the decision journal and comparative reasoning layer.
+- Chat Orchestration Layer is now recognized as a future architectural layer.
+- Neither should bypass the Execution Boundary Engine once action is implicated.
