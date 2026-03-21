@@ -3,8 +3,11 @@ from __future__ import annotations
 from typing import Any, Callable, Dict
 import secrets
 
+from datetime import UTC, datetime, timedelta
+
 from src.service.decision_loop.engine import run_decision_loop
-from src.service.decision_loop.models import Scenario
+from src.service.decision_loop.execution_boundary_engine import evaluate_execution_boundary
+from src.service.decision_loop.models import ActionProposal, ExecutionSnapshot, Scenario
 from src.service.execution_record import ExecutionRecord
 
 
@@ -56,15 +59,52 @@ def run_decision_service(
     report = run_decision_loop(tenant_id=tenant_id, user_id=user_id, scenario=scenario)
 
     envelope_id = secrets.token_hex(16)
+
+    issued_at = datetime.now(UTC)
+    proposal = ActionProposal(
+        proposal_id=f"proposal_{envelope_id[:12]}",
+        tenant_id=tenant_id,
+        user_id=user_id,
+        action_type="decision_artifact_ready",
+        target_ref=envelope_id,
+        payload={
+            "scenario_type": scenario.scenario_type,
+            "governing_objective": scenario.governing_objective,
+            "requested_depth": scenario.requested_depth,
+        },
+        decision_envelope_id=envelope_id,
+        issued_at=issued_at,
+        expires_at=issued_at + timedelta(minutes=15),
+        authority_context={"user_id": user_id, "tenant_id": tenant_id, "role": "operator"},
+        risk_level="medium",
+        requires_human_review=False,
+    )
+    snapshot = ExecutionSnapshot(
+        snapshot_time=issued_at,
+        tenant_id=tenant_id,
+        user_id=user_id,
+        current_authority={"user_id": user_id, "tenant_id": tenant_id, "role": "operator"},
+        current_state_hash=f"scenario:{scenario.scenario_type}:{scenario.requested_depth}",
+        constraint_flags=[],
+        policy_flags=[],
+        required_inputs_present=True,
+        risk_posture="normal",
+        execution_window_open=True,
+    )
+    boundary = evaluate_execution_boundary(proposal, snapshot)
+
+    out = report.to_dict()
+    out["execution_boundary"] = boundary.to_dict()
+    out["audit"] = dict(out.get("audit") or {})
+    out["audit"]["execution_boundary"] = boundary.to_dict()
+
     record = ExecutionRecord(
         tenant_id=tenant_id,
         envelope_id=envelope_id,
-        result=report.to_dict(),
+        result=out,
     )
     persisted = persist_fn(record)
 
-    out = report.to_dict()
-    out["audit"] = dict(out.get("audit") or {})
     out["audit"]["envelope_id"] = envelope_id
     out["audit"]["persist"] = persisted
     return out

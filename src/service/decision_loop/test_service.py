@@ -38,6 +38,13 @@ class TestDecisionService(unittest.TestCase):
         self.assertTrue(out["ok"])
         self.assertIn("report", out)
         self.assertIn("audit", out)
+        self.assertIn("execution_boundary", out)
+        self.assertEqual(out["execution_boundary"]["status"], "ALLOW")
+        self.assertIn("execution_boundary", out["audit"])
+        self.assertEqual(
+            out["audit"]["execution_boundary"]["status"],
+            out["execution_boundary"]["status"],
+        )
         self.assertEqual(out["audit"]["tenant_id"], "tenant_test_001")
         self.assertEqual(out["audit"]["user_id"], "test_user")
         self.assertEqual(out["audit"]["scenario_type"], "draft_trade")
