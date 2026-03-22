@@ -3,11 +3,29 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, Dict, Optional
 
+from src.service.decision_loop.models import ActionProposal
 from src.service.orchestration.models import ScenarioEnvelope, TurnClass
 
 
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat()
+def _now() -> datetime:
+    return datetime.now(UTC)
+
+
+def _serialize_action_proposal(proposal: ActionProposal) -> Dict[str, Any]:
+    return {
+        "proposal_id": proposal.proposal_id,
+        "tenant_id": proposal.tenant_id,
+        "user_id": proposal.user_id,
+        "action_type": proposal.action_type,
+        "target_ref": proposal.target_ref,
+        "payload": proposal.payload,
+        "decision_envelope_id": proposal.decision_envelope_id,
+        "issued_at": proposal.issued_at.isoformat(),
+        "expires_at": proposal.expires_at.isoformat() if proposal.expires_at else None,
+        "authority_context": proposal.authority_context,
+        "risk_level": proposal.risk_level,
+        "requires_human_review": proposal.requires_human_review,
+    }
 
 
 def classify_turn(user_text: str) -> TurnClass:
@@ -36,7 +54,7 @@ def build_scenario_envelope(
     governing_objective: str = "unspecified",
     relevant_constraints: Optional[Dict[str, Any]] = None,
 ) -> ScenarioEnvelope:
-    now = datetime.now(UTC)
+    now = _now()
     return ScenarioEnvelope(
         scenario_id=f"scenario_{int(now.timestamp())}",
         scenario_type=scenario_type,
@@ -51,10 +69,34 @@ def build_scenario_envelope(
     )
 
 
+def _build_action_proposal(
+    *,
+    scenario: ScenarioEnvelope,
+    tenant_id: str,
+    user_id: str,
+    action_type: str,
+    requires_human_review: bool = False,
+    risk_level: str = "unknown",
+) -> ActionProposal:
+    return ActionProposal(
+        proposal_id=f"proposal_{scenario.scenario_id}",
+        tenant_id=tenant_id,
+        user_id=user_id,
+        action_type=action_type,
+        payload={"source_prompt": scenario.prompt},
+        decision_envelope_id=scenario.scenario_id,
+        authority_context={"governing_objective": scenario.governing_objective},
+        risk_level=risk_level,
+        requires_human_review=requires_human_review,
+    )
+
+
 def route_turn(
     *,
     turn_class: TurnClass,
     scenario: ScenarioEnvelope,
+    tenant_id: str,
+    user_id: str,
 ) -> Dict[str, Any]:
     if turn_class == "decision_seeking":
         return {
@@ -66,38 +108,32 @@ def route_turn(
         }
 
     if turn_class == "action_proposing":
+        proposal = _build_action_proposal(
+            scenario=scenario,
+            tenant_id=tenant_id,
+            user_id=user_id,
+            action_type="proposed_action",
+        )
         return {
             "decision_result": {"ok": True, "status": "stubbed"},
-            "action_proposal": {
-                "proposal_id": f"proposal_{scenario.scenario_id}",
-                "scenario_id": scenario.scenario_id,
-                "action_type": "proposed_action",
-                "action_payload": {"source_prompt": scenario.prompt},
-                "assumptions": [],
-                "constraints": scenario.relevant_constraints,
-                "approval_thresholds": {},
-                "confidence": "unknown",
-                "created_at": _now_iso(),
-            },
+            "action_proposal": _serialize_action_proposal(proposal),
             "execution_boundary_result": None,
             "assistant_message": "Action proposal path selected.",
             "rail_state": {"mode": "action_proposal"},
         }
 
     if turn_class == "execution_seeking":
+        proposal = _build_action_proposal(
+            scenario=scenario,
+            tenant_id=tenant_id,
+            user_id=user_id,
+            action_type="execution_requested",
+            requires_human_review=True,
+            risk_level="elevated",
+        )
         return {
             "decision_result": None,
-            "action_proposal": {
-                "proposal_id": f"proposal_{scenario.scenario_id}",
-                "scenario_id": scenario.scenario_id,
-                "action_type": "execution_requested",
-                "action_payload": {"source_prompt": scenario.prompt},
-                "assumptions": [],
-                "constraints": scenario.relevant_constraints,
-                "approval_thresholds": {},
-                "confidence": "unknown",
-                "created_at": _now_iso(),
-            },
+            "action_proposal": _serialize_action_proposal(proposal),
             "execution_boundary_result": {
                 "status": "ESCALATE",
                 "reason": "EBE v2 integration not wired yet",
@@ -130,6 +166,8 @@ def run_orchestration(
     scenario_type: str = "general",
     governing_objective: str = "unspecified",
     relevant_constraints: Optional[Dict[str, Any]] = None,
+    tenant_id: str = "tenant_test_001",
+    user_id: str = "test_user",
 ) -> Dict[str, Any]:
     turn_class = classify_turn(user_text)
     scenario = build_scenario_envelope(
@@ -139,7 +177,12 @@ def run_orchestration(
         governing_objective=governing_objective,
         relevant_constraints=relevant_constraints,
     )
-    routed = route_turn(turn_class=turn_class, scenario=scenario)
+    routed = route_turn(
+        turn_class=turn_class,
+        scenario=scenario,
+        tenant_id=tenant_id,
+        user_id=user_id,
+    )
 
     return {
         "ok": True,
