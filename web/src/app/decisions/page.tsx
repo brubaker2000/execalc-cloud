@@ -45,6 +45,28 @@ type DecisionDetailResponse = {
   error?: string;
 };
 
+type OrchestrationResponse = {
+  ok: boolean;
+  turn_class?: string;
+  assistant_message?: string;
+  rail_state?: {
+    mode?: string;
+  };
+  action_proposal?: {
+    action_type?: string;
+    tenant_id?: string;
+    user_id?: string;
+    requires_human_review?: boolean;
+    risk_level?: string;
+  } | null;
+  execution_boundary_result?: {
+    status?: string;
+    reason?: string;
+  } | null;
+  error?: string;
+};
+
+
 const rightRail = (
   <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
     <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
@@ -82,6 +104,11 @@ export default function DecisionsPage() {
   const [loadingList, setLoadingList] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [orchestrationInput, setOrchestrationInput] = useState("What should we do?");
+  const [orchestrationLoading, setOrchestrationLoading] = useState(false);
+  const [orchestrationResult, setOrchestrationResult] =
+    useState<OrchestrationResponse | null>(null);
+  const [orchestrationError, setOrchestrationError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadRecent() {
@@ -162,6 +189,43 @@ export default function DecisionsPage() {
 
   const report = detail?.result?.report;
 
+  async function runOrchestrationProbe() {
+    setOrchestrationLoading(true);
+    setOrchestrationError(null);
+
+    try {
+      const response = await fetch("/api/orchestration/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": "test_user",
+          "X-Role": "operator",
+          "X-Tenant-Id": "tenant_test_001",
+        },
+        body: JSON.stringify({
+          user_text: orchestrationInput,
+          scenario_type: "general",
+          governing_objective: "workspace_probe",
+        }),
+      });
+
+      const body = (await response.json()) as OrchestrationResponse;
+
+      if (!response.ok || !body.ok) {
+        setOrchestrationResult(null);
+        setOrchestrationError(body.error || "Failed to run orchestration");
+        return;
+      }
+
+      setOrchestrationResult(body);
+    } catch (err) {
+      setOrchestrationResult(null);
+      setOrchestrationError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setOrchestrationLoading(false);
+    }
+  }
+
   return (
     <WorkspaceShell activeTab="Decisions" rightRail={rightRail}>
       <div className="mb-6">
@@ -186,6 +250,98 @@ export default function DecisionsPage() {
           <p className="text-sm text-red-200">{error}</p>
         </div>
       ) : null}
+
+      <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          Orchestration Probe
+        </div>
+        <p className="mb-4 max-w-2xl text-sm text-zinc-400">
+          Narrow end-to-end proof for the thin chat orchestration layer. This sends one
+          executive turn through the new orchestration API and shows the returned runtime envelope.
+        </p>
+
+        <div className="flex flex-col gap-3">
+          <textarea
+            value={orchestrationInput}
+            onChange={(e) => setOrchestrationInput(e.target.value)}
+            className="min-h-[96px] rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none"
+          />
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={runOrchestrationProbe}
+              disabled={orchestrationLoading || !orchestrationInput.trim()}
+              className="rounded-lg border border-zinc-700 bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {orchestrationLoading ? "Running..." : "Run orchestration"}
+            </button>
+
+            {orchestrationError ? (
+              <span className="text-sm text-red-300">{orchestrationError}</span>
+            ) : null}
+          </div>
+
+          {orchestrationResult ? (
+            <div className="mt-2 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    Turn Class
+                  </div>
+                  <div className="mt-1 text-sm text-zinc-200">
+                    {orchestrationResult.turn_class || "unknown"}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    Rail Mode
+                  </div>
+                  <div className="mt-1 text-sm text-zinc-200">
+                    {orchestrationResult.rail_state?.mode || "unknown"}
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                    Assistant Message
+                  </div>
+                  <div className="mt-1 text-sm text-zinc-200">
+                    {orchestrationResult.assistant_message || "No message returned."}
+                  </div>
+                </div>
+
+                {orchestrationResult.action_proposal ? (
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      Action Proposal
+                    </div>
+                    <div className="mt-2 space-y-1 text-sm text-zinc-200">
+                      <div>Type: {orchestrationResult.action_proposal.action_type || "unknown"}</div>
+                      <div>Tenant: {orchestrationResult.action_proposal.tenant_id || "unknown"}</div>
+                      <div>User: {orchestrationResult.action_proposal.user_id || "unknown"}</div>
+                      <div>
+                        Human Review: {orchestrationResult.action_proposal.requires_human_review ? "yes" : "no"}
+                      </div>
+                      <div>Risk: {orchestrationResult.action_proposal.risk_level || "unknown"}</div>
+                    </div>
+                  </div>
+                ) : null}
+
+                {orchestrationResult.execution_boundary_result ? (
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      Boundary Result
+                    </div>
+                    <div className="mt-2 space-y-1 text-sm text-zinc-200">
+                      <div>Status: {orchestrationResult.execution_boundary_result.status || "unknown"}</div>
+                      <div>Reason: {orchestrationResult.execution_boundary_result.reason || "none"}</div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
