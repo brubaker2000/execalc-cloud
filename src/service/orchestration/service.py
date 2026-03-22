@@ -1,45 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, Optional
 
-
-TurnClass = Literal[
-    "conversational",
-    "decision_seeking",
-    "action_proposing",
-    "execution_seeking",
-    "evidence_seeking",
-]
-
-
-@dataclass
-class ScenarioEnvelope:
-    scenario_id: str
-    scenario_type: str
-    governing_objective: str
-    user_intent: str
-    prompt: str
-    relevant_constraints: Dict[str, Any]
-    decision_state: str
-    action_state: str
-    created_at: str
-    updated_at: str
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "scenario_id": self.scenario_id,
-            "scenario_type": self.scenario_type,
-            "governing_objective": self.governing_objective,
-            "user_intent": self.user_intent,
-            "prompt": self.prompt,
-            "relevant_constraints": self.relevant_constraints,
-            "decision_state": self.decision_state,
-            "action_state": self.action_state,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
-        }
+from src.service.orchestration.models import ScenarioEnvelope, TurnClass
 
 
 def _now_iso() -> str:
@@ -72,9 +36,9 @@ def build_scenario_envelope(
     governing_objective: str = "unspecified",
     relevant_constraints: Optional[Dict[str, Any]] = None,
 ) -> ScenarioEnvelope:
-    now = _now_iso()
+    now = datetime.now(UTC)
     return ScenarioEnvelope(
-        scenario_id=f"scenario_{int(datetime.now(UTC).timestamp())}",
+        scenario_id=f"scenario_{int(now.timestamp())}",
         scenario_type=scenario_type,
         governing_objective=governing_objective,
         user_intent=turn_class,
