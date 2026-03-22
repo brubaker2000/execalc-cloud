@@ -13,12 +13,20 @@ class TestOrchestrationService(unittest.TestCase):
         self.assertIsNone(out["execution_boundary_result"])
         self.assertEqual(out["rail_state"]["mode"], "decision")
 
-    def test_action_proposing_turn_emits_action_proposal(self):
+    def test_action_proposing_turn_emits_shared_action_proposal_fields(self):
         out = run_orchestration(user_text="Draft the next move.")
         self.assertTrue(out["ok"])
         self.assertEqual(out["turn_class"], "action_proposing")
         self.assertIsNotNone(out["action_proposal"])
         self.assertEqual(out["action_proposal"]["action_type"], "proposed_action")
+        self.assertEqual(out["action_proposal"]["tenant_id"], "tenant_test_001")
+        self.assertEqual(out["action_proposal"]["user_id"], "test_user")
+        self.assertEqual(
+            out["action_proposal"]["decision_envelope_id"],
+            out["scenario"]["scenario_id"],
+        )
+        self.assertEqual(out["action_proposal"]["risk_level"], "unknown")
+        self.assertFalse(out["action_proposal"]["requires_human_review"])
         self.assertIsNone(out["execution_boundary_result"])
         self.assertEqual(out["rail_state"]["mode"], "action_proposal")
 
@@ -27,6 +35,14 @@ class TestOrchestrationService(unittest.TestCase):
         self.assertTrue(out["ok"])
         self.assertEqual(out["turn_class"], "execution_seeking")
         self.assertIsNotNone(out["action_proposal"])
+        self.assertEqual(out["action_proposal"]["tenant_id"], "tenant_test_001")
+        self.assertEqual(out["action_proposal"]["user_id"], "test_user")
+        self.assertEqual(
+            out["action_proposal"]["decision_envelope_id"],
+            out["scenario"]["scenario_id"],
+        )
+        self.assertEqual(out["action_proposal"]["risk_level"], "elevated")
+        self.assertTrue(out["action_proposal"]["requires_human_review"])
         self.assertIsNotNone(out["execution_boundary_result"])
         self.assertEqual(out["execution_boundary_result"]["status"], "ESCALATE")
         self.assertEqual(out["rail_state"]["mode"], "execution_review")
