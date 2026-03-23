@@ -130,6 +130,17 @@ def route_turn(
         }
 
     if turn_class == "action_proposing":
+        decision_out = run_decision_service(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            scenario_in={
+                "scenario_type": scenario.scenario_type,
+                "governing_objective": scenario.governing_objective,
+                "prompt": scenario.prompt,
+                "constraints": scenario.relevant_constraints,
+            },
+            persist_fn=_noop_persist,
+        )
         proposal = _build_action_proposal(
             scenario=scenario,
             tenant_id=tenant_id,
@@ -137,7 +148,7 @@ def route_turn(
             action_type="proposed_action",
         )
         return {
-            "decision_result": {"ok": True, "status": "stubbed"},
+            "decision_result": decision_out,
             "action_proposal": _serialize_action_proposal(proposal),
             "execution_boundary_result": None,
             "assistant_message": "Action proposal path selected.",
