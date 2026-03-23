@@ -10,7 +10,8 @@ class TestOrchestrationService(unittest.TestCase):
         self.assertEqual(out["turn_class"], "decision_seeking")
         self.assertIsNotNone(out["decision_result"])
         self.assertIsNone(out["action_proposal"])
-        self.assertIsNone(out["execution_boundary_result"])
+        self.assertIsNotNone(out["execution_boundary_result"])
+        self.assertEqual(out["execution_boundary_result"]["status"], "ALLOW")
         self.assertEqual(out["rail_state"]["mode"], "decision")
 
     def test_action_proposing_turn_emits_shared_action_proposal_fields(self):

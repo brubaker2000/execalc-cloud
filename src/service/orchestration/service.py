@@ -4,6 +4,8 @@ from datetime import UTC, datetime
 from typing import Any, Dict, Optional
 
 from src.service.decision_loop.models import ActionProposal
+from src.service.decision_loop.service import run_decision_service
+from src.service.execution_record import ExecutionRecord
 from src.service.orchestration.models import ScenarioEnvelope, TurnClass
 
 
@@ -25,6 +27,15 @@ def _serialize_action_proposal(proposal: ActionProposal) -> Dict[str, Any]:
         "authority_context": proposal.authority_context,
         "risk_level": proposal.risk_level,
         "requires_human_review": proposal.requires_human_review,
+    }
+
+
+def _noop_persist(record: ExecutionRecord) -> Dict[str, Any]:
+    return {
+        "persisted": False,
+        "persist_table": None,
+        "envelope_id": record.envelope_id,
+        "mode": "orchestration_noop",
     }
 
 
@@ -99,10 +110,21 @@ def route_turn(
     user_id: str,
 ) -> Dict[str, Any]:
     if turn_class == "decision_seeking":
+        decision_out = run_decision_service(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            scenario_in={
+                "scenario_type": scenario.scenario_type,
+                "governing_objective": scenario.governing_objective,
+                "prompt": scenario.prompt,
+                "constraints": scenario.relevant_constraints,
+            },
+            persist_fn=_noop_persist,
+        )
         return {
-            "decision_result": {"ok": True, "status": "stubbed"},
+            "decision_result": decision_out,
             "action_proposal": None,
-            "execution_boundary_result": None,
+            "execution_boundary_result": decision_out.get("execution_boundary"),
             "assistant_message": "Decision path selected.",
             "rail_state": {"mode": "decision"},
         }
