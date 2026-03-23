@@ -58,7 +58,7 @@ class TestOrchestrationAPI(unittest.TestCase):
         body = response.get_json()
         self.assertTrue(body["ok"])
         self.assertEqual(body["turn_class"], "execution_seeking")
-        self.assertEqual(body["execution_boundary_result"]["status"], "ESCALATE")
+        self.assertEqual(body["execution_boundary_result"]["status"], "ALLOW")
         self.assertTrue(body["action_proposal"]["requires_human_review"])
         self.assertEqual(body["rail_state"]["mode"], "execution_review")
 

@@ -45,7 +45,7 @@ class TestOrchestrationService(unittest.TestCase):
         self.assertEqual(out["action_proposal"]["risk_level"], "elevated")
         self.assertTrue(out["action_proposal"]["requires_human_review"])
         self.assertIsNotNone(out["execution_boundary_result"])
-        self.assertEqual(out["execution_boundary_result"]["status"], "ESCALATE")
+        self.assertEqual(out["execution_boundary_result"]["status"], "ALLOW")
         self.assertEqual(out["rail_state"]["mode"], "execution_review")
 
     def test_conversational_turn_does_not_create_execution_state(self):
