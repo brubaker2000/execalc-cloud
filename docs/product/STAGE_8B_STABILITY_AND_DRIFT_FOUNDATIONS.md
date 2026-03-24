@@ -1,7 +1,15 @@
 # Stage 8B — Stability & Drift Foundations
 
-Status: Planned architecture tranche  
+Status: In progress — observe-only foundation implemented at the decision service seam  
 Purpose: Capture the next governance hardening layer for Execalc without derailing the newly established orchestration spine.
+
+Current implementation checkpoint:
+- Observe-only Stage 8B instrumentation now exists at `src/service/decision_loop/service.py`
+- `audit.stability` and `audit.drift` are attached at the canonical decision-service seam
+- Stability registry version `stage8b.2` tracks invariants for `decision_result`, `action_proposal`, and `execution_snapshot`
+- Drift contract version `stage8b.3` tracks expected signals for `boundary_status`, `scenario_type`, and `governing_objective`
+- Both layers now emit live observe-only signals and report `status: signals_recorded`
+- No blocking behavior has been introduced; this remains visibility-first scaffolding
 
 Related context:
 - `docs/product/EXECUTION_BOUNDARY_ENGINE_V2_SPEC.md`
