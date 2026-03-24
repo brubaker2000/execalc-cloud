@@ -100,7 +100,7 @@ def run_decision_service(
         "stability",
         {
             "mode": "observe_only",
-            "status": "not_evaluated",
+            "status": "signals_recorded",
             "signals": [],
             "registry_version": "stage8b.2",
             "invariants": [
@@ -119,7 +119,7 @@ def run_decision_service(
         "drift",
         {
             "mode": "observe_only",
-            "status": "not_evaluated",
+            "status": "signals_recorded",
             "signals": [],
             "contract_version": "stage8b.3",
             "signals_expected": [
