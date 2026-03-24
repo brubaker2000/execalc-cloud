@@ -116,6 +116,12 @@ def run_decision_service(
             "mode": "observe_only",
             "status": "not_evaluated",
             "signals": [],
+            "contract_version": "stage8b.3",
+            "signals_expected": [
+                "boundary_status",
+                "scenario_type",
+                "governing_objective",
+            ],
         },
     )
     out["audit"]["execution_boundary"] = boundary.to_dict()
