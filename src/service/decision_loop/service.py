@@ -110,6 +110,11 @@ def run_decision_service(
             ],
         },
     )
+    out["audit"]["stability"]["signals"] = [
+        "decision_result:present",
+        "action_proposal:present",
+        "execution_snapshot:present",
+    ]
     out["audit"].setdefault(
         "drift",
         {
