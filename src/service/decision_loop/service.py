@@ -124,6 +124,11 @@ def run_decision_service(
             ],
         },
     )
+    out["audit"]["drift"]["signals"] = [
+        f'boundary_status:{out["execution_boundary"]["status"]}',
+        f"scenario_type:{scenario.scenario_type}",
+        f"governing_objective:{scenario.governing_objective}",
+    ]
     out["audit"]["execution_boundary"] = boundary.to_dict()
 
     record = ExecutionRecord(
