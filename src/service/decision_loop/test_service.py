@@ -70,6 +70,8 @@ class TestDecisionService(unittest.TestCase):
         self.assertIn("boundary_status:ALLOW", out["audit"]["drift"]["signals"])
         self.assertIn("scenario_type:draft_trade", out["audit"]["drift"]["signals"])
         self.assertIn("governing_objective:cut_payroll", out["audit"]["drift"]["signals"])
+        self.assertEqual(out["audit"]["stability"]["anomalies"], [])
+        self.assertEqual(out["audit"]["drift"]["anomalies"], [])
 
         self.assertEqual(len(persisted_records), 1)
         self.assertEqual(persisted_records[0].tenant_id, "tenant_test_001")

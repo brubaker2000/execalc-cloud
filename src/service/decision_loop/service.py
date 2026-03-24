@@ -102,6 +102,7 @@ def run_decision_service(
             "mode": "observe_only",
             "status": "signals_recorded",
             "signals": [],
+            "anomalies": [],
             "registry_version": "stage8b.2",
             "invariants": [
                 "decision_result",
@@ -121,6 +122,7 @@ def run_decision_service(
             "mode": "observe_only",
             "status": "signals_recorded",
             "signals": [],
+            "anomalies": [],
             "contract_version": "stage8b.3",
             "signals_expected": [
                 "boundary_status",
