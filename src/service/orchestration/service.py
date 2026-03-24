@@ -156,6 +156,17 @@ def route_turn(
         }
 
     if turn_class == "execution_seeking":
+        decision_out = run_decision_service(
+            tenant_id=tenant_id,
+            user_id=user_id,
+            scenario_in={
+                "scenario_type": scenario.scenario_type,
+                "governing_objective": scenario.governing_objective,
+                "prompt": scenario.prompt,
+                "constraints": scenario.relevant_constraints,
+            },
+            persist_fn=_noop_persist,
+        )
         proposal = _build_action_proposal(
             scenario=scenario,
             tenant_id=tenant_id,
@@ -164,13 +175,17 @@ def route_turn(
             requires_human_review=True,
             risk_level="elevated",
         )
-        return {
-            "decision_result": None,
-            "action_proposal": _serialize_action_proposal(proposal),
-            "execution_boundary_result": {
+        # Adjust boundary decision for escalation
+        execution_boundary_result = decision_out.get("execution_boundary", {})
+        if not execution_boundary_result:
+            execution_boundary_result = {
                 "status": "ESCALATE",
-                "reason": "EBE v2 integration not wired yet",
-            },
+                "reason": "EBE v2 integration incomplete",
+            }
+        return {
+            "decision_result": decision_out,
+            "action_proposal": _serialize_action_proposal(proposal),
+            "execution_boundary_result": execution_boundary_result,
             "assistant_message": "Execution path selected; boundary review required.",
             "rail_state": {"mode": "execution_review"},
         }
