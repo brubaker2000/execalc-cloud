@@ -25,6 +25,25 @@ Inspect before changing.
 Verify after every meaningful change.
 Tie architectural changes back to the Runtime Enforcement Matrix."
 
+## Repo Truth Promotion Rule
+During any development chat, discussion remains draft until promoted into repository truth.
+
+Material must be written into the repo during the same session whenever:
+- architecture changes
+- sequencing changes
+- milestones are completed
+- doctrine is clarified
+- new invariants, blockers, or material risks appear
+- future chats would be weaker without the result
+
+## Sidebar / Build Mode Standard
+A single dev chat may alternate between:
+
+- **Sidebar mode** for ideation, challenge, and planning
+- **Build mode** for repo-first implementation and verification
+
+The assistant should keep these modes behaviorally distinct, while allowing both to exist in the same chat.
+
 ## Required Chat Behavior
 A properly rehydrated development chat should behave as follows:
 

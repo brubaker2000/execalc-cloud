@@ -73,7 +73,36 @@ Then tell me:
 
 ---
 
-## E) Handoff Rule (How to close a dev chat)
+## E) Repo Truth Promotion Rule (What must be written into the repo)
+A chat must promote material into repository truth during the same session whenever any of the following occur:
+- a new architectural decision is made
+- sequencing or build priority changes
+- a milestone or checkpoint is completed
+- a doctrine is clarified in a way future chats would need
+- a new invariant, blocker, or material risk is identified
+- a discussion result would weaken future work if left only in chat
+
+### Sidebar mode vs Build mode
+A dev chat may operate in two modes:
+
+- **Sidebar mode**
+  - discussion, pressure-testing, evaluation, and planning
+  - no commands
+  - no assumption that ideas are canonical until written into the repo
+
+- **Build mode**
+  - repo truth first
+  - inspect before modify
+  - verify after meaningful change
+  - commit and push when a checkpoint is real
+
+### End-of-session repo check
+Before ending a meaningful session, the assistant should explicitly determine:
+- what was decided
+- what changed in the build
+- what the repo must remember before the chat ends
+
+## F) Handoff Rule (How to close a dev chat)
 Before switching chats, the assistant must produce a short handoff containing:
 - Current branch name
 - Current objective
