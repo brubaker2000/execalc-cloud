@@ -102,6 +102,12 @@ def run_decision_service(
             "mode": "observe_only",
             "status": "not_evaluated",
             "signals": [],
+            "registry_version": "stage8b.2",
+            "invariants": [
+                "decision_result",
+                "action_proposal",
+                "execution_snapshot",
+            ],
         },
     )
     out["audit"].setdefault(

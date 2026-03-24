@@ -54,6 +54,10 @@ class TestDecisionService(unittest.TestCase):
         self.assertEqual(out["audit"]["stability"]["mode"], "observe_only")
         self.assertIn("drift", out["audit"])
         self.assertEqual(out["audit"]["drift"]["mode"], "observe_only")
+        self.assertEqual(out["audit"]["stability"]["registry_version"], "stage8b.2")
+        self.assertIn("decision_result", out["audit"]["stability"]["invariants"])
+        self.assertIn("action_proposal", out["audit"]["stability"]["invariants"])
+        self.assertIn("execution_snapshot", out["audit"]["stability"]["invariants"])
 
         self.assertEqual(len(persisted_records), 1)
         self.assertEqual(persisted_records[0].tenant_id, "tenant_test_001")
