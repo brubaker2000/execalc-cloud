@@ -96,6 +96,22 @@ def run_decision_service(
     out = report.to_dict()
     out["execution_boundary"] = boundary.to_dict()
     out["audit"] = dict(out.get("audit") or {})
+    out["audit"].setdefault(
+        "stability",
+        {
+            "mode": "observe_only",
+            "status": "not_evaluated",
+            "signals": [],
+        },
+    )
+    out["audit"].setdefault(
+        "drift",
+        {
+            "mode": "observe_only",
+            "status": "not_evaluated",
+            "signals": [],
+        },
+    )
     out["audit"]["execution_boundary"] = boundary.to_dict()
 
     record = ExecutionRecord(

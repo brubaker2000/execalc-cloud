@@ -50,6 +50,10 @@ class TestDecisionService(unittest.TestCase):
         self.assertEqual(out["audit"]["scenario_type"], "draft_trade")
         self.assertIn("envelope_id", out["audit"])
         self.assertEqual(out["audit"]["persist"]["persisted"], True)
+        self.assertIn("stability", out["audit"])
+        self.assertEqual(out["audit"]["stability"]["mode"], "observe_only")
+        self.assertIn("drift", out["audit"])
+        self.assertEqual(out["audit"]["drift"]["mode"], "observe_only")
 
         self.assertEqual(len(persisted_records), 1)
         self.assertEqual(persisted_records[0].tenant_id, "tenant_test_001")
