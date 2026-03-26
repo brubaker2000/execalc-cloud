@@ -4,22 +4,22 @@ import { useMemo, useState } from "react";
 import { LiveExecutiveBrief, type ExecutiveArtifact } from "@/components/shell/live-executive-brief";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
-const MOCK_ARTIFACT: ExecutiveArtifact = {
+const IDLE_ARTIFACT: ExecutiveArtifact = {
   label: "Live Executive Brief",
-  updatedAt: "Stage 8",
+  updatedAt: "Idle",
   sourceSurface: "Execalc Workspace",
-  status: "Mocked",
+  status: "Idle",
   coreThesis:
-    "Execalc becomes materially more valuable when the interface preserves high-signal thinking in real time instead of forcing the operator to recover it from scrollback.",
+    "The executive rail becomes most credible when it reflects live governed runtime state, and remains explicit about being idle before any decision has been formed.",
   executiveBrief:
-    "The current shell already supports a right-side rail, which makes it the cleanest place to prove the Real-Time Decision Artifact Engine in product. Instead of showing passive context only, the rail should act as a live executive layer that tracks what the conversation has actually concluded, what matters, and where judgment is heading.",
+    "No live decision artifact is loaded yet. Use the workspace to run a governed decision, and the rail will switch from idle posture to runtime-derived signal.",
   keyInsights: [
-    "The right rail is the first visible proof of Execalc's cognition layer.",
-    "The operator should be able to think from the rail while the chat is still unfolding.",
-    "This stub should be deterministic first, then wired to live scenario and decision logic.",
+    "The rail should stay truthful even before a decision exists.",
+    "Idle state is more honest than mock state.",
+    "Live runtime output should replace idle copy as soon as a decision is formed.",
   ],
   decisionSignal:
-    "Structurally correct next move. Keep the first implementation mocked and visible, then wire it to live cognition after the UI shape is proven.",
+    "No decision loaded yet. Submit a prompt to generate a governed decision artifact.",
 };
 
 type DecisionRunResponse = {
@@ -172,18 +172,18 @@ export default function ExecalcPage() {
             : "Decision ready",
       }
     : {
-        ...MOCK_ARTIFACT,
-        status: isSubmitting ? "Converting" : error ? "Error" : MOCK_ARTIFACT.status,
+        ...IDLE_ARTIFACT,
+        status: isSubmitting ? "Converting" : error ? "Error" : IDLE_ARTIFACT.status,
         updatedAt: isSubmitting
           ? "Updating"
           : error
             ? "Execution failed"
-            : MOCK_ARTIFACT.updatedAt,
+            : IDLE_ARTIFACT.updatedAt,
         decisionSignal: error
           ? "Decision failed: " + error
           : isSubmitting
             ? "Decision conversion in progress"
-            : MOCK_ARTIFACT.decisionSignal,
+            : IDLE_ARTIFACT.decisionSignal,
       };
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
