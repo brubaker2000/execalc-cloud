@@ -3,13 +3,13 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: c9c6353
+- Last verified code commit: eb2e610
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - repo-truth documentation updates in progress
+  - clean after truthful left-rail tranche
 
 ## Current Completed Tranche
-### Stage 8A — Workspace Shell Spine (completed on stage8/ui-shell-scaffold)
+### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
 - Workspace shell is live on:
   - /execalc
   - /decisions
@@ -17,8 +17,8 @@
   - WorkspaceShell
   - LiveExecutiveBrief
 - Left rail behavior is truthful by surface:
-  - /decisions reads persisted recent decisions
-  - /execalc reads current decision state
+  - /decisions reads persisted recent decisions and explicit project/chat context
+  - /execalc reads current decision state and explicit project/chat context
 - Shell defaults were neutralized so fake branded/sample workspace state no longer leaks into runtime surfaces
 - Root / redirects to /execalc
 
@@ -43,6 +43,8 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- eb2e610 Make workspace shell left rail truthful
+- d04d406 Align Stage 8 repo truth surfaces
 - c9c6353 Thread execalc navigation through decision request
 - 7588ebd Thread navigation through decision path audit
 - 381c760 Send navigation from decisions orchestration probe
@@ -56,11 +58,11 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The live Stage 8 UI seam that remained at handoff time has been closed.
-- Repo truth is being brought into alignment with the actual branch state.
-- The next build decision should be a narrow Stage 8 move, not a broad new framework.
+- The Stage 8 shell is now truthful on both rails.
+- Repo truth still needs a small follow-up alignment pass to reflect the latest left-rail tranche.
+- The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
-1) Finish repo-truth cleanup across remaining status/cockpit surfaces
+1) Align repo-truth docs to eb2e610 truthful left-rail tranche
 2) Choose the next smallest governed Stage 8 increment
 3) Preserve workstation-safe execution discipline

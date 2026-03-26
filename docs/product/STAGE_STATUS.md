@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-26
-Last verified state: Stage 8 UI shell scaffold and navigation identity threading implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, and truthful left-rail injection implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -96,7 +96,7 @@ Last verified state: Stage 8 UI shell scaffold and navigation identity threading
   - Shell has `noclobber` behavior; `rm -f` may be needed before redirecting to existing files
   - Long heredocs and long quoted commands are fragile in this environment; prefer simpler, verifiable steps
 
-## Stage 8A: Workspace Shell Spine (COMPLETE ON stage8/ui-shell-scaffold)
+## Stage 8A: Workspace Shell Spine + Truthful Left Rail (COMPLETE ON stage8/ui-shell-scaffold)
 - Workspace shell is live on:
   - /execalc
   - /decisions
@@ -104,8 +104,8 @@ Last verified state: Stage 8 UI shell scaffold and navigation identity threading
   - WorkspaceShell
   - LiveExecutiveBrief
 - Left rail is truthful and injected per surface:
-  - /decisions uses persisted recent decisions
-  - /execalc uses current decision state
+  - /decisions uses persisted recent decisions plus explicit project/chat labels
+  - /execalc uses current decision state plus explicit project/chat labels
 - Shell defaults were neutralized so no fake branded/sample workspace leaks remain
 - Root / redirects to /execalc
 - Key commits:
@@ -113,6 +113,7 @@ Last verified state: Stage 8 UI shell scaffold and navigation identity threading
   - fde873d Feed decisions left rail from persisted records
   - 63977e8 Feed execalc left rail from current decision state
   - 19f6fcf Neutralize shell defaults and label decisions workspace
+  - eb2e610 Make workspace shell left rail truthful
 
 ## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY SCAFFOLD IN PLACE)
 - Observe-only anomaly slots were added in code

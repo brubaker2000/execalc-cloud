@@ -15,15 +15,15 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Repo truth alignment for Stage 8
-   - Keep Stage 8A, 8B, and 8C status synchronized across repo truth files.
-   - Eliminate stale instructions that still describe `/execalc` UI threading as pending.
-   - Preserve the doctrine that plumbing and cognition advance together.
+1) Final repo-truth alignment for latest Stage 8 tranche
+   - Sync status surfaces to reflect eb2e610.
+   - Record that the workspace shell is now truthful on both rails.
+   - Remove stale language that still treats repo-truth cleanup as pre-left-rail work.
 
-2) Define the next narrow build move after navigation threading
-   - Choose the next smallest governed Stage 8 increment.
-   - Prefer truth-surface alignment or narrowly scoped runtime hardening over broad new surface area.
-   - Do not invent a wider navigation framework until a concrete need appears.
+2) Define the next narrow Stage 8 move after truthful shell completion
+   - Choose the next smallest governed increment.
+   - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
+   - Do not invent a wider navigation or orchestration framework until a concrete need appears.
 
 3) Protect workstation reliability
    - Prefer short, verifiable commands in this shell environment.
@@ -33,7 +33,6 @@ Source of truth for completion claims:
 
 ## NEXT (Queued)
 
-- Stage 8 repo-truth cleanup across BUILD_STATE / BUILD_COCKPIT / status surfaces
 - Stage 8 observe-only stability and drift follow-through
 - Stage 7A DB-available integration-test slice, when explicitly pulled forward
 - Stage 7B: `/decision/compare`
