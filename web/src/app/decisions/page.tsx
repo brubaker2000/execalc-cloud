@@ -261,6 +261,12 @@ export default function DecisionsPage() {
           user_text: orchestrationInput,
           scenario_type: "general",
           governing_objective: "workspace_probe",
+          navigation: {
+            workspace_id: "workspace_decisions",
+            project_id: "project_decision_memory",
+            chat_id: "chat_decisions_probe",
+            thread_id: selectedId || null,
+          },
         }),
       });
 
