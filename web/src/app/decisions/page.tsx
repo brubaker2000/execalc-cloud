@@ -282,7 +282,7 @@ export default function DecisionsPage() {
   }
 
   return (
-    <WorkspaceShell activeTab="Decisions" rightRail={rightRail} recentDecisions={recentDecisionItems}>
+    <WorkspaceShell activeTab="Decisions" rightRail={rightRail} workspaceLabel="Decisions Workspace" recentDecisions={recentDecisionItems}>
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Decision Memory

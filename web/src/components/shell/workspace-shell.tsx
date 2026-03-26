@@ -23,30 +23,30 @@ const surfaceTabs = [
 ] as const;
 
 const defaultProjects: WorkspaceShellItem[] = [
-  { label: "PCG Workspace", active: true },
-  { label: "Athlete Equity" },
-  { label: "ClaimCheck" },
-  { label: "Wells Fargo" },
+  { label: "Current Workspace", active: true },
+  { label: "Additional workspace" },
+  { label: "Additional workspace" },
+  { label: "Additional workspace" },
 ];
 
 const defaultChats: WorkspaceShellItem[] = [
-  { label: "Nick lender thesis" },
-  { label: "Bow River model" },
-  { label: "Org cognition notes" },
-  { label: "Stage 8 UI shell" },
+  { label: "No chat selected" },
+  { label: "Awaiting live chat source" },
+  { label: "Awaiting live chat source" },
+  { label: "Awaiting live chat source" },
 ];
 
 const defaultRecentDecisions: WorkspaceShellItem[] = [
-  { label: "Draft trade-down" },
-  { label: "ClaimCheck positioning" },
-  { label: "Bank partner thesis" },
+  { label: "No recent decisions" },
+  { label: "Awaiting live decision source" },
+  { label: "Awaiting live decision source" },
 ];
 
 export function WorkspaceShell({
   activeTab,
   children,
   rightRail,
-  workspaceLabel = "PCG Workspace",
+  workspaceLabel = "Current Workspace",
   projects = defaultProjects,
   chats = defaultChats,
   recentDecisions = defaultRecentDecisions,
