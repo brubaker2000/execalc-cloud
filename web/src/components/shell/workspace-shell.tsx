@@ -1,7 +1,16 @@
+type WorkspaceShellItem = {
+  label: string;
+  active?: boolean;
+};
+
 type WorkspaceShellProps = {
   activeTab: "Execalc" | "Decisions" | "Diagnostics" | "Planning" | "Signals" | "Admin";
   children: React.ReactNode;
   rightRail?: React.ReactNode;
+  workspaceLabel?: string;
+  projects?: WorkspaceShellItem[];
+  chats?: WorkspaceShellItem[];
+  recentDecisions?: WorkspaceShellItem[];
 };
 
 const surfaceTabs = [
@@ -13,30 +22,34 @@ const surfaceTabs = [
   "Admin",
 ] as const;
 
-const projects = [
-  "PCG Workspace",
-  "Athlete Equity",
-  "ClaimCheck",
-  "Wells Fargo",
+const defaultProjects: WorkspaceShellItem[] = [
+  { label: "PCG Workspace", active: true },
+  { label: "Athlete Equity" },
+  { label: "ClaimCheck" },
+  { label: "Wells Fargo" },
 ];
 
-const chats = [
-  "Nick lender thesis",
-  "Bow River model",
-  "Org cognition notes",
-  "Stage 8 UI shell",
+const defaultChats: WorkspaceShellItem[] = [
+  { label: "Nick lender thesis" },
+  { label: "Bow River model" },
+  { label: "Org cognition notes" },
+  { label: "Stage 8 UI shell" },
 ];
 
-const recentDecisions = [
-  "Draft trade-down",
-  "ClaimCheck positioning",
-  "Bank partner thesis",
+const defaultRecentDecisions: WorkspaceShellItem[] = [
+  { label: "Draft trade-down" },
+  { label: "ClaimCheck positioning" },
+  { label: "Bank partner thesis" },
 ];
 
 export function WorkspaceShell({
   activeTab,
   children,
   rightRail,
+  workspaceLabel = "PCG Workspace",
+  projects = defaultProjects,
+  chats = defaultChats,
+  recentDecisions = defaultRecentDecisions,
 }: WorkspaceShellProps) {
   return (
     <main className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -47,7 +60,7 @@ export function WorkspaceShell({
               <div className="rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm font-semibold">
                 Execalc
               </div>
-              <div className="text-sm text-zinc-400">PCG Workspace</div>
+              <div className="text-sm text-zinc-400">{workspaceLabel}</div>
             </div>
 
             <div className="hidden flex-1 justify-center px-8 md:flex">
@@ -95,16 +108,16 @@ export function WorkspaceShell({
                 Projects
               </div>
               <div className="mt-3 space-y-2">
-                {projects.map((project, idx) => (
+                {projects.map((project) => (
                   <div
-                    key={project}
-                    className={`rounded-md px-3 py-2 text-sm ${
-                      idx == 0
-                        ? "bg-zinc-100 text-zinc-950"
-                        : "bg-zinc-800 text-zinc-300"
-                    }`}
+                    key={project.label}
+                    className={
+                      project.active
+                        ? "rounded-md bg-zinc-100 px-3 py-2 text-sm text-zinc-950"
+                        : "rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300"
+                    }
                   >
-                    {project}
+                    {project.label}
                   </div>
                 ))}
               </div>
@@ -117,10 +130,14 @@ export function WorkspaceShell({
               <div className="mt-3 space-y-2">
                 {chats.map((chat) => (
                   <div
-                    key={chat}
-                    className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300"
+                    key={chat.label}
+                    className={
+                      chat.active
+                        ? "rounded-md bg-zinc-100 px-3 py-2 text-sm text-zinc-950"
+                        : "rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300"
+                    }
                   >
-                    {chat}
+                    {chat.label}
                   </div>
                 ))}
               </div>
@@ -131,12 +148,16 @@ export function WorkspaceShell({
                 Recent Decisions
               </div>
               <div className="mt-3 space-y-2">
-                {recentDecisions.map((decisionLabel) => (
+                {recentDecisions.map((decisionItem) => (
                   <div
-                    key={decisionLabel}
-                    className="rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300"
+                    key={decisionItem.label}
+                    className={
+                      decisionItem.active
+                        ? "rounded-md bg-zinc-100 px-3 py-2 text-sm text-zinc-950"
+                        : "rounded-md bg-zinc-800 px-3 py-2 text-sm text-zinc-300"
+                    }
                   >
-                    {decisionLabel}
+                    {decisionItem.label}
                   </div>
                 ))}
               </div>
