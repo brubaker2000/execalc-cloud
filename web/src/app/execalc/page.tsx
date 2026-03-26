@@ -125,36 +125,66 @@ export default function ExecalcPage() {
     }
   }
 
-  const artifact: ExecutiveArtifact = {
-    ...MOCK_ARTIFACT,
-    status: isSubmitting
-      ? "Converting"
-      : error
-        ? "Error"
-        : decision?.report
-          ? "Live"
-          : MOCK_ARTIFACT.status,
-    updatedAt: decision?.report
-      ? "Decision generated"
-      : isSubmitting
-        ? "Updating"
-        : MOCK_ARTIFACT.updatedAt,
-    coreThesis: decision?.report?.executive_summary || MOCK_ARTIFACT.coreThesis,
-    executiveBrief:
-      decision?.report?.value_assessment || MOCK_ARTIFACT.executiveBrief,
-    keyInsights:
-      decision?.report?.tradeoffs?.key_tradeoffs &&
-      decision.report.tradeoffs.key_tradeoffs.length > 0
-        ? decision.report.tradeoffs.key_tradeoffs
-        : MOCK_ARTIFACT.keyInsights,
-    decisionSignal: error
-      ? `Decision failed: ${error}`
-      : decision?.report
-        ? `Decision ready: ${decision.report.confidence || "unknown"} confidence`
-        : isSubmitting
+  const liveInsights = [
+    decision?.report?.value_assessment,
+    decision?.report?.risk_reward_assessment,
+    decision?.report?.supply_demand_assessment,
+    decision?.report?.asset_assessment,
+    decision?.report?.liability_assessment,
+    ...(decision?.report?.tradeoffs?.key_tradeoffs || []),
+    ...(decision?.report?.next_actions || [])
+      .slice(0, 2)
+      .map((action) => "Next action: " + action),
+    ...(decision?.report?.sensitivity || [])
+      .slice(0, 2)
+      .map((item) => "Sensitivity: " + item.name + " (" + item.impact + ")"),
+  ].filter((value): value is string => Boolean(value));
+
+  const artifact: ExecutiveArtifact = decision?.report
+    ? {
+        label: "Live Executive Brief",
+        updatedAt: isSubmitting ? "Refreshing" : "Decision generated",
+        sourceSurface: "Execalc Workspace",
+        status: isSubmitting ? "Converting" : "Live",
+        coreThesis:
+          decision.report.executive_summary ||
+          "Decision generated from governed runtime output.",
+        executiveBrief:
+          (decision.audit?.scenario_type
+            ? "Scenario: " + decision.audit.scenario_type
+            : "Live decision artifact") +
+          (decision.report.governing_objective
+            ? ". Governing objective: " + decision.report.governing_objective
+            : "") +
+          (decision.report.confidence
+            ? ". Confidence: " + decision.report.confidence
+            : ""),
+        keyInsights:
+          liveInsights.length > 0
+            ? liveInsights.slice(0, 3)
+            : [
+                "Decision artifact available, but no additional governed insights have been surfaced yet.",
+              ],
+        decisionSignal: isSubmitting
           ? "Decision conversion in progress"
-          : MOCK_ARTIFACT.decisionSignal,
-  };
+          : decision.report.confidence
+            ? "Decision ready: " + decision.report.confidence + " confidence"
+            : "Decision ready",
+      }
+    : {
+        ...MOCK_ARTIFACT,
+        status: isSubmitting ? "Converting" : error ? "Error" : MOCK_ARTIFACT.status,
+        updatedAt: isSubmitting
+          ? "Updating"
+          : error
+            ? "Execution failed"
+            : MOCK_ARTIFACT.updatedAt,
+        decisionSignal: error
+          ? "Decision failed: " + error
+          : isSubmitting
+            ? "Decision conversion in progress"
+            : MOCK_ARTIFACT.decisionSignal,
+      };
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
 
