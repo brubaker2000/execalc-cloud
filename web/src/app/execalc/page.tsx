@@ -104,6 +104,10 @@ export default function ExecalcPage() {
               "A familiar shell will increase usability and stickiness.",
             decision_notes:
               "Initial UI shell should remain governed, minimal, and extensible.",
+              workspace_id: "workspace_execalc",
+              project_id: "project_stage8",
+              chat_id: "chat_execalc",
+              thread_id: decision?.audit?.envelope_id ?? null,
           },
         }),
       });
