@@ -13,6 +13,10 @@ class TestOrchestrationService(unittest.TestCase):
         self.assertIsNotNone(out["execution_boundary_result"])
         self.assertEqual(out["execution_boundary_result"]["status"], "ALLOW")
         self.assertEqual(out["rail_state"]["mode"], "decision")
+        self.assertEqual(out["scenario"]["navigation"]["workspace_id"], "workspace_default")
+        self.assertIsNone(out["scenario"]["navigation"]["project_id"])
+        self.assertIsNone(out["scenario"]["navigation"]["chat_id"])
+        self.assertIsNone(out["scenario"]["navigation"]["thread_id"])
 
     def test_action_proposing_turn_emits_shared_action_proposal_fields(self):
         out = run_orchestration(user_text="Draft the next move.")

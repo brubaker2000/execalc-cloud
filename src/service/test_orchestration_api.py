@@ -33,6 +33,10 @@ class TestOrchestrationAPI(unittest.TestCase):
         self.assertTrue(body["ok"])
         self.assertEqual(body["turn_class"], "decision_seeking")
         self.assertEqual(body["rail_state"]["mode"], "decision")
+        self.assertEqual(body["scenario"]["navigation"]["workspace_id"], "workspace_default")
+        self.assertIsNone(body["scenario"]["navigation"]["project_id"])
+        self.assertIsNone(body["scenario"]["navigation"]["chat_id"])
+        self.assertIsNone(body["scenario"]["navigation"]["thread_id"])
 
     def test_orchestration_run_action_turn(self):
         response = self.client.post(
