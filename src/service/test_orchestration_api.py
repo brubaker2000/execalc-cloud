@@ -66,6 +66,23 @@ class TestOrchestrationAPI(unittest.TestCase):
         self.assertTrue(body["action_proposal"]["requires_human_review"])
         self.assertEqual(body["rail_state"]["mode"], "execution_review")
 
+
+    def test_orchestration_run_rejects_non_object_navigation(self):
+        response = self.client.post(
+            "/orchestration/run",
+            json={
+                "user_text": "Should we pursue the bank partnership?",
+                "navigation": "not-an-object",
+            },
+            headers=self.headers,
+        )
+        self.assertEqual(response.status_code, 400)
+        body = response.get_json()
+        self.assertFalse(body["ok"])
+        self.assertEqual(body["error"], "navigation must be an object")
+
+
+
     def test_orchestration_run_requires_user_text(self):
         response = self.client.post(
             "/orchestration/run",

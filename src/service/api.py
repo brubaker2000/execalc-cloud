@@ -782,17 +782,21 @@ def orchestration_run():
     scenario_type = str(body.get("scenario_type") or "general")
     governing_objective = str(body.get("governing_objective") or "unspecified")
     relevant_constraints = body.get("relevant_constraints") or {}
+    navigation = body.get("navigation") or {}
 
     if not user_text.strip():
         return {"ok": False, "error": "user_text is required"}, 400
     if not isinstance(relevant_constraints, dict):
         return {"ok": False, "error": "relevant_constraints must be an object"}, 400
+    if not isinstance(navigation, dict):
+        return {"ok": False, "error": "navigation must be an object"}, 400
 
     out = run_orchestration(
         user_text=user_text,
         scenario_type=scenario_type,
         governing_objective=governing_objective,
         relevant_constraints=relevant_constraints,
+        navigation=navigation,
         tenant_id=claims.tenant_id,
         user_id=claims.user_id,
     )
