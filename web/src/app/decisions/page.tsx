@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LiveExecutiveBrief, type ExecutiveArtifact } from "@/components/shell/live-executive-brief";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
 type DecisionListRecord = {
@@ -66,36 +67,6 @@ type OrchestrationResponse = {
   error?: string;
 };
 
-
-const rightRail = (
-  <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
-    <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-      Decisions Surface
-    </div>
-
-    <div className="mt-4 space-y-4">
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-          Purpose
-        </div>
-        <div className="mt-2 text-sm text-zinc-200">
-          This surface now reads from the persisted decision journal instead of
-          placeholder data.
-        </div>
-      </div>
-
-      <div>
-        <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-          Next Build Target
-        </div>
-        <div className="mt-2 text-sm text-zinc-200">
-          Add comparison, filters, and richer artifact inspection across stored
-          decisions.
-        </div>
-      </div>
-    </div>
-  </div>
-);
 
 export default function DecisionsPage() {
   const [records, setRecords] = useState<DecisionListRecord[]>([]);
@@ -188,6 +159,83 @@ export default function DecisionsPage() {
   }, [selectedId]);
 
   const report = detail?.result?.report;
+
+  const railInsights = [
+    report?.value_assessment,
+    report?.risk_reward_assessment,
+    ...(report?.tradeoffs?.key_tradeoffs || []),
+    ...(report?.next_actions || []).slice(0, 2).map((action) => "Next action: " + action),
+    ...(report?.sensitivity || [])
+      .slice(0, 2)
+      .map((item) => "Sensitivity: " + item.name + " (" + item.impact + ")"),
+    orchestrationResult?.execution_boundary_result?.status
+      ? "Boundary: " +
+        orchestrationResult.execution_boundary_result.status +
+        (orchestrationResult.execution_boundary_result.reason
+          ? " - " + orchestrationResult.execution_boundary_result.reason
+          : "")
+      : null,
+    orchestrationResult?.action_proposal?.action_type
+      ? "Action proposal: " +
+        orchestrationResult.action_proposal.action_type +
+        (orchestrationResult.action_proposal.risk_level
+          ? " (" + orchestrationResult.action_proposal.risk_level + ")"
+          : "")
+      : null,
+  ].filter((value): value is string => Boolean(value));
+
+  const artifact: ExecutiveArtifact = {
+    label: "Decision Rail",
+    updatedAt: detail?.created_at,
+    sourceSurface: "Decisions Workspace",
+    status: error
+      ? "Error"
+      : orchestrationError
+        ? "Probe error"
+        : orchestrationLoading
+          ? "Probe running"
+          : loadingDetail
+            ? "Loading detail"
+            : selectedId
+              ? "Decision loaded"
+              : loadingList
+                ? "Loading list"
+                : "Idle",
+    coreThesis:
+      report?.executive_summary ||
+      (loadingDetail
+        ? "Loading selected decision artifact from persisted decision memory."
+        : records.length > 0
+          ? "A persisted decision is available for inspection; the rail should surface governed state from the selected artifact rather than placeholder copy."
+          : "No persisted decisions are available yet. The rail will populate once decision artifacts exist."),
+    executiveBrief: detail?.result?.audit?.scenario_type
+      ? "Selected scenario: " +
+        detail.result.audit.scenario_type +
+        (report?.governing_objective
+          ? ". Governing objective: " + report.governing_objective
+          : "") +
+        (report?.confidence ? ". Confidence: " + report.confidence : "")
+      : orchestrationResult?.assistant_message ||
+        "The rail reflects governed decision and orchestration state instead of placeholder narrative.",
+    keyInsights:
+      railInsights.length > 0
+        ? railInsights.slice(0, 3)
+        : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
+    decisionSignal: orchestrationError
+      ? "Orchestration probe failed: " + orchestrationError
+      : orchestrationLoading
+        ? "Running orchestration probe"
+        : orchestrationResult?.execution_boundary_result?.status
+          ? "Execution boundary status: " +
+            orchestrationResult.execution_boundary_result.status
+          : report?.confidence
+            ? "Selected decision confidence: " + report.confidence
+            : selectedId
+              ? "Decision detail loaded; more governed signals appear as runtime outputs expand."
+              : "Select a persisted decision to populate the rail.",
+  };
+
+  const rightRail = <LiveExecutiveBrief artifact={artifact} />;
 
   async function runOrchestrationProbe() {
     setOrchestrationLoading(true);
