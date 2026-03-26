@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-21
-Last verified state: Stage 4C–4E Execution Boundary Engine implemented, integrated, tested, and pushed on stage8/ui-shell-scaffold
+Last updated: 2026-03-26
+Last verified state: Stage 8 UI shell scaffold and navigation identity threading implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -95,6 +95,53 @@ Last verified state: Stage 4C–4E Execution Boundary Engine implemented, integr
 - Workstation posture note:
   - Shell has `noclobber` behavior; `rm -f` may be needed before redirecting to existing files
   - Long heredocs and long quoted commands are fragile in this environment; prefer simpler, verifiable steps
+
+## Stage 8A: Workspace Shell Spine (COMPLETE ON stage8/ui-shell-scaffold)
+- Workspace shell is live on:
+  - /execalc
+  - /decisions
+- Both surfaces use:
+  - WorkspaceShell
+  - LiveExecutiveBrief
+- Left rail is truthful and injected per surface:
+  - /decisions uses persisted recent decisions
+  - /execalc uses current decision state
+- Shell defaults were neutralized so no fake branded/sample workspace leaks remain
+- Root / redirects to /execalc
+- Key commits:
+  - 1740404 Make workspace shell left rail data injectable
+  - fde873d Feed decisions left rail from persisted records
+  - 63977e8 Feed execalc left rail from current decision state
+  - 19f6fcf Neutralize shell defaults and label decisions workspace
+
+## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY SCAFFOLD IN PLACE)
+- Observe-only anomaly slots were added in code
+- Stage 8B doctrine/spec scaffolding exists and was synced to code
+- Product docs added:
+  - docs/product/STAGE_8B_STABILITY_AND_DRIFT_FOUNDATIONS.md
+  - docs/product/SUBSTRATE_VS_EXECALC_DOCTRINE.md
+
+## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
+- Orchestration path now carries navigation envelope identity
+- /orchestration/run accepts and validates navigation
+- /decisions orchestration probe sends navigation
+- Decision-path scenario now carries:
+  - workspace_id
+  - project_id
+  - chat_id
+  - thread_id
+- /execalc now threads navigation identity through /api/decision/run
+- Verification:
+  - backend suite passed for orchestration + decision-path navigation tranches
+  - frontend build and lint passed after /execalc navigation patch
+- Key commits:
+  - e8a3c32 Add navigation envelope to orchestration scenario model
+  - 8901a66 Assert orchestration navigation envelope in tests
+  - 852d0ae Thread navigation through orchestration service
+  - a4d248d Accept navigation in orchestration API
+  - 381c760 Send navigation from decisions orchestration probe
+  - 7588ebd Thread navigation through decision path audit
+  - c9c6353 Thread execalc navigation through decision request
 
 ## Current Architecture Reality
 Execalc is now operating as a decision-plus-execution-governance system, not merely a decision artifact generator.

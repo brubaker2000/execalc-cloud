@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-03-07 (America/New_York)
+Last updated: 2026-03-26 (America/New_York)
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,14 +15,15 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Stage 7A integration-test slice
-   - Add a DB-available integration-test path for local Postgres persistence.
-   - Skip cleanly when local Postgres is not available.
-   - Cover `/decision/run`, `/decision/<envelope_id>`, and `/decision/recent`.
-
-2) Repo truth alignment
-   - Keep Stage 7A status, runbook, and next actions synchronized.
+1) Repo truth alignment for Stage 8
+   - Keep Stage 8A, 8B, and 8C status synchronized across repo truth files.
+   - Eliminate stale instructions that still describe `/execalc` UI threading as pending.
    - Preserve the doctrine that plumbing and cognition advance together.
+
+2) Define the next narrow build move after navigation threading
+   - Choose the next smallest governed Stage 8 increment.
+   - Prefer truth-surface alignment or narrowly scoped runtime hardening over broad new surface area.
+   - Do not invent a wider navigation framework until a concrete need appears.
 
 3) Protect workstation reliability
    - Prefer short, verifiable commands in this shell environment.
@@ -32,9 +33,11 @@ Source of truth for completion claims:
 
 ## NEXT (Queued)
 
+- Stage 8 repo-truth cleanup across BUILD_STATE / BUILD_COCKPIT / status surfaces
+- Stage 8 observe-only stability and drift follow-through
+- Stage 7A DB-available integration-test slice, when explicitly pulled forward
 - Stage 7B: `/decision/compare`
 - Stage 7C: multi-objective comparison logic
-- Refine the decision artifact into a comparable executive memory unit
 
 ---
 
@@ -42,6 +45,5 @@ Source of truth for completion claims:
 
 - Intelligent Front Door implementation
 - Bridges / subscriber-to-subscriber operability
-- Any UI work
 - Any vector DB expansion beyond explicitly scoped semantic fields
 - Any new feature surface that outruns the current operational rails
