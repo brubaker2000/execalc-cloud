@@ -188,8 +188,18 @@ export default function ExecalcPage() {
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
 
+    const recentDecisionItems = decision?.audit?.envelope_id
+      ? [{
+          label: "Current: " + decision.audit.envelope_id,
+          active: true,
+        }]
+      : [{
+          label: "No decision yet",
+          active: true,
+        }];
+
   return (
-    <WorkspaceShell activeTab="Execalc" rightRail={rightRail}>
+    <WorkspaceShell activeTab="Execalc" rightRail={rightRail} workspaceLabel="Execalc Workspace" recentDecisions={recentDecisionItems}>
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Workbench Mode
