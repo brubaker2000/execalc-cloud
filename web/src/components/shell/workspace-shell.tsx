@@ -23,23 +23,15 @@ const surfaceTabs = [
 ] as const;
 
 const defaultProjects: WorkspaceShellItem[] = [
-  { label: "Current Workspace", active: true },
-  { label: "Additional workspace" },
-  { label: "Additional workspace" },
-  { label: "Additional workspace" },
+  { label: "No project source provided", active: true },
 ];
 
 const defaultChats: WorkspaceShellItem[] = [
-  { label: "No chat selected" },
-  { label: "Awaiting live chat source" },
-  { label: "Awaiting live chat source" },
-  { label: "Awaiting live chat source" },
+  { label: "No chat source provided", active: true },
 ];
 
 const defaultRecentDecisions: WorkspaceShellItem[] = [
-  { label: "No recent decisions" },
-  { label: "Awaiting live decision source" },
-  { label: "Awaiting live decision source" },
+  { label: "No recent decisions", active: true },
 ];
 
 export function WorkspaceShell({

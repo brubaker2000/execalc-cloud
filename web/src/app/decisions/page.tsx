@@ -197,8 +197,8 @@ export default function DecisionsPage() {
           : loadingDetail
             ? "Loading detail"
             : selectedId
-              ? "Decision loaded"
-              : loadingList
+            ? "Decision loaded"
+            : loadingList
                 ? "Loading list"
                 : "Idle",
     coreThesis:
@@ -231,8 +231,8 @@ export default function DecisionsPage() {
           : report?.confidence
             ? "Selected decision confidence: " + report.confidence
             : selectedId
-              ? "Decision detail loaded; more governed signals appear as runtime outputs expand."
-              : "Select a persisted decision to populate the rail.",
+            ? "Decision detail loaded; more governed signals appear as runtime outputs expand."
+            : "Select a persisted decision to populate the rail.",
   };
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
@@ -288,7 +288,17 @@ export default function DecisionsPage() {
   }
 
   return (
-    <WorkspaceShell activeTab="Decisions" rightRail={rightRail} workspaceLabel="Decisions Workspace" recentDecisions={recentDecisionItems}>
+    <WorkspaceShell
+        activeTab="Decisions"
+        rightRail={rightRail}
+        workspaceLabel="Decisions Workspace"
+        projects={[{ label: "Decision Memory", active: true }]}
+        chats={[{
+          label: selectedId ? "Selected thread: " + selectedId : "Decision list view",
+          active: true,
+        }]}
+        recentDecisions={recentDecisionItems}
+      >
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Decision Memory

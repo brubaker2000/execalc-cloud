@@ -203,7 +203,19 @@ export default function ExecalcPage() {
         }];
 
   return (
-    <WorkspaceShell activeTab="Execalc" rightRail={rightRail} workspaceLabel="Execalc Workspace" recentDecisions={recentDecisionItems}>
+    <WorkspaceShell
+        activeTab="Execalc"
+        rightRail={rightRail}
+        workspaceLabel="Execalc Workspace"
+        projects={[{ label: "Stage 8 UI Shell", active: true }]}
+        chats={[{
+          label: decision?.audit?.envelope_id
+            ? "Thread: " + decision.audit.envelope_id
+            : "Thread not established yet",
+          active: true,
+        }]}
+        recentDecisions={recentDecisionItems}
+      >
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Workbench Mode
