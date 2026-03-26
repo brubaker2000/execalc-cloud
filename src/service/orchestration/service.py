@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 from src.service.decision_loop.models import ActionProposal
 from src.service.decision_loop.service import run_decision_service
 from src.service.execution_record import ExecutionRecord
-from src.service.orchestration.models import ScenarioEnvelope, TurnClass
+from src.service.orchestration.models import NavigationEnvelope, ScenarioEnvelope, TurnClass
 
 
 def _now() -> datetime:
@@ -64,8 +64,10 @@ def build_scenario_envelope(
     scenario_type: str = "general",
     governing_objective: str = "unspecified",
     relevant_constraints: Optional[Dict[str, Any]] = None,
+    navigation: Optional[Dict[str, Optional[str]]] = None,
 ) -> ScenarioEnvelope:
     now = _now()
+    navigation_envelope = NavigationEnvelope(**(navigation or {}))
     return ScenarioEnvelope(
         scenario_id=f"scenario_{int(now.timestamp())}",
         scenario_type=scenario_type,
@@ -75,6 +77,7 @@ def build_scenario_envelope(
         relevant_constraints=relevant_constraints or {},
         decision_state="pending" if turn_class in ("decision_seeking", "action_proposing", "execution_seeking") else "not_requested",
         action_state="pending" if turn_class in ("action_proposing", "execution_seeking") else "not_requested",
+        navigation=navigation_envelope,
         created_at=now,
         updated_at=now,
     )
@@ -214,6 +217,7 @@ def run_orchestration(
     scenario_type: str = "general",
     governing_objective: str = "unspecified",
     relevant_constraints: Optional[Dict[str, Any]] = None,
+    navigation: Optional[Dict[str, Optional[str]]] = None,
     tenant_id: str = "tenant_test_001",
     user_id: str = "test_user",
 ) -> Dict[str, Any]:
@@ -224,6 +228,7 @@ def run_orchestration(
         scenario_type=scenario_type,
         governing_objective=governing_objective,
         relevant_constraints=relevant_constraints,
+        navigation=navigation,
     )
     routed = route_turn(
         turn_class=turn_class,
