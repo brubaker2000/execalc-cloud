@@ -237,6 +237,13 @@ export default function DecisionsPage() {
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
 
+    const recentDecisionItems = records.map((record) => ({
+      label: record.envelope_id === selectedId
+        ? "Selected: " + record.envelope_id
+        : record.envelope_id,
+      active: record.envelope_id === selectedId,
+    }));
+
   async function runOrchestrationProbe() {
     setOrchestrationLoading(true);
     setOrchestrationError(null);
@@ -275,7 +282,7 @@ export default function DecisionsPage() {
   }
 
   return (
-    <WorkspaceShell activeTab="Decisions" rightRail={rightRail}>
+    <WorkspaceShell activeTab="Decisions" rightRail={rightRail} recentDecisions={recentDecisionItems}>
       <div className="mb-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
           Decision Memory
