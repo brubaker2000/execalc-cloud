@@ -30,6 +30,10 @@ class Scenario:
     domain: Optional[str] = None
     urgency: Optional[str] = None
     source_surface: Optional[str] = None
+    workspace_id: Optional[str] = None
+    project_id: Optional[str] = None
+    chat_id: Optional[str] = None
+    thread_id: Optional[str] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 

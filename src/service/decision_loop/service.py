@@ -52,6 +52,10 @@ def run_decision_service(
         risk_surface=str(scenario_in.get("risk_surface")) if scenario_in.get("risk_surface") is not None else None,
         assumptions=str(scenario_in.get("assumptions")) if scenario_in.get("assumptions") is not None else None,
         decision_notes=str(scenario_in.get("decision_notes")) if scenario_in.get("decision_notes") is not None else None,
+        workspace_id=str(scenario_in.get("workspace_id")) if scenario_in.get("workspace_id") is not None else None,
+        project_id=str(scenario_in.get("project_id")) if scenario_in.get("project_id") is not None else None,
+        chat_id=str(scenario_in.get("chat_id")) if scenario_in.get("chat_id") is not None else None,
+        thread_id=str(scenario_in.get("thread_id")) if scenario_in.get("thread_id") is not None else None,
         tenant_id=tenant_id,
         operator_id=user_id,
     )

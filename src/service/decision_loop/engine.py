@@ -327,6 +327,10 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
         "user_id": user_id,
         "scenario_type": scenario.scenario_type,
         "governing_objective": scenario.governing_objective,
+        "workspace_id": scenario.workspace_id,
+        "project_id": scenario.project_id,
+        "chat_id": scenario.chat_id,
+        "thread_id": scenario.thread_id,
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "version": "stage4b",
     }
