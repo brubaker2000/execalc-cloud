@@ -15,12 +15,12 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Final repo-truth alignment for executive-rail anomaly tranche
-   - Sync status surfaces to reflect 4b7f361.
-   - Record that Stage 8B anomalies are now visible in the executive rail, not only in backend audit payloads.
-   - Remove stale language that still stops at dbcaf16.
+1) Final repo-truth alignment for decision-boundary rail tranche
+   - Sync status surfaces to reflect 7cbb980.
+   - Record that `/execalc` now surfaces decision execution-boundary state directly from the decision response.
+   - Remove stale language that still stops at 4b7f361.
 
-2) Define the next narrow Stage 8 move after rail anomaly surfacing
+2) Define the next narrow Stage 8 move after decision-boundary surfacing
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.

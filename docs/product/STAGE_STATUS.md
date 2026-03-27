@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-26
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, and executive-rail anomaly surfacing implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, and decision-boundary rail surfacing implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -115,7 +115,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 19f6fcf Neutralize shell defaults and label decisions workspace
   - eb2e610 Make workspace shell left rail truthful
 
-## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY ANOMALY RECORDING IN PLACE)
+## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY ANOMALY RECORDING + RAIL SURFACING IN PLACE)
 - Observe-only stability and drift layers now emit live signals and anomaly arrays in code
 - Runtime records non-blocking anomalies for:
   - missing navigation context
@@ -128,6 +128,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
 - Key commits:
   - dbcaf16 Record observe-only Stage 8B anomalies
   - 4b7f361 Surface Stage 8B anomalies in executive rail
+  - 7cbb980 Surface decision boundary state in execalc rail
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity
@@ -169,7 +170,6 @@ A future chat orchestration layer will sit above both.
 
 ## Next
 - Formalize the runtime architecture docs so the EBE is canon in the system map
-- Surface execution_boundary state in the UI Executive Rail
 - Define the chat orchestration layer that classifies turns into discuss / decide / action / execute
 - Introduce real execution adapters after orchestration exists
 - Deepen persistence so execution-boundary events can be queried independently over time
