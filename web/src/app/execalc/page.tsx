@@ -68,6 +68,10 @@ type DecisionRunResponse = {
       anomalies?: string[];
     };
   };
+  execution_boundary?: {
+    status?: string;
+    reason?: string;
+  };
   error?: string;
 };
 
@@ -169,6 +173,14 @@ export default function ExecalcPage() {
     ),
   ];
 
+  const boundaryInsight = decision?.execution_boundary?.status
+    ? "Execution boundary: " +
+      decision.execution_boundary.status +
+      (decision.execution_boundary.reason
+        ? " - " + decision.execution_boundary.reason
+        : "")
+    : null;
+
   const artifact: ExecutiveArtifact = decision?.report
     ? {
         label: "Live Executive Brief",
@@ -189,16 +201,22 @@ export default function ExecalcPage() {
             ? ". Confidence: " + decision.report.confidence
             : ""),
         keyInsights:
-          [...observedAnomalies, ...liveInsights].length > 0
-            ? [...observedAnomalies, ...liveInsights].slice(0, 3)
+          [boundaryInsight, ...observedAnomalies, ...liveInsights].filter(
+            (value): value is string => Boolean(value)
+          ).length > 0
+            ? [boundaryInsight, ...observedAnomalies, ...liveInsights]
+                .filter((value): value is string => Boolean(value))
+                .slice(0, 3)
             : [
                 "Decision artifact available, but no additional governed insights have been surfaced yet.",
               ],
         decisionSignal: isSubmitting
           ? "Decision conversion in progress"
-          : decision.report.confidence
-            ? "Decision ready: " + decision.report.confidence + " confidence"
-            : "Decision ready",
+          : boundaryInsight
+            ? boundaryInsight
+            : decision.report.confidence
+              ? "Decision ready: " + decision.report.confidence + " confidence"
+              : "Decision ready",
       }
     : {
         ...IDLE_ARTIFACT,
