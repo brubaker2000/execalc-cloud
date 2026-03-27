@@ -8,9 +8,10 @@ Current implementation checkpoint:
 - `audit.stability` and `audit.drift` are attached at the canonical decision-service seam
 - Stability registry version `stage8b.2` tracks invariants for `decision_result`, `action_proposal`, and `execution_snapshot`
 - Drift contract version `stage8b.3` tracks expected signals for `boundary_status`, `scenario_type`, and `governing_objective`
-- audit.stability.anomalies and audit.drift.anomalies now exist as empty observe-only arrays reserved for future anomaly surfacing
+- audit.stability.anomalies and audit.drift.anomalies now exist as canonical observe-only anomaly arrays
 - Both layers now emit live observe-only signals and report `status: signals_recorded`
-- Runtime and tests currently lock anomaly slots to empty lists; no anomaly-detection behavior is active yet
+- Runtime now records non-blocking anomalies for missing navigation context, unspecified governing objective, and non-ALLOW boundary outcomes
+- Tests lock the current observe-only behavior for both anomaly-free and anomaly-present paths
 - No blocking behavior has been introduced; this remains visibility-first scaffolding
 
 Related context:
@@ -259,8 +260,8 @@ Surface warnings in audit or debug output first.
 ### 8B.6 — Graduated Enforcement
 Only after signal quality is good should these checks become gating or escalation inputs.
 
-### 8B.7 — Observe-Only Anomaly Slots
-Reserve canonical anomaly arrays under audit.stability and audit.drift so future detections have a stable home before any warning or enforcement semantics are introduced.
+### 8B.7 — Observe-Only Anomaly Detection
+Use canonical anomaly arrays under audit.stability and audit.drift to surface non-blocking runtime findings before any warning or enforcement semantics are introduced.
 
 ---
 

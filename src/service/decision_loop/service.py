@@ -97,9 +97,25 @@ def run_decision_service(
     )
     boundary = evaluate_execution_boundary(proposal, snapshot)
 
+    boundary_dict = boundary.to_dict()
+    boundary_status = boundary_dict["status"]
+
     out = report.to_dict()
-    out["execution_boundary"] = boundary.to_dict()
+    out["execution_boundary"] = boundary_dict
     out["audit"] = dict(out.get("audit") or {})
+
+    stability_signals = [
+        "decision_result:present",
+        "action_proposal:present",
+        "execution_snapshot:present",
+    ]
+    stability_anomalies = []
+    if scenario.workspace_id or scenario.project_id or scenario.chat_id:
+        stability_signals.append("navigation_context:present")
+    else:
+        stability_signals.append("navigation_context:missing")
+        stability_anomalies.append("navigation_context:missing")
+
     out["audit"].setdefault(
         "stability",
         {
@@ -115,11 +131,20 @@ def run_decision_service(
             ],
         },
     )
-    out["audit"]["stability"]["signals"] = [
-        "decision_result:present",
-        "action_proposal:present",
-        "execution_snapshot:present",
+    out["audit"]["stability"]["signals"] = stability_signals
+    out["audit"]["stability"]["anomalies"] = stability_anomalies
+
+    drift_signals = [
+        f"boundary_status:{boundary_status}",
+        f"scenario_type:{scenario.scenario_type}",
+        f"governing_objective:{scenario.governing_objective}",
     ]
+    drift_anomalies = []
+    if scenario.governing_objective == "unspecified_objective":
+        drift_anomalies.append("governing_objective:unspecified")
+    if boundary_status != "ALLOW":
+        drift_anomalies.append("boundary_status:non_allow")
+
     out["audit"].setdefault(
         "drift",
         {
@@ -135,12 +160,9 @@ def run_decision_service(
             ],
         },
     )
-    out["audit"]["drift"]["signals"] = [
-        f'boundary_status:{out["execution_boundary"]["status"]}',
-        f"scenario_type:{scenario.scenario_type}",
-        f"governing_objective:{scenario.governing_objective}",
-    ]
-    out["audit"]["execution_boundary"] = boundary.to_dict()
+    out["audit"]["drift"]["signals"] = drift_signals
+    out["audit"]["drift"]["anomalies"] = drift_anomalies
+    out["audit"]["execution_boundary"] = boundary_dict
 
     record = ExecutionRecord(
         tenant_id=tenant_id,
