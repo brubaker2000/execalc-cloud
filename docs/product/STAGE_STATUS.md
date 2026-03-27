@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-26
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, and observe-only Stage 8B anomaly recording implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, and executive-rail anomaly surfacing implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -125,8 +125,9 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
 - Product docs added and synced:
   - docs/product/STAGE_8B_STABILITY_AND_DRIFT_FOUNDATIONS.md
   - docs/product/SUBSTRATE_VS_EXECALC_DOCTRINE.md
-- Key commit:
+- Key commits:
   - dbcaf16 Record observe-only Stage 8B anomalies
+  - 4b7f361 Surface Stage 8B anomalies in executive rail
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity
