@@ -41,6 +41,22 @@ type DecisionDetailResponse = {
       tenant_id?: string;
       scenario_type?: string;
       user_id?: string;
+      workspace_id?: string;
+      project_id?: string;
+      chat_id?: string;
+      thread_id?: string | null;
+      stability?: {
+        mode?: string;
+        status?: string;
+        signals?: string[];
+        anomalies?: string[];
+      };
+      drift?: {
+        mode?: string;
+        status?: string;
+        signals?: string[];
+        anomalies?: string[];
+      };
     };
   };
   error?: string;
@@ -184,6 +200,16 @@ export default function DecisionsPage() {
       : null,
   ].filter((value): value is string => Boolean(value));
 
+  const detailAudit = detail?.result?.audit;
+  const observedAnomalies = [
+    ...(detailAudit?.stability?.anomalies || []).map(
+      (item) => "Stability anomaly: " + item
+    ),
+    ...(detailAudit?.drift?.anomalies || []).map(
+      (item) => "Drift anomaly: " + item
+    ),
+  ];
+
   const artifact: ExecutiveArtifact = {
     label: "Decision Rail",
     updatedAt: detail?.created_at,
@@ -218,8 +244,8 @@ export default function DecisionsPage() {
       : orchestrationResult?.assistant_message ||
         "The rail reflects governed decision and orchestration state instead of placeholder narrative.",
     keyInsights:
-      railInsights.length > 0
-        ? railInsights.slice(0, 3)
+      [...observedAnomalies, ...railInsights].length > 0
+        ? [...observedAnomalies, ...railInsights].slice(0, 3)
         : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
     decisionSignal: orchestrationError
       ? "Orchestration probe failed: " + orchestrationError

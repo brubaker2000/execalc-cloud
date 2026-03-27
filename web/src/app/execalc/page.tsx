@@ -51,6 +51,22 @@ type DecisionRunResponse = {
     scenario_type?: string;
     tenant_id?: string;
     user_id?: string;
+    workspace_id?: string;
+    project_id?: string;
+    chat_id?: string;
+    thread_id?: string | null;
+    stability?: {
+      mode?: string;
+      status?: string;
+      signals?: string[];
+      anomalies?: string[];
+    };
+    drift?: {
+      mode?: string;
+      status?: string;
+      signals?: string[];
+      anomalies?: string[];
+    };
   };
   error?: string;
 };
@@ -144,6 +160,15 @@ export default function ExecalcPage() {
       .map((item) => "Sensitivity: " + item.name + " (" + item.impact + ")"),
   ].filter((value): value is string => Boolean(value));
 
+  const observedAnomalies = [
+    ...(decision?.audit?.stability?.anomalies || []).map(
+      (item) => "Stability anomaly: " + item
+    ),
+    ...(decision?.audit?.drift?.anomalies || []).map(
+      (item) => "Drift anomaly: " + item
+    ),
+  ];
+
   const artifact: ExecutiveArtifact = decision?.report
     ? {
         label: "Live Executive Brief",
@@ -164,8 +189,8 @@ export default function ExecalcPage() {
             ? ". Confidence: " + decision.report.confidence
             : ""),
         keyInsights:
-          liveInsights.length > 0
-            ? liveInsights.slice(0, 3)
+          [...observedAnomalies, ...liveInsights].length > 0
+            ? [...observedAnomalies, ...liveInsights].slice(0, 3)
             : [
                 "Decision artifact available, but no additional governed insights have been surfaced yet.",
               ],
