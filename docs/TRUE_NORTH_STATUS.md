@@ -13,17 +13,17 @@ This file tracks the current build tranche and enforcement posture only.
 ---
 
 ## Current Tranche
-Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading  
-Subphase: Truthful shell completion and final repo-truth alignment
+Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
+Subphase: Final repo-truth alignment after Stage 8B anomaly recording
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `eb2e610`  
+Last verified code commit: `dbcaf16`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend navigation tranches: PASS before current doc-alignment pass  
+Recent backend and Stage 8B anomaly tranches: PASS before current doc-alignment pass  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -33,11 +33,11 @@ Remote alignment: branch aligned with origin after push
 - Left rail behavior is truthful by surface:
   - `/decisions` reflects persisted recent decisions plus explicit project/chat context
   - `/execalc` reflects current decision state plus explicit project/chat context
-- Stage 8B observe-only stability/drift scaffolding exists.
+- Stage 8B observe-only stability/drift anomaly recording exists.
 - Navigation identity now threads through:
   - orchestration path
   - decision path
   - `/execalc` request path
-- Current work is focused on the final repo-truth alignment pass after truthful shell completion.
+- Current work is focused on the final repo-truth alignment pass after Stage 8B anomaly recording.
 
 This document must never redefine system doctrine.

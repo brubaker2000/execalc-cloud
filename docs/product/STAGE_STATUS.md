@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-26
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, and truthful left-rail injection implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, and observe-only Stage 8B anomaly recording implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -115,12 +115,18 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, a
   - 19f6fcf Neutralize shell defaults and label decisions workspace
   - eb2e610 Make workspace shell left rail truthful
 
-## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY SCAFFOLD IN PLACE)
-- Observe-only anomaly slots were added in code
-- Stage 8B doctrine/spec scaffolding exists and was synced to code
-- Product docs added:
+## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY ANOMALY RECORDING IN PLACE)
+- Observe-only stability and drift layers now emit live signals and anomaly arrays in code
+- Runtime records non-blocking anomalies for:
+  - missing navigation context
+  - unspecified governing objective
+  - non-ALLOW boundary outcomes
+- Service tests cover both anomaly-free and anomaly-present paths
+- Product docs added and synced:
   - docs/product/STAGE_8B_STABILITY_AND_DRIFT_FOUNDATIONS.md
   - docs/product/SUBSTRATE_VS_EXECALC_DOCTRINE.md
+- Key commit:
+  - dbcaf16 Record observe-only Stage 8B anomalies
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity

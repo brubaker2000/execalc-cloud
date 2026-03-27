@@ -15,12 +15,12 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Final repo-truth alignment for latest Stage 8 tranche
-   - Sync status surfaces to reflect eb2e610.
-   - Record that the workspace shell is now truthful on both rails.
-   - Remove stale language that still treats repo-truth cleanup as pre-left-rail work.
+1) Final repo-truth alignment for latest Stage 8B tranche
+   - Sync status surfaces to reflect dbcaf16.
+   - Record that observe-only anomaly recording is live in the decision service.
+   - Remove stale language that still stops at the truthful-shell tranche.
 
-2) Define the next narrow Stage 8 move after truthful shell completion
+2) Define the next narrow Stage 8 move after observe-only anomaly recording
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.
