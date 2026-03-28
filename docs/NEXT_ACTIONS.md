@@ -15,12 +15,12 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Final repo-truth alignment for decision-boundary rail tranche
-   - Sync status surfaces to reflect 7cbb980.
-   - Record that `/execalc` now surfaces decision execution-boundary state directly from the decision response.
-   - Remove stale language that still stops at 4b7f361.
+1) Final repo-truth alignment for decisions-rail boundary tranche
+   - Sync status surfaces to reflect d16143a.
+   - Record that `/decisions` now surfaces selected decision execution-boundary state directly from persisted decision detail.
+   - Remove stale language that still stops at 7cbb980.
 
-2) Define the next narrow Stage 8 move after decision-boundary surfacing
+2) Define the next narrow Stage 8 move after decisions-rail boundary surfacing
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.

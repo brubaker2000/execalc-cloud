@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 7cbb980
+- Last verified code commit: d16143a
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after decision-boundary rail surfacing tranche
+  - clean after decisions-rail boundary surfacing tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -26,6 +26,7 @@
 - Observe-only anomaly recording now runs in code for stability/drift audit layers
 - Executive rail now surfaces anomaly strings from audit payloads on both `/execalc` and `/decisions`
 - `/execalc` now also surfaces decision execution-boundary state directly from the decision response
+- `/decisions` now surfaces the selected decision execution-boundary state directly from persisted decision detail
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -45,6 +46,8 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- d16143a Surface decision boundary state in decisions rail
+- e46d875 Refresh repo truth for decision-boundary rail
 - 7cbb980 Surface decision boundary state in execalc rail
 - 80025e9 Refresh repo truth for rail anomaly surfacing
 - 4b7f361 Surface Stage 8B anomalies in executive rail
@@ -66,11 +69,11 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, and `/execalc` now surfaces decision-boundary state.
-- Repo truth is being aligned to the latest decision-boundary rail tranche.
+- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, and both `/execalc` and `/decisions` now surface decision-boundary state.
+- Repo truth is being aligned to the latest decisions-rail boundary tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
-1) Align repo-truth docs to 7cbb980 decision-boundary rail tranche
+1) Align repo-truth docs to d16143a decisions-rail boundary tranche
 2) Choose the next smallest governed Stage 8 increment
 3) Preserve workstation-safe execution discipline
