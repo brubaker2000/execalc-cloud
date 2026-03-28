@@ -58,6 +58,10 @@ type DecisionDetailResponse = {
         anomalies?: string[];
       };
     };
+      execution_boundary?: {
+        status?: string;
+        reason?: string;
+      };
   };
   error?: string;
 };
@@ -210,6 +214,14 @@ export default function DecisionsPage() {
     ),
   ];
 
+  const detailBoundaryInsight = detail?.result?.execution_boundary?.status
+    ? "Decision boundary: " +
+      detail.result.execution_boundary.status +
+      (detail.result.execution_boundary.reason
+        ? " - " + detail.result.execution_boundary.reason
+        : "")
+    : null;
+
   const artifact: ExecutiveArtifact = {
     label: "Decision Rail",
     updatedAt: detail?.created_at,
@@ -243,22 +255,31 @@ export default function DecisionsPage() {
         (report?.confidence ? ". Confidence: " + report.confidence : "")
       : orchestrationResult?.assistant_message ||
         "The rail reflects governed decision and orchestration state instead of placeholder narrative.",
-    keyInsights:
-      [...observedAnomalies, ...railInsights].length > 0
-        ? [...observedAnomalies, ...railInsights].slice(0, 3)
-        : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
-    decisionSignal: orchestrationError
-      ? "Orchestration probe failed: " + orchestrationError
-      : orchestrationLoading
-        ? "Running orchestration probe"
-        : orchestrationResult?.execution_boundary_result?.status
-          ? "Execution boundary status: " +
-            orchestrationResult.execution_boundary_result.status
-          : report?.confidence
-            ? "Selected decision confidence: " + report.confidence
-            : selectedId
-            ? "Decision detail loaded; more governed signals appear as runtime outputs expand."
-            : "Select a persisted decision to populate the rail.",
+      keyInsights:
+        [detailBoundaryInsight, ...observedAnomalies, ...railInsights].filter(
+          (value): value is string => Boolean(value)
+        ).length > 0
+          ? [detailBoundaryInsight, ...observedAnomalies, ...railInsights]
+              .filter((value): value is string => Boolean(value))
+              .slice(0, 3)
+          : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
+      decisionSignal: orchestrationError
+        ? "Orchestration probe failed: " + orchestrationError
+        : orchestrationLoading
+          ? "Running orchestration probe"
+          : detailBoundaryInsight
+            ? detailBoundaryInsight
+            : orchestrationResult?.execution_boundary_result?.status
+              ? "Execution boundary status: " +
+                orchestrationResult.execution_boundary_result.status +
+                (orchestrationResult.execution_boundary_result.reason
+                  ? " - " + orchestrationResult.execution_boundary_result.reason
+                  : "")
+              : report?.confidence
+                ? "Selected decision confidence: " + report.confidence
+                : selectedId
+                  ? "Decision detail loaded; more governed signals appear as runtime outputs expand."
+                  : "Select a persisted decision to populate the rail.",
   };
 
   const rightRail = <LiveExecutiveBrief artifact={artifact} />;
