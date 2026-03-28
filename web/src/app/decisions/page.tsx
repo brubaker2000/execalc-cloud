@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LiveExecutiveBrief, type ExecutiveArtifact } from "@/components/shell/live-executive-brief";
+import { LiveExecutiveBrief, type ExecutiveArtifact, type RailNugget } from "@/components/shell/live-executive-brief";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
 type DecisionListRecord = {
@@ -222,6 +222,29 @@ export default function DecisionsPage() {
         : "")
     : null;
 
+
+  const runtimeNuggets: RailNugget[] = [
+    ...(detailBoundaryInsight
+      ? [{
+          id: "detail-boundary",
+          label: "Decision Boundary",
+          body: detailBoundaryInsight,
+          kind: "boundary" as const,
+        }]
+      : []),
+    ...observedAnomalies.slice(0, 2).map((item, index) => ({
+      id: "anomaly-" + index,
+      label: "Observed Anomaly",
+      body: item,
+      kind: "anomaly" as const,
+    })),
+    ...railInsights.slice(0, 3).map((item, index) => ({
+      id: "insight-" + index,
+      label: index === 0 ? "Primary Insight" : "Supporting Insight",
+      body: item,
+      kind: item.startsWith("Action proposal:") ? ("action" as const) : ("insight" as const),
+    })),
+  ];
   const artifact: ExecutiveArtifact = {
     label: "Decision Rail",
     updatedAt: detail?.created_at,
@@ -263,6 +286,7 @@ export default function DecisionsPage() {
               .filter((value): value is string => Boolean(value))
               .slice(0, 3)
           : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
+        railNuggets: runtimeNuggets,
       decisionSignal: orchestrationError
         ? "Orchestration probe failed: " + orchestrationError
         : orchestrationLoading

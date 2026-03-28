@@ -1,3 +1,10 @@
+type RailNugget = {
+  id: string;
+  label: string;
+  body: string;
+  kind?: "boundary" | "anomaly" | "insight" | "action" | "memory";
+};
+
 type ExecutiveArtifact = {
   label?: string;
   updatedAt?: string;
@@ -7,15 +14,27 @@ type ExecutiveArtifact = {
   executiveBrief: string;
   keyInsights: string[];
   decisionSignal: string;
+  railNuggets?: RailNugget[];
 };
 
 type LiveExecutiveBriefProps = {
   artifact: ExecutiveArtifact;
 };
 
+const nuggetTone: Record<NonNullable<RailNugget["kind"]>, string> = {
+  boundary: "border-amber-700/40 bg-amber-950/20",
+  anomaly: "border-red-800/40 bg-red-950/20",
+  insight: "border-zinc-800 bg-zinc-900",
+  action: "border-emerald-800/40 bg-emerald-950/20",
+  memory: "border-sky-800/40 bg-sky-950/20",
+};
+
 export function LiveExecutiveBrief({
   artifact,
 }: LiveExecutiveBriefProps) {
+  const runtimeNuggets = artifact.railNuggets || [];
+  const sectionTitle = runtimeNuggets.length > 0 ? "Runtime Nuggets" : "Key Insights";
+
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
       <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
@@ -63,17 +82,31 @@ export function LiveExecutiveBrief({
 
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
           <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            Key Insights
+            {sectionTitle}
           </div>
           <div className="mt-2 space-y-2">
-            {artifact.keyInsights.map((insight) => (
-              <div
-                key={insight}
-                className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm leading-6 text-zinc-300"
-              >
-                {insight}
-              </div>
-            ))}
+            {runtimeNuggets.length > 0
+              ? runtimeNuggets.map((nugget) => (
+                  <div
+                    key={nugget.id}
+                    className={`rounded-lg border px-3 py-3 ${nugget.kind ? nuggetTone[nugget.kind] : "border-zinc-800 bg-zinc-900"}`}
+                  >
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">
+                      {nugget.label}
+                    </div>
+                    <div className="mt-1 text-sm leading-6 text-zinc-200">
+                      {nugget.body}
+                    </div>
+                  </div>
+                ))
+              : artifact.keyInsights.map((insight) => (
+                  <div
+                    key={insight}
+                    className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm leading-6 text-zinc-300"
+                  >
+                    {insight}
+                  </div>
+                ))}
           </div>
         </div>
 
@@ -90,4 +123,4 @@ export function LiveExecutiveBrief({
   );
 }
 
-export type { ExecutiveArtifact };
+export type { ExecutiveArtifact, RailNugget };

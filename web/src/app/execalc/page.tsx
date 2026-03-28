@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { LiveExecutiveBrief, type ExecutiveArtifact } from "@/components/shell/live-executive-brief";
+import { LiveExecutiveBrief, type ExecutiveArtifact, type RailNugget } from "@/components/shell/live-executive-brief";
 import { WorkspaceShell } from "@/components/shell/workspace-shell";
 
 const IDLE_ARTIFACT: ExecutiveArtifact = {
@@ -181,6 +181,35 @@ export default function ExecalcPage() {
         : "")
     : null;
 
+  const runtimeNuggets: RailNugget[] = [
+    ...(boundaryInsight
+      ? [{
+          id: "boundary",
+          label: "Execution Boundary",
+          body: boundaryInsight,
+          kind: "boundary" as const,
+        }]
+      : []),
+    ...(decision?.audit?.stability?.anomalies || []).slice(0, 2).map((item, index) => ({
+      id: "stability-" + index,
+      label: "Stability Anomaly",
+      body: item,
+      kind: "anomaly" as const,
+    })),
+    ...(decision?.audit?.drift?.anomalies || []).slice(0, 2).map((item, index) => ({
+      id: "drift-" + index,
+      label: "Drift Anomaly",
+      body: item,
+      kind: "anomaly" as const,
+    })),
+    ...liveInsights.slice(0, 3).map((item, index) => ({
+      id: "insight-" + index,
+      label: index === 0 ? "Primary Insight" : "Supporting Insight",
+      body: item,
+      kind: item.startsWith("Next action:") ? ("action" as const) : ("insight" as const),
+    })),
+  ];
+
   const artifact: ExecutiveArtifact = decision?.report
     ? {
         label: "Live Executive Brief",
@@ -210,6 +239,7 @@ export default function ExecalcPage() {
             : [
                 "Decision artifact available, but no additional governed insights have been surfaced yet.",
               ],
+        railNuggets: runtimeNuggets,
         decisionSignal: isSubmitting
           ? "Decision conversion in progress"
           : boundaryInsight
