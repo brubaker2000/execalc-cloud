@@ -204,50 +204,66 @@ export default function DecisionsPage() {
       : null,
   ].filter((value): value is string => Boolean(value));
 
-  const detailAudit = detail?.result?.audit;
-  const observedAnomalies = [
-    ...(detailAudit?.stability?.anomalies || []).map(
-      (item) => "Stability anomaly: " + item
-    ),
-    ...(detailAudit?.drift?.anomalies || []).map(
-      (item) => "Drift anomaly: " + item
-    ),
-  ];
+    const detailAudit = detail?.result?.audit;
+    const observedAnomalies = [
+      ...(detailAudit?.stability?.anomalies || []).map(
+        (item) => "Stability anomaly: " + item
+      ),
+      ...(detailAudit?.drift?.anomalies || []).map(
+        (item) => "Drift anomaly: " + item
+      ),
+    ];
 
-  const detailBoundaryInsight = detail?.result?.execution_boundary?.status
-    ? "Decision boundary: " +
-      detail.result.execution_boundary.status +
-      (detail.result.execution_boundary.reason
-        ? " - " + detail.result.execution_boundary.reason
-        : "")
-    : null;
+    const observedSignals = [
+      ...(detailAudit?.stability?.signals || []).map(
+        (item) => "Stability signal: " + item
+      ),
+      ...(detailAudit?.drift?.signals || []).map(
+        (item) => "Drift signal: " + item
+      ),
+    ];
 
+    const detailBoundaryInsight = detail?.result?.execution_boundary?.status
+      ? "Decision boundary: " +
+        detail.result.execution_boundary.status +
+        (detail.result.execution_boundary.reason
+          ? " - " + detail.result.execution_boundary.reason
+          : "")
+      : null;
 
-  const runtimeNuggets: RailNugget[] = [
-    ...(detailBoundaryInsight
-      ? [{
-          id: "detail-boundary",
-          label: "Decision Boundary",
-          body: detailBoundaryInsight,
-          kind: "boundary" as const,
-          priority: 100,
-        }]
-      : []),
-    ...observedAnomalies.slice(0, 2).map((item, index) => ({
-      id: "anomaly-" + index,
-      label: "Observed Anomaly",
-      body: item,
-      kind: "anomaly" as const,
-      priority: 90,
-    })),
-    ...railInsights.slice(0, 3).map((item, index) => ({
-      id: "insight-" + index,
-      label: index === 0 ? "Primary Insight" : "Supporting Insight",
-      body: item,
-      kind: item.startsWith("Action proposal:") ? ("action" as const) : ("insight" as const),
-      priority: item.startsWith("Action proposal:") ? 80 : (index === 0 ? 70 : 60),
-    })),
-  ];
+    const runtimeNuggets: RailNugget[] = [
+      ...(detailBoundaryInsight
+        ? [{
+            id: "detail-boundary",
+            label: "Decision Boundary",
+            body: detailBoundaryInsight,
+            kind: "boundary" as const,
+            priority: 100,
+          }]
+        : []),
+      ...observedAnomalies.slice(0, 2).map((item, index) => ({
+        id: "anomaly-" + index,
+        label: "Observed Anomaly",
+        body: item,
+        kind: "anomaly" as const,
+        priority: 90,
+      })),
+      ...observedSignals.slice(0, 2).map((item, index) => ({
+        id: "signal-" + index,
+        label: "Observed Signal",
+        body: item,
+        kind: "insight" as const,
+        priority: 65,
+      })),
+      ...railInsights.slice(0, 3).map((item, index) => ({
+        id: "insight-" + index,
+        label: index === 0 ? "Primary Insight" : "Supporting Insight",
+        body: item,
+        kind: item.startsWith("Action proposal:") ? ("action" as const) : ("insight" as const),
+        priority: item.startsWith("Action proposal:") ? 80 : (index === 0 ? 70 : 60),
+      })),
+    ];
+
   const artifact: ExecutiveArtifact = {
     label: "Decision Rail",
     updatedAt: detail?.created_at,

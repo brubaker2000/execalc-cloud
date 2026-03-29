@@ -164,55 +164,71 @@ export default function ExecalcPage() {
       .map((item) => "Sensitivity: " + item.name + " (" + item.impact + ")"),
   ].filter((value): value is string => Boolean(value));
 
-  const observedAnomalies = [
-    ...(decision?.audit?.stability?.anomalies || []).map(
-      (item) => "Stability anomaly: " + item
-    ),
-    ...(decision?.audit?.drift?.anomalies || []).map(
-      (item) => "Drift anomaly: " + item
-    ),
-  ];
+    const observedAnomalies = [
+      ...(decision?.audit?.stability?.anomalies || []).map(
+        (item) => "Stability anomaly: " + item
+      ),
+      ...(decision?.audit?.drift?.anomalies || []).map(
+        (item) => "Drift anomaly: " + item
+      ),
+    ];
 
-  const boundaryInsight = decision?.execution_boundary?.status
-    ? "Execution boundary: " +
-      decision.execution_boundary.status +
-      (decision.execution_boundary.reason
-        ? " - " + decision.execution_boundary.reason
-        : "")
-    : null;
+    const observedSignals = [
+      ...(decision?.audit?.stability?.signals || []).map(
+        (item) => "Stability signal: " + item
+      ),
+      ...(decision?.audit?.drift?.signals || []).map(
+        (item) => "Drift signal: " + item
+      ),
+    ];
 
-  const runtimeNuggets: RailNugget[] = [
-    ...(boundaryInsight
-      ? [{
-          id: "boundary",
-          label: "Execution Boundary",
-          body: boundaryInsight,
-          kind: "boundary" as const,
-          priority: 100,
-        }]
-      : []),
-    ...(decision?.audit?.stability?.anomalies || []).slice(0, 2).map((item, index) => ({
-      id: "stability-" + index,
-      label: "Stability Anomaly",
-      body: item,
-      kind: "anomaly" as const,
-      priority: 90,
-    })),
-    ...(decision?.audit?.drift?.anomalies || []).slice(0, 2).map((item, index) => ({
-      id: "drift-" + index,
-      label: "Drift Anomaly",
-      body: item,
-      kind: "anomaly" as const,
-      priority: 90,
-    })),
-    ...liveInsights.slice(0, 3).map((item, index) => ({
-      id: "insight-" + index,
-      label: index === 0 ? "Primary Insight" : "Supporting Insight",
-      body: item,
-      kind: item.startsWith("Next action:") ? ("action" as const) : ("insight" as const),
-      priority: item.startsWith("Next action:") ? 80 : (index === 0 ? 70 : 60),
-    })),
-  ];
+    const boundaryInsight = decision?.execution_boundary?.status
+      ? "Execution boundary: " +
+        decision.execution_boundary.status +
+        (decision.execution_boundary.reason
+          ? " - " + decision.execution_boundary.reason
+          : "")
+      : null;
+
+    const runtimeNuggets: RailNugget[] = [
+      ...(boundaryInsight
+        ? [{
+            id: "boundary",
+            label: "Execution Boundary",
+            body: boundaryInsight,
+            kind: "boundary" as const,
+            priority: 100,
+          }]
+        : []),
+      ...(decision?.audit?.stability?.anomalies || []).slice(0, 2).map((item, index) => ({
+        id: "stability-" + index,
+        label: "Stability Anomaly",
+        body: item,
+        kind: "anomaly" as const,
+        priority: 90,
+      })),
+      ...(decision?.audit?.drift?.anomalies || []).slice(0, 2).map((item, index) => ({
+        id: "drift-" + index,
+        label: "Drift Anomaly",
+        body: item,
+        kind: "anomaly" as const,
+        priority: 90,
+      })),
+      ...observedSignals.slice(0, 2).map((item, index) => ({
+        id: "signal-" + index,
+        label: "Observed Signal",
+        body: item,
+        kind: "insight" as const,
+        priority: 65,
+      })),
+      ...liveInsights.slice(0, 3).map((item, index) => ({
+        id: "insight-" + index,
+        label: index === 0 ? "Primary Insight" : "Supporting Insight",
+        body: item,
+        kind: item.startsWith("Next action:") ? ("action" as const) : ("insight" as const),
+        priority: item.startsWith("Next action:") ? 80 : (index === 0 ? 70 : 60),
+      })),
+    ];
 
   const artifact: ExecutiveArtifact = decision?.report
     ? {
