@@ -230,6 +230,7 @@ export default function DecisionsPage() {
           label: "Decision Boundary",
           body: detailBoundaryInsight,
           kind: "boundary" as const,
+          priority: 100,
         }]
       : []),
     ...observedAnomalies.slice(0, 2).map((item, index) => ({
@@ -237,12 +238,14 @@ export default function DecisionsPage() {
       label: "Observed Anomaly",
       body: item,
       kind: "anomaly" as const,
+      priority: 90,
     })),
     ...railInsights.slice(0, 3).map((item, index) => ({
       id: "insight-" + index,
       label: index === 0 ? "Primary Insight" : "Supporting Insight",
       body: item,
       kind: item.startsWith("Action proposal:") ? ("action" as const) : ("insight" as const),
+      priority: item.startsWith("Action proposal:") ? 80 : (index === 0 ? 70 : 60),
     })),
   ];
   const artifact: ExecutiveArtifact = {

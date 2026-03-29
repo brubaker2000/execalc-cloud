@@ -188,6 +188,7 @@ export default function ExecalcPage() {
           label: "Execution Boundary",
           body: boundaryInsight,
           kind: "boundary" as const,
+          priority: 100,
         }]
       : []),
     ...(decision?.audit?.stability?.anomalies || []).slice(0, 2).map((item, index) => ({
@@ -195,18 +196,21 @@ export default function ExecalcPage() {
       label: "Stability Anomaly",
       body: item,
       kind: "anomaly" as const,
+      priority: 90,
     })),
     ...(decision?.audit?.drift?.anomalies || []).slice(0, 2).map((item, index) => ({
       id: "drift-" + index,
       label: "Drift Anomaly",
       body: item,
       kind: "anomaly" as const,
+      priority: 90,
     })),
     ...liveInsights.slice(0, 3).map((item, index) => ({
       id: "insight-" + index,
       label: index === 0 ? "Primary Insight" : "Supporting Insight",
       body: item,
       kind: item.startsWith("Next action:") ? ("action" as const) : ("insight" as const),
+      priority: item.startsWith("Next action:") ? 80 : (index === 0 ? 70 : 60),
     })),
   ];
 

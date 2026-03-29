@@ -3,6 +3,7 @@ type RailNugget = {
   label: string;
   body: string;
   kind?: "boundary" | "anomaly" | "insight" | "action" | "memory";
+  priority?: number;
 };
 
 type ExecutiveArtifact = {
@@ -32,7 +33,9 @@ const nuggetTone: Record<NonNullable<RailNugget["kind"]>, string> = {
 export function LiveExecutiveBrief({
   artifact,
 }: LiveExecutiveBriefProps) {
-  const runtimeNuggets = artifact.railNuggets || [];
+  const runtimeNuggets = [...(artifact.railNuggets || [])].sort(
+    (a, b) => (b.priority || 0) - (a.priority || 0)
+  );
   const sectionTitle = runtimeNuggets.length > 0 ? "Runtime Nuggets" : "Key Insights";
 
   return (
