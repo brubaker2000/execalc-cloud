@@ -1,6 +1,6 @@
 # Stage 8B — Stability & Drift Foundations
 
-Status: In progress — observe-only foundation implemented at the decision service seam  
+Status: In progress — observe-only foundation implemented at the decision service seam, with executive-rail anomaly/signal surfacing now live on `/execalc` and `/decisions`  
 Purpose: Capture the next governance hardening layer for Execalc without derailing the newly established orchestration spine.
 
 Current implementation checkpoint:
@@ -8,9 +8,15 @@ Current implementation checkpoint:
 - `audit.stability` and `audit.drift` are attached at the canonical decision-service seam
 - Stability registry version `stage8b.2` tracks invariants for `decision_result`, `action_proposal`, and `execution_snapshot`
 - Drift contract version `stage8b.3` tracks expected signals for `boundary_status`, `scenario_type`, and `governing_objective`
-- audit.stability.anomalies and audit.drift.anomalies now exist as canonical observe-only anomaly arrays
+- `audit.stability.anomalies` and `audit.drift.anomalies` now exist as canonical observe-only anomaly arrays
 - Both layers now emit live observe-only signals and report `status: signals_recorded`
 - Runtime now records non-blocking anomalies for missing navigation context, unspecified governing objective, and non-ALLOW boundary outcomes
+- The executive rail now surfaces:
+  - anomaly strings
+  - decision boundary state
+  - structured runtime nuggets
+  - observe-only stability/drift signals
+- `/execalc` and `/decisions` now both surface Stage 8B signals through `LiveExecutiveBrief`
 - Tests lock the current observe-only behavior for both anomaly-free and anomaly-present paths
 - No blocking behavior has been introduced; this remains visibility-first scaffolding
 
