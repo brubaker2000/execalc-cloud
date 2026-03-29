@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-03-26 (America/New_York)
+Last updated: 2026-03-29 (America/New_York)
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,12 +15,12 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Final repo-truth alignment for runtime-nugget rail tranche
-   - Sync status surfaces to reflect 978b245.
-   - Record that the executive rail now renders structured runtime nuggets instead of only plain insight strings.
-   - Remove stale language that still stops at d16143a.
+1) Final repo-truth alignment for signal-surfacing tranche
+   - Sync status surfaces to reflect 45cd4f5.
+   - Record that the executive rail now surfaces observe-only stability/drift signals on both `/execalc` and `/decisions`.
+   - Remove stale language that still stops at the runtime-nugget tranche.
 
-2) Define the next narrow Stage 8 move after runtime-nugget surfacing
+2) Define the next narrow Stage 8 move after signal surfacing
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.

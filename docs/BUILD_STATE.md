@@ -1,12 +1,12 @@
-# Build State Snapshot — 2026-03-26
+# Build State Snapshot — 2026-03-29
 
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 978b245
+- Last verified code commit: 45cd4f5
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after runtime-nugget rail tranche
+  - repo-truth refresh in progress after signal-surfacing tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -22,12 +22,13 @@
 - Shell defaults were neutralized so fake branded/sample workspace state no longer leaks into runtime surfaces
 - Root / redirects to /execalc
 
-### Stage 8B — Stability & Drift Foundations (observe-only anomaly recording + rail surfacing in place)
+### Stage 8B — Stability & Drift Foundations (observe-only anomaly recording + signal surfacing + runtime nuggets in place)
 - Observe-only anomaly recording now runs in code for stability/drift audit layers
 - Executive rail now surfaces anomaly strings from audit payloads on both `/execalc` and `/decisions`
 - `/execalc` now also surfaces decision execution-boundary state directly from the decision response
 - `/decisions` now surfaces the selected decision execution-boundary state directly from persisted decision detail
 - The executive rail now renders structured runtime nuggets instead of only plain insight strings
+- The executive rail now surfaces observe-only stability/drift signals on both `/execalc` and `/decisions`
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -47,6 +48,9 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 45cd4f5 Surface observe-only signals in executive rail
+- 99f45fb Prioritize runtime nuggets in executive rail
+- 1a4c6aa Refresh repo truth for runtime nugget rail
 - 978b245 Render runtime nuggets in executive rail
 - dc0c65a Refresh repo truth for decisions rail boundary
 - d16143a Surface decision boundary state in decisions rail
@@ -72,11 +76,11 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, and the rail now renders structured runtime nuggets.
-- Repo truth is being aligned to the latest runtime-nugget rail tranche.
+- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, the rail renders structured runtime nuggets, and observe-only stability/drift signals are now surfaced on both pages.
+- Repo truth is being aligned to the latest signal-surfacing tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
-1) Align repo-truth docs to 978b245 runtime-nugget rail tranche
+1) Align repo-truth docs to 45cd4f5 signal-surfacing tranche
 2) Choose the next smallest governed Stage 8 increment
 3) Preserve workstation-safe execution discipline

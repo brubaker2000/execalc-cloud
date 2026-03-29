@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-26
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, and runtime-nugget rail surfacing on execalc and decisions implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last updated: 2026-03-29
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, and observe-only signal surfacing on execalc and decisions implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -115,12 +115,17 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 19f6fcf Neutralize shell defaults and label decisions workspace
   - eb2e610 Make workspace shell left rail truthful
 
-## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY ANOMALY RECORDING + RAIL SURFACING + RUNTIME NUGGETS IN PLACE)
+## Stage 8B: Stability & Drift Foundations (OBSERVE-ONLY ANOMALY RECORDING + SIGNAL SURFACING + RUNTIME NUGGETS IN PLACE)
 - Observe-only stability and drift layers now emit live signals and anomaly arrays in code
 - Runtime records non-blocking anomalies for:
   - missing navigation context
   - unspecified governing objective
   - non-ALLOW boundary outcomes
+- Executive rail now surfaces:
+  - anomaly strings
+  - decision boundary state
+  - structured runtime nuggets
+  - observe-only stability/drift signals
 - Service tests cover both anomaly-free and anomaly-present paths
 - Product docs added and synced:
   - docs/product/STAGE_8B_STABILITY_AND_DRIFT_FOUNDATIONS.md
@@ -131,6 +136,8 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 7cbb980 Surface decision boundary state in execalc rail
   - d16143a Surface decision boundary state in decisions rail
   - 978b245 Render runtime nuggets in executive rail
+  - 99f45fb Prioritize runtime nuggets in executive rail
+  - 45cd4f5 Surface observe-only signals in executive rail
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity
