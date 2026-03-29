@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: d16143a
+- Last verified code commit: 978b245
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after decisions-rail boundary surfacing tranche
+  - clean after runtime-nugget rail tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -27,6 +27,7 @@
 - Executive rail now surfaces anomaly strings from audit payloads on both `/execalc` and `/decisions`
 - `/execalc` now also surfaces decision execution-boundary state directly from the decision response
 - `/decisions` now surfaces the selected decision execution-boundary state directly from persisted decision detail
+- The executive rail now renders structured runtime nuggets instead of only plain insight strings
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -46,6 +47,8 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 978b245 Render runtime nuggets in executive rail
+- dc0c65a Refresh repo truth for decisions rail boundary
 - d16143a Surface decision boundary state in decisions rail
 - e46d875 Refresh repo truth for decision-boundary rail
 - 7cbb980 Surface decision boundary state in execalc rail
@@ -69,11 +72,11 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, and both `/execalc` and `/decisions` now surface decision-boundary state.
-- Repo truth is being aligned to the latest decisions-rail boundary tranche.
+- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, and the rail now renders structured runtime nuggets.
+- Repo truth is being aligned to the latest runtime-nugget rail tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
-1) Align repo-truth docs to d16143a decisions-rail boundary tranche
+1) Align repo-truth docs to 978b245 runtime-nugget rail tranche
 2) Choose the next smallest governed Stage 8 increment
 3) Preserve workstation-safe execution discipline
