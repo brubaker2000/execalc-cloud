@@ -205,14 +205,9 @@ export default function DecisionsPage() {
   ].filter((value): value is string => Boolean(value));
 
     const detailAudit = detail?.result?.audit;
-    const observedAnomalies = [
-      ...(detailAudit?.stability?.anomalies || []).map(
-        (item) => "Stability anomaly: " + item
-      ),
-      ...(detailAudit?.drift?.anomalies || []).map(
-        (item) => "Drift anomaly: " + item
-      ),
-    ];
+      const stabilityAnomalies = (detailAudit?.stability?.anomalies || []).slice(0, 2);
+
+      const driftAnomalies = (detailAudit?.drift?.anomalies || []).slice(0, 2);
 
       const stabilitySignals = (detailAudit?.stability?.signals || []).map(
         (item) => "Stability signal: " + item
@@ -240,13 +235,20 @@ export default function DecisionsPage() {
             priority: 100,
           }]
         : []),
-      ...observedAnomalies.slice(0, 2).map((item, index) => ({
-        id: "anomaly-" + index,
-        label: "Observed Anomaly",
-        body: item,
-        kind: "anomaly" as const,
-        priority: 90,
-      })),
+        ...stabilityAnomalies.map((item, index) => ({
+          id: "stability-" + index,
+          label: "Stability Anomaly",
+          body: item,
+          kind: "anomaly" as const,
+          priority: 90,
+        })),
+        ...driftAnomalies.map((item, index) => ({
+          id: "drift-" + index,
+          label: "Drift Anomaly",
+          body: item,
+          kind: "anomaly" as const,
+          priority: 90,
+        })),
         ...((detailAudit?.stability?.anomalies || []).length === 0
           ? stabilitySignals.slice(0, 1).map((item, index) => ({
               id: "stability-signal-" + index,
@@ -308,10 +310,10 @@ export default function DecisionsPage() {
       : orchestrationResult?.assistant_message ||
         "The rail reflects governed decision and orchestration state instead of placeholder narrative.",
       keyInsights:
-        [detailBoundaryInsight, ...observedAnomalies, ...railInsights].filter(
+        [detailBoundaryInsight, ...stabilityAnomalies, ...driftAnomalies, ...railInsights].filter(
           (value): value is string => Boolean(value)
         ).length > 0
-          ? [detailBoundaryInsight, ...observedAnomalies, ...railInsights]
+          ? [detailBoundaryInsight, ...stabilityAnomalies, ...driftAnomalies, ...railInsights]
               .filter((value): value is string => Boolean(value))
               .slice(0, 3)
           : ["No governed signals surfaced yet from the selected decision or orchestration probe."],
