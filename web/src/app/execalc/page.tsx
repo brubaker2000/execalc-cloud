@@ -204,14 +204,14 @@ export default function ExecalcPage() {
         label: "Stability Anomaly",
         body: item,
         kind: "anomaly" as const,
-        priority: 90,
+        priority: 88,
       })),
       ...(decision?.audit?.drift?.anomalies || []).slice(0, 2).map((item, index) => ({
         id: "drift-" + index,
         label: "Drift Anomaly",
         body: item,
         kind: "anomaly" as const,
-        priority: 90,
+        priority: 92,
       })),
         ...((decision?.audit?.stability?.anomalies || []).length === 0
           ? stabilitySignals.slice(0, 1).map((item, index) => ({

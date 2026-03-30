@@ -240,14 +240,14 @@ export default function DecisionsPage() {
           label: "Stability Anomaly",
           body: item,
           kind: "anomaly" as const,
-          priority: 90,
+          priority: 88,
         })),
         ...driftAnomalies.map((item, index) => ({
           id: "drift-" + index,
           label: "Drift Anomaly",
           body: item,
           kind: "anomaly" as const,
-          priority: 90,
+          priority: 92,
         })),
         ...((detailAudit?.stability?.anomalies || []).length === 0
           ? stabilitySignals.slice(0, 1).map((item, index) => ({
