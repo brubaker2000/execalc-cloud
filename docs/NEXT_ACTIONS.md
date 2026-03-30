@@ -15,19 +15,18 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Final repo-truth alignment for signal-surfacing tranche
-   - Sync status surfaces to reflect 45cd4f5.
-   - Record that the executive rail now surfaces observe-only stability/drift signals on both `/execalc` and `/decisions`.
-   - Remove stale language that still stops at the runtime-nugget tranche.
-
-2) Define the next narrow Stage 8 move after signal surfacing
+1) Define the next narrow Stage 8 move after signal styling
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.
 
-3) Protect workstation reliability
+2) Preserve workstation reliability
    - Prefer short, verifiable commands in this shell environment.
    - Avoid fragile long heredocs and long quoted command chains where possible.
+
+3) Keep Stage 8 work isolated
+   - Leave unrelated untracked docs out of Stage 8 commits.
+   - Keep branch cleanliness and repo-truth discipline intact.
 
 ---
 

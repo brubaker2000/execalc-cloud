@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-29
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, and observe-only signal surfacing on execalc and decisions implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, and distinct signal styling on execalc and decisions implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -138,6 +138,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 978b245 Render runtime nuggets in executive rail
   - 99f45fb Prioritize runtime nuggets in executive rail
   - 45cd4f5 Surface observe-only signals in executive rail
+  - 81a46be Add signal styling to executive rail nuggets
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity
