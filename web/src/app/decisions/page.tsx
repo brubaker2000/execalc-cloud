@@ -214,14 +214,13 @@ export default function DecisionsPage() {
       ),
     ];
 
-    const observedSignals = [
-      ...(detailAudit?.stability?.signals || []).map(
+      const stabilitySignals = (detailAudit?.stability?.signals || []).map(
         (item) => "Stability signal: " + item
-      ),
-      ...(detailAudit?.drift?.signals || []).map(
+      );
+
+      const driftSignals = (detailAudit?.drift?.signals || []).map(
         (item) => "Drift signal: " + item
-      ),
-    ];
+      );
 
     const detailBoundaryInsight = detail?.result?.execution_boundary?.status
       ? "Decision boundary: " +
@@ -248,13 +247,20 @@ export default function DecisionsPage() {
         kind: "anomaly" as const,
         priority: 90,
       })),
-      ...observedSignals.slice(0, 2).map((item, index) => ({
-        id: "signal-" + index,
-        label: "Observed Signal",
-        body: item,
-        kind: "signal" as const,
-        priority: 65,
-      })),
+        ...stabilitySignals.slice(0, 1).map((item, index) => ({
+          id: "stability-signal-" + index,
+          label: "Stability Signal",
+          body: item,
+          kind: "signal" as const,
+          priority: 68,
+        })),
+        ...driftSignals.slice(0, 1).map((item, index) => ({
+          id: "drift-signal-" + index,
+          label: "Drift Signal",
+          body: item,
+          kind: "signal" as const,
+          priority: 66,
+        })),
       ...railInsights.slice(0, 3).map((item, index) => ({
         id: "insight-" + index,
         label: index === 0 ? "Primary Insight" : "Supporting Insight",

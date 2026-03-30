@@ -173,14 +173,13 @@ export default function ExecalcPage() {
       ),
     ];
 
-    const observedSignals = [
-      ...(decision?.audit?.stability?.signals || []).map(
+      const stabilitySignals = (decision?.audit?.stability?.signals || []).map(
         (item) => "Stability signal: " + item
-      ),
-      ...(decision?.audit?.drift?.signals || []).map(
+      );
+
+      const driftSignals = (decision?.audit?.drift?.signals || []).map(
         (item) => "Drift signal: " + item
-      ),
-    ];
+      );
 
     const boundaryInsight = decision?.execution_boundary?.status
       ? "Execution boundary: " +
@@ -214,13 +213,20 @@ export default function ExecalcPage() {
         kind: "anomaly" as const,
         priority: 90,
       })),
-      ...observedSignals.slice(0, 2).map((item, index) => ({
-        id: "signal-" + index,
-        label: "Observed Signal",
-        body: item,
-        kind: "signal" as const,
-        priority: 65,
-      })),
+        ...stabilitySignals.slice(0, 1).map((item, index) => ({
+          id: "stability-signal-" + index,
+          label: "Stability Signal",
+          body: item,
+          kind: "signal" as const,
+          priority: 68,
+        })),
+        ...driftSignals.slice(0, 1).map((item, index) => ({
+          id: "drift-signal-" + index,
+          label: "Drift Signal",
+          body: item,
+          kind: "signal" as const,
+          priority: 66,
+        })),
       ...liveInsights.slice(0, 3).map((item, index) => ({
         id: "insight-" + index,
         label: index === 0 ? "Primary Insight" : "Supporting Insight",
