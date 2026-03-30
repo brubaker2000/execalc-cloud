@@ -15,7 +15,7 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Define the next narrow Stage 8 move after anomaly-priority ranking
+1) Define the next narrow Stage 8 move after drift-anomaly visual treatment
    - Choose the next smallest governed increment.
    - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
    - Do not invent a wider navigation or orchestration framework until a concrete need appears.

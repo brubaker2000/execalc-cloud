@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-29
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, and drift-anomaly priority ranking implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, and distinct drift-anomaly visual treatment implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md

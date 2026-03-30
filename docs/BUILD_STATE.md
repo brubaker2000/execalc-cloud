@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 246f586
+- Last verified code commit: 24e03a5
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after anomaly-priority tranche
+  - clean after drift-anomaly-visual tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -35,6 +35,8 @@
 - Matching anomalies now suppress their lower-priority sibling signals on both `/execalc` and `/decisions`
 - `/decisions` now labels anomaly categories explicitly as Stability Anomaly and Drift Anomaly instead of a generic observed anomaly
 - Drift anomalies now rank above stability anomalies on both `/execalc` and `/decisions` for clearer executive prioritization
+- Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
+- Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -54,6 +56,7 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 24e03a5 Refresh repo truth for anomaly-priority tranche
 - 246f586 Prioritize drift anomalies above stability anomalies
 - 4da04c5 Refresh repo truth for decisions anomaly labeling
 - 04de4b0 Make decisions anomaly labels explicit
@@ -97,7 +100,7 @@
 
 ## Current Build Reality
 - The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, the rail renders structured runtime nuggets, and observe-only stability/drift signals are now surfaced on both pages.
-- Repo truth is closed again after the anomaly-priority tranche.
+- Repo truth is closed again after the drift-anomaly-visual tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
