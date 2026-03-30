@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 81a46be
+- Last verified code commit: 1db91d7
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after signal-styling tranche
+  - clean after signal-routing tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -30,6 +30,7 @@
 - The executive rail now renders structured runtime nuggets instead of only plain insight strings
 - The executive rail now surfaces observe-only stability/drift signals on both `/execalc` and `/decisions`
 - Signal nuggets now render with distinct styling in `LiveExecutiveBrief`
+- Observed signals now route through `kind: "signal"` on both `/execalc` and `/decisions`
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -49,6 +50,8 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 1db91d7 Route observed signals through signal nugget styling
+- eee7a08 Refresh repo truth for signal-styling tranche
 - 81a46be Add signal styling to executive rail nuggets
 - 1d117e3 Update Stage 8B foundations for signal surfacing
 - 611b374 Refresh repo truth for signal-surfacing tranche
@@ -81,7 +84,7 @@
 
 ## Current Build Reality
 - The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, the rail renders structured runtime nuggets, and observe-only stability/drift signals are now surfaced on both pages.
-- Repo truth is closed again after the signal-styling tranche.
+- Repo truth is closed again after the signal-routing tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
