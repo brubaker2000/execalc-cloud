@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: b15114f
+- Last verified code commit: 04de4b0
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after signal-suppression tranche
+  - clean after decisions-anomaly-label tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -33,6 +33,7 @@
 - Observed signals now route through `kind: "signal"` on both `/execalc` and `/decisions`
 - Stability and drift signals now surface as distinct nuggets with distinct labels and priorities on both pages
 - Matching anomalies now suppress their lower-priority sibling signals on both `/execalc` and `/decisions`
+- `/decisions` now labels anomaly categories explicitly as Stability Anomaly and Drift Anomaly instead of a generic observed anomaly
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -52,6 +53,9 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 04de4b0 Make decisions anomaly labels explicit
+- ca1f4c0 Update Stage 8B foundations for signal suppression
+- da0ca44 Refresh repo truth for signal-suppression tranche
 - b15114f Suppress signals when matching anomalies exist
 - bdb5f49 Refresh repo truth for signal-split tranche
 - a5386e4 Split stability and drift signal nuggets
@@ -90,7 +94,7 @@
 
 ## Current Build Reality
 - The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, the rail renders structured runtime nuggets, and observe-only stability/drift signals are now surfaced on both pages.
-- Repo truth is closed again after the signal-suppression tranche.
+- Repo truth is closed again after the decisions-anomaly-label tranche.
 - The next build decision should remain a narrow Stage 8 move, not a broad new framework.
 
 ## Immediate Next Work
