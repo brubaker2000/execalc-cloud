@@ -252,7 +252,7 @@ export default function DecisionsPage() {
         id: "signal-" + index,
         label: "Observed Signal",
         body: item,
-        kind: "insight" as const,
+        kind: "signal" as const,
         priority: 65,
       })),
       ...railInsights.slice(0, 3).map((item, index) => ({

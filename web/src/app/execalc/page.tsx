@@ -218,7 +218,7 @@ export default function ExecalcPage() {
         id: "signal-" + index,
         label: "Observed Signal",
         body: item,
-        kind: "insight" as const,
+        kind: "signal" as const,
         priority: 65,
       })),
       ...liveInsights.slice(0, 3).map((item, index) => ({
