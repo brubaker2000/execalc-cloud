@@ -247,20 +247,24 @@ export default function DecisionsPage() {
         kind: "anomaly" as const,
         priority: 90,
       })),
-        ...stabilitySignals.slice(0, 1).map((item, index) => ({
-          id: "stability-signal-" + index,
-          label: "Stability Signal",
-          body: item,
-          kind: "signal" as const,
-          priority: 68,
-        })),
-        ...driftSignals.slice(0, 1).map((item, index) => ({
-          id: "drift-signal-" + index,
-          label: "Drift Signal",
-          body: item,
-          kind: "signal" as const,
-          priority: 66,
-        })),
+        ...((detailAudit?.stability?.anomalies || []).length === 0
+          ? stabilitySignals.slice(0, 1).map((item, index) => ({
+              id: "stability-signal-" + index,
+              label: "Stability Signal",
+              body: item,
+              kind: "signal" as const,
+              priority: 68,
+            }))
+          : []),
+        ...((detailAudit?.drift?.anomalies || []).length === 0
+          ? driftSignals.slice(0, 1).map((item, index) => ({
+              id: "drift-signal-" + index,
+              label: "Drift Signal",
+              body: item,
+              kind: "signal" as const,
+              priority: 66,
+            }))
+          : []),
       ...railInsights.slice(0, 3).map((item, index) => ({
         id: "insight-" + index,
         label: index === 0 ? "Primary Insight" : "Supporting Insight",
