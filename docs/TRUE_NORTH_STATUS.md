@@ -14,16 +14,16 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Post-signal-split repo-truth alignment closed
+Subphase: Post-signal-suppression repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `a5386e4`  
+Last verified code commit: `b15114f`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, and signal-split tranches: PASS  
+Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, and signal-suppression tranches: PASS  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -41,10 +41,11 @@ Remote alignment: branch aligned with origin after push
 - Signal nuggets now render with distinct styling in `LiveExecutiveBrief`.
 - Observed signals now route through `kind: "signal"` on both `/execalc` and `/decisions`.
 - Stability and drift signals now surface as distinct nuggets with distinct labels and priorities on both pages.
+- Matching anomalies now suppress their lower-priority sibling signals on both `/execalc` and `/decisions`.
 - Navigation identity now threads through:
   - orchestration path
   - decision path
   - `/execalc` request path
-- Current work is focused on choosing the next narrow Stage 8 increment after the signal-split tranche, with repo-truth alignment closed.
+- Current work is focused on choosing the next narrow Stage 8 increment after the signal-suppression tranche, with repo-truth alignment closed.
 
 This document must never redefine system doctrine.
