@@ -1,6 +1,6 @@
 # Stage 8B — Stability & Drift Foundations
 
-Status: In progress — observe-only foundation implemented at the decision service seam, with executive-rail anomaly/signal surfacing now live on `/execalc` and `/decisions`  
+Status: In progress — observe-only foundation implemented at the decision service seam, with executive-rail anomaly/signal surfacing, split stability/drift nuggets, and anomaly-priority signal suppression now live on `/execalc` and `/decisions`  
 Purpose: Capture the next governance hardening layer for Execalc without derailing the newly established orchestration spine.
 
 Current implementation checkpoint:
@@ -16,6 +16,8 @@ Current implementation checkpoint:
   - decision boundary state
   - structured runtime nuggets
   - observe-only stability/drift signals
+  - distinct stability and drift signal nuggets
+  - anomaly-priority suppression of matching sibling signals
 - `/execalc` and `/decisions` now both surface Stage 8B signals through `LiveExecutiveBrief`
 - Tests lock the current observe-only behavior for both anomaly-free and anomaly-present paths
 - No blocking behavior has been introduced; this remains visibility-first scaffolding
