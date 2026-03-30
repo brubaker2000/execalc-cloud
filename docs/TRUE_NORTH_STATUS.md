@@ -14,16 +14,16 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Post-decisions-anomaly-label repo-truth alignment closed
+Subphase: Post-anomaly-priority repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `04de4b0`  
+Last verified code commit: `246f586`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, and decisions-anomaly-label tranches: PASS  
+Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, and anomaly-priority tranches: PASS  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -43,10 +43,11 @@ Remote alignment: branch aligned with origin after push
 - Stability and drift signals now surface as distinct nuggets with distinct labels and priorities on both pages.
 - Matching anomalies now suppress their lower-priority sibling signals on both `/execalc` and `/decisions`.
 - `/decisions` now labels anomaly categories explicitly as Stability Anomaly and Drift Anomaly instead of a generic observed anomaly.
+- Drift anomalies now rank above stability anomalies on both `/execalc` and `/decisions` for clearer executive prioritization.
 - Navigation identity now threads through:
   - orchestration path
   - decision path
   - `/execalc` request path
-- Current work is focused on choosing the next narrow Stage 8 increment after the decisions-anomaly-label tranche, with repo-truth alignment closed.
+- Current work is focused on choosing the next narrow Stage 8 increment after the anomaly-priority tranche, with repo-truth alignment closed.
 
 This document must never redefine system doctrine.

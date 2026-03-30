@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-29
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, and explicit decisions anomaly labeling implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, and drift-anomaly priority ranking implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -143,6 +143,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - a5386e4 Split stability and drift signal nuggets
   - b15114f Suppress signals when matching anomalies exist
   - 04de4b0 Make decisions anomaly labels explicit
+  - 246f586 Prioritize drift anomalies above stability anomalies
 
 ## Stage 8C: Navigation Identity Threading (COMPLETE ON stage8/ui-shell-scaffold)
 - Orchestration path now carries navigation envelope identity
