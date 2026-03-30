@@ -246,7 +246,7 @@ export default function DecisionsPage() {
           id: "drift-" + index,
           label: "Drift Anomaly",
           body: item,
-          kind: "anomaly" as const,
+          kind: "drift_anomaly" as const,
           priority: 92,
         })),
         ...((detailAudit?.stability?.anomalies || []).length === 0

@@ -210,7 +210,7 @@ export default function ExecalcPage() {
         id: "drift-" + index,
         label: "Drift Anomaly",
         body: item,
-        kind: "anomaly" as const,
+        kind: "drift_anomaly" as const,
         priority: 92,
       })),
         ...((decision?.audit?.stability?.anomalies || []).length === 0

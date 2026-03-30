@@ -2,7 +2,7 @@ type RailNugget = {
   id: string;
   label: string;
   body: string;
-  kind?: "boundary" | "anomaly" | "signal" | "insight" | "action" | "memory";
+  kind?: "boundary" | "anomaly" | "drift_anomaly" | "signal" | "insight" | "action" | "memory";
   priority?: number;
 };
 
@@ -25,6 +25,7 @@ type LiveExecutiveBriefProps = {
 const nuggetTone: Record<NonNullable<RailNugget["kind"]>, string> = {
   boundary: "border-amber-700/40 bg-amber-950/20",
   anomaly: "border-red-800/40 bg-red-950/20",
+    drift_anomaly: "border-orange-800/40 bg-orange-950/20",
     signal: "border-violet-800/40 bg-violet-950/20",
   insight: "border-zinc-800 bg-zinc-900",
   action: "border-emerald-800/40 bg-emerald-950/20",
