@@ -15,17 +15,17 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Define the next narrow Stage 8 move after drift-anomaly visual treatment
-   - Choose the next smallest governed increment.
-   - Prefer runtime honesty, narrow hardening, or truthful surfacing over broad new feature area.
-   - Do not invent a wider navigation or orchestration framework until a concrete need appears.
+1) Thread persistent-memory architecture into repo truth
+   - Update repo-truth surfaces to acknowledge `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` and commit `c183ec7`.
+   - Keep the next move architectural and documentary, not runtime implementation.
+   - Do not widen beyond the documented phased rollout until explicitly pulled forward.
 
 2) Preserve workstation reliability
    - Prefer short, verifiable commands in this shell environment.
    - Avoid fragile long heredocs and long quoted command chains where possible.
 
-3) Keep Stage 8 work isolated
-   - Leave unrelated untracked docs out of Stage 8 commits.
+3) Keep repo-truth work isolated
+   - Keep the persistent-memory threading pass scoped to the relevant truth surfaces only.
    - Keep branch cleanliness and repo-truth discipline intact.
 
 ---

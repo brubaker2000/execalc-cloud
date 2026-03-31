@@ -14,13 +14,13 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Post-drift-anomaly-visual repo-truth alignment closed
+Subphase: Post-persistent-memory-architecture repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `246f586`  
+Last verified code commit: `c183ec7`  
 Frontend build: PASS  
 Frontend lint: PASS  
 Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, and drift-anomaly-visual tranches: PASS  
@@ -49,6 +49,7 @@ Remote alignment: branch aligned with origin after push
   - orchestration path
   - decision path
   - `/execalc` request path
-- Current work is focused on choosing the next narrow Stage 8 increment after the drift-anomaly-visual tranche, with repo-truth alignment closed.
+- `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` now exists as the canonical architecture draft for governed persistent memory.
+- Current work should thread this new memory architecture artifact into repo-truth without inventing runtime implementation beyond the documented phased rollout.
 
 This document must never redefine system doctrine.

@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 24e03a5
+- Last verified code commit: c183ec7
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after drift-anomaly-visual tranche
+  - clean after persistent-memory-architecture tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -36,7 +36,7 @@
 - `/decisions` now labels anomaly categories explicitly as Stability Anomaly and Drift Anomaly instead of a generic observed anomaly
 - Drift anomalies now rank above stability anomalies on both `/execalc` and `/decisions` for clearer executive prioritization
 - Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
-- Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
+- `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` was added as the canonical architecture draft for governed persistent memory
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -56,6 +56,9 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- c183ec7 Define persistent memory system architecture
+- b25d03d Refresh repo truth for drift anomaly visual treatment
+- a65b334 Give drift anomalies distinct visual treatment
 - 24e03a5 Refresh repo truth for anomaly-priority tranche
 - 246f586 Prioritize drift anomalies above stability anomalies
 - 4da04c5 Refresh repo truth for decisions anomaly labeling
