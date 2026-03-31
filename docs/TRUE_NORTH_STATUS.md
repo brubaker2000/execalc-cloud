@@ -14,16 +14,16 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Post-persistent-memory-architecture repo-truth alignment closed
+Subphase: Persistent-memory attachment-map repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `c183ec7`  
+Last verified code commit: `81d2548`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, and drift-anomaly-visual tranches: PASS  
+Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, drift-anomaly-visual, persistent-memory architecture, and persistent-memory attachment-map tranches: PASS  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -50,6 +50,7 @@ Remote alignment: branch aligned with origin after push
   - decision path
   - `/execalc` request path
 - `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` now exists as the canonical architecture draft for governed persistent memory.
-- Current work should thread this new memory architecture artifact into repo-truth without inventing runtime implementation beyond the documented phased rollout.
+- `docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md` now exists as the narrow Phase 1 implementation map for attaching memory beside the current decision journal.
+- Current work should remain architectural and documentary unless runtime memory implementation is explicitly pulled forward beyond the documented phased rollout.
 
 This document must never redefine system doctrine.

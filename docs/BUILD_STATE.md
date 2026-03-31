@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: c183ec7
+- Last verified code commit: 81d2548
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after persistent-memory-architecture tranche
+  - clean after persistent-memory-phase1-attachment-map tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -36,7 +36,8 @@
 - `/decisions` now labels anomaly categories explicitly as Stability Anomaly and Drift Anomaly instead of a generic observed anomaly
 - Drift anomalies now rank above stability anomalies on both `/execalc` and `/decisions` for clearer executive prioritization
 - Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
-- `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` was added as the canonical architecture draft for governed persistent memory
+- `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` now defines the canonical governed persistent-memory architecture
+  - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md` now maps the narrow Phase 1 attachment path onto current service/journal seams
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -56,6 +57,8 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 81d2548 Map persistent memory phase 1 attachment seams
+- 8f1e75a Thread persistent memory architecture into repo truth
 - c183ec7 Define persistent memory system architecture
 - b25d03d Refresh repo truth for drift anomaly visual treatment
 - a65b334 Give drift anomalies distinct visual treatment
@@ -102,11 +105,11 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell is truthful on both rails, the executive rail surfaces Stage 8B anomalies, both `/execalc` and `/decisions` surface decision-boundary state, the rail renders structured runtime nuggets, and observe-only stability/drift signals are now surfaced on both pages.
-- Repo truth is closed again after the drift-anomaly-visual tranche.
-- The next build decision should remain a narrow Stage 8 move, not a broad new framework.
+- The Stage 8 shell remains truthful on both rails, and the repo now includes both the canonical persistent-memory architecture draft and the narrow Phase 1 attachment map.
+- Repo truth is closed again after the persistent-memory Phase 1 attachment-map tranche.
+- The next build decision should remain architectural and documentary unless the memory rollout is explicitly pulled forward.
 
 ## Immediate Next Work
 1) Choose the next smallest governed Stage 8 increment
-2) Prefer truthful UI surfacing or narrow hardening over broad new feature area
+2) Keep the next move architectural and documentary unless memory implementation is explicitly pulled forward
 3) Preserve workstation-safe execution discipline
