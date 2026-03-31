@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-31
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, distinct drift-anomaly visual treatment, canonical persistent-memory architecture drafting, and persistent-memory Phase 1 attachment mapping implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, distinct drift-anomaly visual treatment, canonical persistent-memory architecture drafting, persistent-memory Phase 1 attachment mapping, and persistent-memory Phase 1 object-contract drafting implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -167,19 +167,22 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 7588ebd Thread navigation through decision path audit
   - c9c6353 Thread execalc navigation through decision request
 
-## Stage 8D: Persistent Memory Architecture + Phase 1 Attachment Mapping (ARCHITECTURE COMPLETE, IMPLEMENTATION NOT STARTED)
+## Stage 8D: Persistent Memory Architecture + Phase 1 Attachment Mapping + Object Contract (ARCHITECTURE COMPLETE, IMPLEMENTATION NOT STARTED)
 - Canonical architecture doc:
   - docs/architecture/PERSISTENT_MEMORY_SYSTEM.md
 - Narrow Phase 1 implementation-mapping doc:
   - docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md
+- Phase 1 object-contract doc:
+  - docs/architecture/PERSISTENT_MEMORY_PHASE1_OBJECT_CONTRACT.md
 - Current posture:
-  - architecture and implementation-mapping are now documented
+  - architecture, implementation-mapping, and object-contract definition are now documented
   - runtime persistent-memory behavior has not been introduced yet
   - the decision journal remains the current tenant-scoped execution record layer
 - Key commits:
   - c183ec7 Define persistent memory system architecture
   - 8f1e75a Thread persistent memory architecture into repo truth
   - 81d2548 Map persistent memory phase 1 attachment seams
+  - bdd7891 Define persistent memory phase 1 object contract
 
 ## Current Architecture Reality
 Execalc is now operating as a decision-plus-execution-governance system, not merely a decision artifact generator.

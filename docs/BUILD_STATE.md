@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 81d2548
+- Last verified code commit: bdd7891
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after persistent-memory-phase1-attachment-map tranche
+  - clean after persistent-memory-phase1-object-contract tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -38,6 +38,7 @@
 - Drift anomalies now render with a distinct visual treatment in `LiveExecutiveBrief`, separate from the default anomaly tone
 - `docs/architecture/PERSISTENT_MEMORY_SYSTEM.md` now defines the canonical governed persistent-memory architecture
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md` now maps the narrow Phase 1 attachment path onto current service/journal seams
+  - `docs/architecture/PERSISTENT_MEMORY_PHASE1_OBJECT_CONTRACT.md` now defines the first explicit Phase 1 memory object contract
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -57,6 +58,7 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- bdd7891 Define persistent memory phase 1 object contract
 - 81d2548 Map persistent memory phase 1 attachment seams
 - 8f1e75a Thread persistent memory architecture into repo truth
 - c183ec7 Define persistent memory system architecture
@@ -105,8 +107,8 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell remains truthful on both rails, and the repo now includes both the canonical persistent-memory architecture draft and the narrow Phase 1 attachment map.
-- Repo truth is closed again after the persistent-memory Phase 1 attachment-map tranche.
+- The Stage 8 shell remains truthful on both rails, and the repo now includes the canonical persistent-memory architecture draft, the Phase 1 attachment map, and the Phase 1 object contract.
+- Repo truth is closed again after the persistent-memory Phase 1 object-contract tranche.
 - The next build decision should remain architectural and documentary unless the memory rollout is explicitly pulled forward.
 
 ## Immediate Next Work
