@@ -14,16 +14,16 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Persistent-memory retrieval-path repo-truth alignment closed
+Subphase: Persistent-memory access-policy repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `91ce24c`  
+Last verified code commit: `199dcee`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, drift-anomaly-visual, persistent-memory architecture, persistent-memory attachment-map, persistent-memory object-contract, persistent-memory service-seam, persistent-memory persistence-path, persistent-memory admission-path, and persistent-memory retrieval-path tranches: PASS  
+Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, drift-anomaly-visual, persistent-memory architecture, persistent-memory attachment-map, persistent-memory object-contract, persistent-memory service-seam, persistent-memory persistence-path, persistent-memory admission-path, persistent-memory retrieval-path, and persistent-memory access-policy tranches: PASS  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -56,6 +56,7 @@ Remote alignment: branch aligned with origin after push
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_PERSISTENCE_PATH.md` now exists as the first separate Phase 1 memory persistence path.
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ADMISSION_PATH.md` now exists as the first explicit Phase 1 memory admission path.
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_RETRIEVAL_PATH.md` now exists as the first governed Phase 1 memory retrieval path.
+- `docs/architecture/PERSISTENT_MEMORY_PHASE1_ACCESS_POLICY.md` now exists as the first governed Phase 1 memory access policy.
 - Current work should remain architectural and documentary unless runtime memory implementation is explicitly pulled forward beyond the documented phased rollout.
 
 This document must never redefine system doctrine.

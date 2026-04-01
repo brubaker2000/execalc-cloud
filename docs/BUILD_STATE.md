@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: 91ce24c
+- Last verified code commit: 199dcee
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after persistent-memory-phase1-retrieval-path tranche
+  - clean after persistent-memory-phase1-access-policy tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -43,6 +43,7 @@
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_PERSISTENCE_PATH.md` now defines the first separate Phase 1 memory persistence path
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ADMISSION_PATH.md` now defines the first explicit Phase 1 memory admission path
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_RETRIEVAL_PATH.md` now defines the first governed Phase 1 memory retrieval path
+  - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ACCESS_POLICY.md` now defines the first governed Phase 1 memory access policy
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -62,6 +63,7 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 199dcee Define persistent memory phase 1 access policy
 - 91ce24c Define persistent memory phase 1 retrieval path
 - d25ccf8 Define persistent memory phase 1 admission path
 - 52ca9f9 Define persistent memory phase 1 persistence path
@@ -115,8 +117,8 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell remains truthful on both rails, and the repo now includes the canonical persistent-memory architecture draft, the Phase 1 attachment map, the Phase 1 object contract, the Phase 1 service seam, the Phase 1 persistence path, the Phase 1 admission path, and the Phase 1 retrieval path.
-- Repo truth is closed again after the persistent-memory Phase 1 retrieval-path tranche.
+- The Stage 8 shell remains truthful on both rails, and the repo now includes the canonical persistent-memory architecture draft, the Phase 1 attachment map, the Phase 1 object contract, the Phase 1 service seam, the Phase 1 persistence path, the Phase 1 admission path, the Phase 1 retrieval path, and the Phase 1 access policy.
+- Repo truth is closed again after the persistent-memory Phase 1 access-policy tranche.
 - The next build decision should remain architectural and documentary unless the memory rollout is explicitly pulled forward.
 
 ## Immediate Next Work
