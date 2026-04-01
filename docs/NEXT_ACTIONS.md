@@ -15,7 +15,7 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Choose the next smallest governed Stage 8 increment after the persistence-path tranche
+1) Choose the next smallest governed Stage 8 increment after the admission-path tranche
    - Keep the next move architectural and documentary unless runtime memory implementation is explicitly pulled forward.
    - Prefer narrow truth-surface hardening or architecture clarification over new feature sprawl.
    - Do not widen beyond the documented phased rollout without an explicit decision.
