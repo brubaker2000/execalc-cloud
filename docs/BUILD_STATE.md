@@ -3,10 +3,10 @@
 ## Repo State
 - Repo: execalc-cloud
 - Branch: stage8/ui-shell-scaffold
-- Last verified code commit: cde4cfc
+- Last verified code commit: 52ca9f9
 - Remote alignment: branch aligned with origin after push
 - Working tree at time of this snapshot:
-  - clean after persistent-memory-phase1-service-seam tranche
+  - clean after persistent-memory-phase1-persistence-path tranche
 
 ## Current Completed Tranche
 ### Stage 8A — Workspace Shell Spine + Truthful Left Rail (completed on stage8/ui-shell-scaffold)
@@ -40,6 +40,7 @@
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md` now maps the narrow Phase 1 attachment path onto current service/journal seams
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_OBJECT_CONTRACT.md` now defines the first explicit Phase 1 memory object contract
   - `docs/architecture/PERSISTENT_MEMORY_PHASE1_SERVICE_SEAM.md` now defines the first governed Phase 1 memory service boundary
+  - `docs/architecture/PERSISTENT_MEMORY_PHASE1_PERSISTENCE_PATH.md` now defines the first separate Phase 1 memory persistence path
 - Stability/drift doctrine now matches live observe-only anomaly behavior
 - Substrate-vs-Execalc doctrine doc was added to keep product framing honest
 
@@ -59,6 +60,7 @@
 - Backend verification passed during orchestration/decision-path navigation tranches
 
 ## Key Recent Commits
+- 52ca9f9 Define persistent memory phase 1 persistence path
 - cde4cfc Define persistent memory phase 1 service seam
 - bdd7891 Define persistent memory phase 1 object contract
 - 81d2548 Map persistent memory phase 1 attachment seams
@@ -109,8 +111,8 @@
 - 1740404 Make workspace shell left rail data injectable
 
 ## Current Build Reality
-- The Stage 8 shell remains truthful on both rails, and the repo now includes the canonical persistent-memory architecture draft, the Phase 1 attachment map, the Phase 1 object contract, and the Phase 1 service seam.
-- Repo truth is closed again after the persistent-memory Phase 1 service-seam tranche.
+- The Stage 8 shell remains truthful on both rails, and the repo now includes the canonical persistent-memory architecture draft, the Phase 1 attachment map, the Phase 1 object contract, the Phase 1 service seam, and the Phase 1 persistence path.
+- Repo truth is closed again after the persistent-memory Phase 1 persistence-path tranche.
 - The next build decision should remain architectural and documentary unless the memory rollout is explicitly pulled forward.
 
 ## Immediate Next Work

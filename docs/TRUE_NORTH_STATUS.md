@@ -14,16 +14,16 @@ This file tracks the current build tranche and enforcement posture only.
 
 ## Current Tranche
 Tranche: Stage 8 — UI Shell Scaffold + Navigation Identity Threading + Observe-Only Stability Signals  
-Subphase: Persistent-memory service-seam repo-truth alignment closed
+Subphase: Persistent-memory persistence-path repo-truth alignment closed
 
 ---
 
 ## Last Verified Gate
 Branch: `stage8/ui-shell-scaffold`  
-Last verified code commit: `cde4cfc`  
+Last verified code commit: `52ca9f9`  
 Frontend build: PASS  
 Frontend lint: PASS  
-Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, drift-anomaly-visual, persistent-memory architecture, persistent-memory attachment-map, persistent-memory object-contract, and persistent-memory service-seam tranches: PASS  
+Recent backend, Stage 8B anomaly, boundary-surfacing, runtime-nugget, signal-surfacing, signal-styling, signal-routing, signal-split, signal-suppression, decisions-anomaly-label, anomaly-priority, drift-anomaly-visual, persistent-memory architecture, persistent-memory attachment-map, persistent-memory object-contract, persistent-memory service-seam, and persistent-memory persistence-path tranches: PASS  
 Remote alignment: branch aligned with origin after push
 
 ---
@@ -53,6 +53,7 @@ Remote alignment: branch aligned with origin after push
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_ATTACHMENT_MAP.md` now exists as the narrow Phase 1 implementation map for attaching memory beside the current decision journal.
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_OBJECT_CONTRACT.md` now exists as the first explicit Phase 1 memory object contract.
 - `docs/architecture/PERSISTENT_MEMORY_PHASE1_SERVICE_SEAM.md` now exists as the first governed Phase 1 memory service boundary.
+- `docs/architecture/PERSISTENT_MEMORY_PHASE1_PERSISTENCE_PATH.md` now exists as the first separate Phase 1 memory persistence path.
 - Current work should remain architectural and documentary unless runtime memory implementation is explicitly pulled forward beyond the documented phased rollout.
 
 This document must never redefine system doctrine.
