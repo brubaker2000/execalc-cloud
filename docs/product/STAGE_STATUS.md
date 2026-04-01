@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-03-31
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, distinct drift-anomaly visual treatment, canonical persistent-memory architecture drafting, persistent-memory Phase 1 attachment mapping, persistent-memory Phase 1 object-contract drafting, persistent-memory Phase 1 service-seam drafting, persistent-memory Phase 1 persistence-path drafting, and persistent-memory Phase 1 admission-path drafting implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, distinct drift-anomaly visual treatment, canonical persistent-memory architecture drafting, persistent-memory Phase 1 attachment mapping, persistent-memory Phase 1 object-contract drafting, persistent-memory Phase 1 service-seam drafting, persistent-memory Phase 1 persistence-path drafting, persistent-memory Phase 1 admission-path drafting, and persistent-memory Phase 1 retrieval-path drafting implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -167,7 +167,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 7588ebd Thread navigation through decision path audit
   - c9c6353 Thread execalc navigation through decision request
 
-## Stage 8D: Persistent Memory Architecture + Phase 1 Attachment Mapping + Object Contract + Service Seam + Persistence Path + Admission Path (ARCHITECTURE COMPLETE, IMPLEMENTATION NOT STARTED)
+## Stage 8D: Persistent Memory Architecture + Phase 1 Attachment Mapping + Object Contract + Service Seam + Persistence Path + Admission Path + Retrieval Path (ARCHITECTURE COMPLETE, IMPLEMENTATION NOT STARTED)
 - Canonical architecture doc:
   - docs/architecture/PERSISTENT_MEMORY_SYSTEM.md
 - Narrow Phase 1 implementation-mapping doc:
@@ -180,8 +180,10 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - docs/architecture/PERSISTENT_MEMORY_PHASE1_PERSISTENCE_PATH.md
 - Phase 1 admission-path doc:
   - docs/architecture/PERSISTENT_MEMORY_PHASE1_ADMISSION_PATH.md
+- Phase 1 retrieval-path doc:
+  - docs/architecture/PERSISTENT_MEMORY_PHASE1_RETRIEVAL_PATH.md
 - Current posture:
-  - architecture, implementation-mapping, object-contract definition, service-seam definition, persistence-path definition, and admission-path definition are now documented
+  - architecture, implementation-mapping, object-contract definition, service-seam definition, persistence-path definition, admission-path definition, and retrieval-path definition are now documented
   - runtime persistent-memory behavior has not been introduced yet
   - the decision journal remains the current tenant-scoped execution record layer
 - Key commits:
@@ -192,6 +194,7 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - cde4cfc Define persistent memory phase 1 service seam
   - 52ca9f9 Define persistent memory phase 1 persistence path
   - d25ccf8 Define persistent memory phase 1 admission path
+  - 91ce24c Define persistent memory phase 1 retrieval path
 
 ## Current Architecture Reality
 Execalc is now operating as a decision-plus-execution-governance system, not merely a decision artifact generator.
