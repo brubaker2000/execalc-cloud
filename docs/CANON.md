@@ -63,6 +63,8 @@ Primary anchors:
 - `docs/vision/TRUE_NORTH.md`
 - `docs/vision/STAGE_MAP.md`
 - `docs/vision/SPINE_NON_PRECLUSION_CHECKLIST.md`
+- `docs/vision/GAQP_FOUNDING_CHARTER.md`
+- `docs/vision/ENTERPRISE_QUALITATIVE_SYNTHESIS_THESIS.md`
 
 Supporting anchor:
 - `docs/architecture/EXECALC_TRUE_NORTH.md`
@@ -102,6 +104,11 @@ Supporting anchors:
 - `docs/architecture/EXECUTIVE_KNOWLEDGE_ENGINE_STRATA.md`
 - `docs/architecture/EXECUTIVE_KNOWLEDGE_ENGINE_ACTIVATION_AND_SIGNALING_MODEL.md`
 - `docs/architecture/EXECUTIVE_KNOWLEDGE_ENGINE_DIAGNOSTIC_COMMANDS.md`
+- `docs/architecture/EXECUTIVE_KNOWLEDGE_ENGINE_CORPUS_SCHEMA.md`
+- `docs/architecture/PERSISTENT_MEMORY_ADMISSION_AND_CLASSIFICATION_DOCTRINE.md`
+- `docs/architecture/SUBSTRATE_ROUTING_AND_MODEL_TIERING_DOCTRINE.md`
+- `docs/architecture/NETWORK_HEURISTIC_PROMOTION_MODEL.md`
+- `docs/architecture/EXECALC_CATEGORY_ARCHITECTURE_MAP.md`
 
 ### 6. Runtime / Product Surface Canon
 Defines how governed cognition appears to the operator.
@@ -116,6 +123,9 @@ Supporting anchors:
 - `docs/product/DECISION_LOOP_ENGINE_SPEC.md`
 - `docs/product/COMPARATIVE_DECISION_MEMORY_SPEC.md`
 - `docs/product/INTELLIGENT_FRONT_DOOR_SPEC.md`
+- `docs/product/EXECALC_QUALITATIVE_FORMULA_LIBRARY_V0_1.md`
+- `docs/product/SIGNAL_ELEVATION_AND_RAIL_CANDIDACY.md`
+- `docs/product/GAQP_VS_CONSULTING_CRAFT_POSITIONING.md`
 
 ### 7. Build / State / Rehydration Canon
 Defines where the build is, how it is resumed, and how dev work remains disciplined.

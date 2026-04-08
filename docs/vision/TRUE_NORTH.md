@@ -44,7 +44,7 @@ Workers may draft and execute bounded tasks only when authorized by Execalc unde
 
 ## Governance Spine
 Execalc governance is enforced by:
-- Prime Directive doctrine (value creation, risk/reward, supply/demand)
+- Prime Directive doctrine (value creation, risk/reward, supply/demand, assets/liabilities — all four lenses must be evaluated)
 - Canonized invariants (non-negotiables enforced by tests)
 - Proof-gated state transitions for irreversible actions
 - Tenant isolation and auditability by default
