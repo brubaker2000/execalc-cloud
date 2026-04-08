@@ -34,8 +34,7 @@ Source of truth for completion claims:
 
 - Stage 8B.8: memory runtime scaffolding (once support stack stable)
 - Persistent Memory Phase 1 runtime — EKE corpus schema + admission endpoint
-- Wave 3 repo promotion docs: NETWORK_HEURISTIC_PROMOTION_MODEL.md, GAQP_VS_CONSULTING_CRAFT_POSITIONING.md
-- Update CANON.md to index all Wave 1+2 docs written this session
+- EXECALC_CATEGORY_ARCHITECTURE_MAP.md — index in CANON.md (currently in architecture, not yet in CANON §5 primary list)
 
 ---
 
