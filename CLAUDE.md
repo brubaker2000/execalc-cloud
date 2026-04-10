@@ -109,31 +109,33 @@ A claim must pass all six to be admitted:
 
 ---
 
-## 4. Prime Directive — Four Lenses (Corrected Model)
+## 4. Prime Directive — Canonical Model
 
-The Prime Directive is the top-level governance framework for all decision evaluation.
+The Prime Directive is the top-level governance framework. It determines whether something gets acted on.
 
-### Four Lenses (locked, in order)
-1. **Value Creation** — Does this create, preserve, or destroy value?
-2. **Risk/Reward Asymmetry** — Is the risk/reward balance favorable and explicit?
-3. **Supply/Demand Imbalance** — Is there a structural imbalance being leveraged or exposed?
-4. **Assets/Liabilities (Balance Sheet)** — What does this do to the balance sheet position?
+### Structure (two-tier)
 
-### Critical Doctrine (corrected in session history)
-**The Prime Directive does not require all four lenses to be positive.**  
-It requires all four to be **evaluated**.
+**Tier 1 — The Objective:**  
+A decision or action must deliver **value** (monetization strategy) or **clarity** (operational clarity).  
+Clarity is itself a form of value. These are the only two valid outputs the Prime Directive recognizes.
 
-The tensions between lenses must be explicitly surfaced and governed.
+**Tier 2 — The Three Lenses:**  
+Whether value or clarity is delivered is judged through three lenses:
+
+1. **Assets vs. Liabilities** — What does this do to the balance sheet position?
+2. **Risk/Reward** — Is the risk/reward balance favorable and explicit?
+3. **Supply/Demand** — Is there a structural imbalance being leveraged or exposed?
+
+Anything that does not pass these gates does not get acted on.
+
+### Enforcement Doctrine
+**The Prime Directive does not require all three lenses to be positive.**  
+It requires all three to be **evaluated**.
 
 > "The sin isn't imbalance. The sin is blindness."
 
-Enforcement Mode blocks decisions where any lens was **never evaluated** — not where a lens is negative.
-
-A decision with three favorable lenses and one unfavorable lens is **valid** if the unfavorable lens was seen, named, and the operator accepted the tradeoff knowingly.
-
-A decision where one lens was simply skipped is a **governance failure**.
-
-**Historical note:** The fourth lens (Assets/Liabilities) was added late in the design process. Some older repo docs list only three lenses. This is the corrected canonical form. When you find a doc listing three lenses, flag it for update — do not treat the three-lens model as authoritative.
+A decision where any lens was never evaluated is a governance failure.  
+A decision with one unfavorable lens is valid — if that lens was seen, named, and the tradeoff was accepted knowingly.
 
 ---
 

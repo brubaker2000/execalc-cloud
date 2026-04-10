@@ -63,13 +63,16 @@ Design goals:
 These frameworks form the cognitive constitution of Execalc. They are permanent system law and must remain visible in the architecture.
 
 ### 5.1 Prime Directive
-All reasoning must be evaluated through:
-- Value Creation
-- Risk/Reward Asymmetry
-- Supply/Demand Imbalance
-- Assets/Liabilities (Balance Sheet)
+The Prime Directive determines whether something gets acted on.
 
-All four lenses must be evaluated. The sin is not imbalance — it is blindness. A decision where any lens was never evaluated is a governance failure.
+**Objective:** A decision must deliver value (monetization strategy) or clarity (operational clarity). Clarity is itself a form of value.
+
+**Three lenses** through which value or clarity is judged:
+- Assets vs. Liabilities — what does this do to the balance sheet position?
+- Risk/Reward — is the risk/reward balance favorable and explicit?
+- Supply/Demand — is there a structural imbalance being leveraged or exposed?
+
+Anything that does not pass these gates does not get acted on. All three lenses must be evaluated — the sin is not imbalance, it is blindness.
 
 ### 5.2 Persistent Memory
 A governed memory layer preserving prior decisions, constraints, operator context, and strategic continuity across sessions and over time.
