@@ -21,7 +21,19 @@ It is not a chatbot. It is not an agent framework. It is not a dashboard.
 
 It is a system where the **model supplies power** and **governance supplies intelligence**.
 
-The LLM is a language substrate. Execalc is the governed layer above it.
+The LLM is the engine. The governance architecture is the product.
+
+**Category thesis:** Execalc is governed intelligence infrastructure — the system that converts machine prediction into disciplined organizational judgment.
+
+### Organizing Principle
+Execalc must compress the organizational decision cycle until the only remaining bottleneck is human judgment.
+
+### Workflow Thesis
+Legacy workflow: `email → document → meeting → spreadsheet → deck → meeting → decision`
+
+Target workflow: `signal → synthesis → decision artifact → action → memory`
+
+The long-term advantage of governed AI is not speed alone — it is the ability to perceive patterns previously invisible to human cognition.
 
 ### Technology Compression Thesis
 Each era compressed time between information and action:
