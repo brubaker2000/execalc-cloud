@@ -1,7 +1,7 @@
 # GAQP_ARTIFACT_RECOGNITION_AND_EXTRACTION_STANDARD.md
 
 ## Status
-Draft v0.1 — Foundational GAQP doctrine
+Draft v0.2 — Foundational GAQP doctrine; patched with Hierarchy of Meaning, Exclusions list, 7-test admission standard, and canonical metadata schema
 
 ## Owner
 GAQP / Architecture
@@ -43,6 +43,31 @@ EXTRACTION  →  CLASSIFICATION  →  ADMISSION
 
 ---
 
+### The Hierarchy of Meaning
+
+Before defining what is harvest-worthy, it helps to understand the levels of linguistic abstraction and why the governed claim is the right unit.
+
+```
+Word              — too small; no standalone meaning
+Sentence          — first complete unit of meaning; not yet governed
+Governed Claim    — first durable governed unit; the atomic nugget
+Reasoning Chain   — multiple claims in sequence; the inference
+Framework         — organized family of claims; the model
+Corpus            — many frameworks together; the knowledge base
+```
+
+GAQP targets the third level: the governed claim.
+
+Not words — too granular, no standalone reasoning value.
+Not frameworks — too large, cannot be individually evaluated, sourced, or activated.
+Not sentences — a sentence is the first unit of grammatical completeness, but not every sentence deserves governed status.
+
+**The governed claim is a sentence-like unit that has crossed into governed usefulness.** It has enough durable meaning to stand alone, be classified, sourced, and activated. A sentence that fails to achieve this remains language, not governed knowledge.
+
+This is the "pixel to library" problem solved: the unit is neither the pixel nor the library. It is the governed claim.
+
+---
+
 ### What Makes Something Harvest-Worthy
 
 Before classifying an artifact, the system must determine whether it is worth extracting at all. This is the extraction threshold — below which, text is noise.
@@ -60,6 +85,24 @@ An artifact is harvest-worthy if it satisfies at least one of the following:
 5. **It surfaces an assumption that is currently driving behavior but has not been established.** Untagged assumptions are a governance risk.
 
 Anything that does not satisfy at least one of these is below the extraction threshold. It may be interesting language. It is not a governed artifact.
+
+---
+
+### What Is Not Harvest-Worthy
+
+The following are not governed artifacts, even when they appear in high-quality text:
+
+- **Single words or phrases without claim content** — a term is not an artifact until it expresses a claim
+- **Slogans without interpretable meaning** — "Innovate or die" is a slogan; the governing claim behind it needs to be extracted explicitly
+- **Decorative metaphors** — an analogy that illustrates but does not claim is not an artifact
+- **Unscoped opinions** — "This seems wrong" without a stated basis fails the governance and stand-alone tests
+- **Raw emotional reactions** — expressions of frustration, enthusiasm, or concern are observation candidates only if they have diagnostic significance
+- **Trivial statements** — observations that any informed participant would agree with without additional reasoning (Non-triviality test, see below)
+- **Fused paragraphs containing multiple claims** — these must be decomposed before any part can be admitted; the paragraph is not the artifact
+- **Entire frameworks treated as single units** — a framework is a corpus-level object; its component claims must be extracted individually
+- **Thought fragments without disputable meaning** — a half-formed idea is a candidate for extraction only after it crystallizes into a claim
+
+**The governing rule:** A sentence is not automatically a nugget. A nugget is a sentence that has survived governance. Interesting is not a governance criterion. Durable, governed usefulness is.
 
 ---
 
@@ -94,6 +137,28 @@ Artifacts that are specific to a particular organization, time period, or contex
 Examples: Observations, Events, Results, Constraints, Objectives, Assumptions, Causal Claims (when organization-specific), Decision Outcomes.
 
 **The governance implication:** A Family A artifact from a book goes into the shared EKE corpus. The same artifact type expressed in an internal conversation about a specific organization goes into that organization's tenant-scoped memory. The type may be identical; the scope is not.
+
+---
+
+### The Admission Test Standard (Seven Tests)
+
+The six-test filter is referenced throughout Execalc doctrine. For completeness and operational use, all seven tests are stated here. Tests 1–6 are the original standard. Test 7 was added by this document.
+
+A candidate artifact must pass all seven to be admitted to active memory.
+
+| # | Test | Question | Failure Condition |
+|---|---|---|---|
+| 1 | **Stand-alone** | Can it be understood without its source paragraph? | Requires context to mean anything |
+| 2 | **Disputability** | Can a serious person agree, disagree, or qualify it? | Pure truism with no challengeable content |
+| 3 | **Governance** | Can it be tagged, typed, sourced, and scoped? | Cannot be classified under the taxonomy |
+| 4 | **Activation** | Is there a scenario in which this would change a decision? | No foreseeable activation context |
+| 5 | **Durability** | Is it likely to remain relevant beyond the originating session? | Ephemeral to the specific moment |
+| 6 | **Composability** | Can it combine with other artifacts to form larger reasoning? | Isolated; cannot integrate with other governed claims |
+| 7 | **Non-triviality** | Does it carry strategic or interpretive weight beyond the obvious? | Any informed participant would state this without prompting |
+
+**On Test 7:** An artifact can pass tests 1–6 and still not deserve admission. A claim can stand alone, be disputed, be tagged, have an activation context, be durable, and be composable — and still be so obvious that admitting it adds noise, not signal. The non-triviality test catches this class of failure. A claim is non-trivial if it contains a judgment or insight that an operator would benefit from having stated and governed, rather than assumed.
+
+**Test sequence:** Tests 1 and 2 are gates — fail either and evaluation stops. Tests 3–7 can be assessed in parallel.
 
 ---
 
@@ -621,6 +686,48 @@ Over time, the accumulation of Decision Outcomes creates an empirical track reco
 |---|---|---|---|
 | 18 | Decision Outcome | Did the decision deliver value? | Never |
 | 19 | Communication Stance | How should this be delivered? | With context |
+
+---
+
+### Canonical Governed Claim Metadata Schema
+
+Every admitted artifact is stored as a Governed Claim object. The following fields are required unless marked optional.
+
+**Required fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `claim_id` | string | Unique identifier |
+| `claim_text` | string | The statement itself, as extracted |
+| `claim_type` | enum | One of the 19 types from this taxonomy |
+| `family` | enum | Pattern / Situated / Decision |
+| `domain` | string | e.g., strategy, capital, operations, human behavior, governance |
+| `confidence_level` | enum | established / probable / contextual / provisional / disputed |
+| `provenance_source` | string | Title, document, or system from which extracted |
+| `provenance_author` | string | Person or organization attributed |
+| `activation_scope` | enum | universal / domain / situational / tenant |
+| `polarity` | enum | positive / cautionary / negative / neutral / mixed |
+| `durability_class` | enum | enduring / medium-term / ephemeral |
+| `freshness_rule` | enum | timeless / date-sensitive / event-bound / expiring |
+| `evidence_status` | enum | observed / argued / inferred / corroborated / unverified |
+
+**Optional fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `subdomain` | string | Narrower domain classification |
+| `activation_triggers` | string[] | Scenarios or signals that activate this artifact |
+| `composability_score` | float | 0–1; how well it combines with other artifacts |
+| `counterclaim_links` | id[] | Artifacts that challenge or qualify this one |
+| `supporting_claim_links` | id[] | Artifacts that corroborate this one |
+| `scenario_tags` | string[] | Named scenarios where this activates |
+| `tenant_scope` | string | If tenant-specific, which tenant |
+| `expiration_date` | date | For event-bound or expiring artifacts |
+| `operator_approval_status` | enum | pending / approved / rejected / superseded |
+
+**On Polarity:** Polarity captures the directional implication of the artifact. A cautionary artifact ("incumbents underreact to disruption") activates differently from a positive one ("high talent density compounds"). The reflex gate must know whether an activating artifact reinforces or warns against a proposed direction.
+
+**On Freshness Rule:** Controls when the artifact can activate. A timeless axiom activates indefinitely. A date-sensitive tendency may have a validity window. An event-bound artifact activates only while its reference event is still recent. An expiring artifact has a hard expiration date after which it enters dormancy pending re-evaluation.
 
 ---
 
