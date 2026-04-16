@@ -1,9 +1,23 @@
 # TRUE NORTH — Execalc
 
 ## Category Statement
-Execalc is a **governed executive cognition system**. It delivers boardroom-grade synthesis and judgment in seconds by operating **one layer above** models, tools, agents, and data.
+Execalc is a **governed, normative, and informed** executive cognition system. It delivers boardroom-grade synthesis and judgment by operating **one layer above** models, tools, agents, and data.
 
-Execalc treats the LLM as a **language substrate**, not the system.
+Execalc treats the LLM as a **language substrate** — not the system.
+
+### The Three-Layer Superstrate
+
+These three words are not synonyms. They describe distinct and non-overlapping layers:
+
+**Governed** — the regulative layer. Execalc enforces safety, compliance, and tenant controls. It will not cross defined ethical and operational limits. This is what every responsible AI deployment has. It is necessary but not sufficient.
+
+**Normative** — the constitutive layer. The Prime Directive, the three lenses, the Core 7 frameworks, the GAQP standards: these are not restrictions on what the system does. They are what the system is. The system does not merely avoid bad reasoning — it is architecturally built to pursue value and clarity according to explicit doctrine. A system that has only governance can be stopped from doing harm. A normative system is shaped to do good. This is the distinction that makes Execalc a different category from a guardrailed chatbot.
+
+**Informed** — the knowledge layer. The EKE corpus, the thought leadership bench, the heuristic library, the organizational memory: these are not retrieved when the operator asks for them. They activate when the situation calls for them. The system carries encoded judgment and retrieves it on the basis of pattern recognition, not keyword search.
+
+Most AI systems are governed. Few are normative. None are informed in this sense.
+
+The competitive moat is not the model. It is the normative architecture and the informed corpus that the model operates within.
 
 ---
 
@@ -11,6 +25,7 @@ Execalc treats the LLM as a **language substrate**, not the system.
 Execalc is:
 
 - A **judgment engine** governed by explicit doctrine (Prime Directive + invariants)
+- A **normative system** — constituted to pursue value and clarity, not merely constrained from harm
 - A **cognition spine** that converts unstructured input into structured executive clarity
 - A **scenario-triggered runtime** (situations first; pathways follow)
 - A **memory-disciplined system** with admission rules and dormant classes

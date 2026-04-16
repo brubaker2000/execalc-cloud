@@ -12,9 +12,17 @@ Its job is to make the category legible.
 
 Execalc is not merely a chatbot, an agent wrapper, or a consulting workflow.
 
-**Execalc is a governed qualitative synthesis system.**
+**Execalc is a governed, normative, and informed qualitative synthesis system.**
 
-It is a governed cognition layer that converts raw language-model capability into structured organizational judgment.
+It is a cognition layer that converts raw language-model capability into structured organizational judgment — not by guardrailing the model, but by giving it a constitutive reasoning architecture and an encoded knowledge base to operate within.
+
+**Governed** means the system enforces safety, compliance, and tenant controls — the regulative layer. Every responsible AI deployment has this.
+
+**Normative** means the system has a constitutive reasoning architecture. The Prime Directive, the three lenses, the Core 7 frameworks: these are not restrictions on the model. They are what the system is. A normative system is built to pursue good outcomes, not merely prevented from bad ones.
+
+**Informed** means the system carries encoded judgment. The EKE corpus, the thought leadership bench, the heuristic library, and organizational memory activate on the basis of situation recognition — not keyword search.
+
+The three layers compound: governance keeps the system safe, normative architecture keeps it purposeful, and the informed corpus keeps it precise.
 
 ---
 
@@ -210,6 +218,6 @@ Execalc is instead:
 
 ## One-Frame Thesis
 
-> Execalc is the governed system that turns raw qualitative processing into durable organizational judgment.
+> Execalc is governed to be safe, normative to be purposeful, and informed to be precise. Together these three properties convert raw qualitative processing into durable organizational judgment.
 
-GAQP defines the discipline. The Formula Library defines the operations. The Executive Knowledge Engine defines the logic bench. Memory preserves what matters. The governed runtime makes it all executable.
+GAQP defines the discipline. The Prime Directive defines the normative architecture. The Executive Knowledge Engine defines the informed corpus. Memory preserves what matters. The governed runtime makes it all executable.

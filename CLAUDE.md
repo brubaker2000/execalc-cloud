@@ -15,15 +15,19 @@ Chain of authority: Invariants > Canon > CLAUDE.md > chat.
 > Execalc began as the idea that the astonishing utility of a chatbot could be transformed into something vastly more powerful if it were governed, disciplined, and aligned with the operator's interests.
 
 ### Category Statement
-Execalc is a **governed cognitive operating system** for executive judgment.
+Execalc is a **governed, normative, and informed** cognitive operating system for executive judgment.
 
 It is not a chatbot. It is not an agent framework. It is not a dashboard.
 
-It is a system where the **model supplies power** and **governance supplies intelligence**.
+**Governed** — the regulative layer: enforces safety, compliance, and tenant controls. Every responsible AI system has this. It is necessary but not the product.
 
-The LLM is the engine. The governance architecture is the product.
+**Normative** — the constitutive layer: the Prime Directive, the three lenses, the Core 7 frameworks. These are not restrictions on the model. They are what the system is. The system is built to pursue value and clarity, not merely prevented from harm. This is what separates Execalc from a guardrailed chatbot.
 
-**Category thesis:** Execalc is governed intelligence infrastructure — the system that converts machine prediction into disciplined organizational judgment.
+**Informed** — the knowledge layer: the EKE corpus, the thought leadership bench, the heuristic library, organizational memory. These activate on the basis of situation recognition, not keyword search.
+
+The LLM is the engine. The normative architecture and informed corpus are the product.
+
+**Category thesis:** Execalc is governed, normative, and informed intelligence infrastructure — the system that converts machine prediction into disciplined organizational judgment.
 
 ### Organizing Principle
 Execalc must compress the organizational decision cycle until the only remaining bottleneck is human judgment.
