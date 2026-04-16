@@ -439,10 +439,67 @@ The shell should feel as familiar as Chrome, while remaining more governed, more
 
 ---
 
-## 13. Next Build Artifacts Required
+## 13. Technology Stack (Locked)
+
+**Decision date:** 2026-04-16
+**Status:** Locked invariant — not subject to per-sprint re-evaluation
+
+### Frontend
+
+| Layer | Technology | Rationale |
+|---|---|---|
+| Component framework | **React** | Best fit for multi-pane, dynamic, stateful executive shell; largest ecosystem; strongest agent tooling support |
+| Styling | **Tailwind CSS** | Layout instructions translate directly to utility classes; design changes expressible in plain language; no custom CSS sprawl |
+| State management | **React Context + hooks (v1)** | Sufficient for v1 scope; upgrade path to Zustand or Redux if cross-panel state becomes complex |
+| Build tool | **Vite** | Fast dev server; modern bundling; React-native |
+
+### Backend-to-Frontend Contract
+
+The Flask API remains the backend. The React frontend communicates with it via:
+- REST endpoints (existing: `/decision/run`, `/decision/recent`, `/decision/compare`, `/decision/<id>`)
+- No GraphQL in v1 — REST contracts are sufficient and already specced
+- Streaming responses for long judgment calls (via Server-Sent Events or chunked transfer) — required so operators see output progressively, not after a 5–10 second blank wait
+
+### What This Means for Layout Changes
+
+With React + Tailwind, natural language layout instructions translate directly to code:
+- "Widen the center chat panel" → adjust flex proportions on the main layout container
+- "Narrow the right rail" → change the rail's fixed width class
+- "Move the left nav to a sidebar" → restructure the shell's top-level flex layout
+- "Make the header sticky" → add `sticky top-0` to the header component
+
+Layout changes are low-risk, fast to execute, and visually verifiable immediately in the dev server.
+
+### What Requires More Caution
+
+- Permission model wiring (role-based tab visibility touches the auth layer)
+- Integration connectors (Gmail, Slack, Calendar require OAuth flows and backend connector work)
+- Streaming output (requires Server-Sent Events or WebSocket implementation on the Flask side)
+
+These are not blocked — they are sequenced after the API contracts stabilize in Stage 8.
+
+### Build Sequence for UI
+
+```
+Stage 8 complete (stable API contracts)
+    → UI scaffold: React + Tailwind shell, tab structure, routing
+    → Chat tab wired to /decision/run with streaming output
+    → Auth and session management
+    → Admin tab (role management, tenant config)
+    → Integration tabs (Gmail, Calendar, Slack) via connector framework
+    → Right rail (decision artifact display, memory surface)
+    → Optional tabs per Phase 2 plan
+```
+
+UI work does not begin until Stage 8 is complete and API contracts are stable.
+
+---
+
+## 14. Next Build Artifacts Required
 
 1. Wireframe-level tab map
 2. Permissions matrix table (roles × tabs × permission types)
 3. V1 component inventory
 4. Shell state model
 5. Integration connector spec for Gmail, Google Calendar, Slack, Google Docs/Sheets
+6. Server-Sent Events spec for streaming judgment call output
