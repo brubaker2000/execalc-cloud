@@ -99,15 +99,17 @@ Once admitted, memory must be classified explicitly.
 
 What kind of memory is this?
 
-- decision memory
-- strategic memory
-- heuristic memory
-- constraint memory
-- relationship memory
-- precedent memory
-- organizational memory
-- clarity memory
-- dissent or conflict memory
+- conversational
+- strategic
+- decision
+- knowledge
+- organizational
+- heuristic
+- clarity
+- constraint
+- relationship
+
+`precedent memory` maps to the `decision` family with appropriate provenance. `dissent or conflict memory` maps to `strategic` or `organizational` with conflict-flagged content. The runtime canonical family list is defined in `PERSISTENT_MEMORY_PHASE_1_RUNTIME_SPEC.md`.
 
 ### B. Source Kind
 
@@ -126,10 +128,12 @@ Where did it originate?
 How live should this memory be?
 
 - active
-- inactive
-- deferred
 - dormant
-- reference-only
+- reference_only
+- deferred
+- disabled
+
+The canonical activation state vocabulary and Phase 1 minimum lifecycle states are defined in `PERSISTENT_MEMORY_PHASE_1_RUNTIME_SPEC.md`.
 
 ### D. Scope
 
@@ -220,6 +224,12 @@ Memory admission at the Execalc level applies the Six-Test Admission Filter orig
 6. Composability — can it combine with other memory to form higher-order reasoning?
 
 All six tests strengthen the admission case. Memory that fails multiple tests should not be admitted.
+
+---
+
+## Relationship to Runtime Spec
+
+This doctrine defines the governance philosophy and admission criteria. The runtime implementation contract — object model, service seam, storage table, lifecycle rules, and TypeScript types — is defined in `PERSISTENT_MEMORY_PHASE_1_RUNTIME_SPEC.md`.
 
 ---
 
