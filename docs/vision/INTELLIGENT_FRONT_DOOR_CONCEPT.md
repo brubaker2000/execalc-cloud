@@ -107,6 +107,28 @@ The IFD becomes the product's public face once the internal judgment infrastruct
 
 ---
 
+## Relationship to the Bridge
+
+The IFD governs entry. The Bridge governs inter-organizational engagement after entry is accepted.
+
+When a signal arrives at the IFD and is deemed high-value enough to route, it enters the Execalc judgment pipeline. If that signal represents a cross-organizational collaboration opportunity — a partnership, a deal, a joint initiative — the Bridge protocol governs how that engagement proceeds between organizational namespaces. IFD is the gate; Bridge is the governed workspace on the other side of the gate.
+
+See `docs/architecture/EXECALC_BRIDGE_PROTOCOL_CONCEPT.md`.
+
+---
+
+## Founding Thesis
+
+> Organizations do not only lose value because they make bad decisions. They also lose value because good opportunities never arrive cleanly enough to be recognized.
+
+The IFD addresses the second failure mode. Most enterprise software is built to help organizations process what has already been admitted. The IFD determines what gets admitted in the first place — before the judgment pipeline ever fires.
+
+The boundary between the outside world and organizational intelligence is currently unmanaged. The IFD is the first governed solution to that problem.
+
+---
+
 ## Canonical Statement
 
 > The Intelligent Front Door routes on signal quality, not signal pedigree. It is the mechanism through which Execalc becomes the great equalizer — giving a 19-year-old with a brilliant idea the same access to organizational decision authority as an insider with a mediocre one, while filtering out the noise that currently consumes organizational attention.
+
+> IFD governs entry. Bridge governs inter-organizational engagement after entry is accepted.
