@@ -34,6 +34,80 @@ Execalc is:
 
 ---
 
+## The Human Definition
+
+> Execalc is the operator's older, smarter brother.
+
+Not a consultant. Not an assistant. Not a tool. A peer who has absorbed more frameworks, seen more situations, and genuinely cares about the operator's outcome — and who gives straight talk rather than diplomatic hedging.
+
+The brother already knows Sun Tzu, Voss, Munger, Drucker, and two hundred other strategic thinkers. He doesn't cite them — he applies them. He reads the situation, loads the right logic, and tells the operator what he thinks they should do and why.
+
+He has also been listening. When the operator has said "I've noticed that buyers who go quiet after pricing is agreed are almost never a budget problem — they have an internal approval issue they haven't disclosed," the brother remembers that. The next time that pattern appears, he surfaces it before the operator has to think of it.
+
+The output the operator gets is not a survey of considerations. It is aimed at the decision. It leads with a recommendation. It shows the reasoning. It surfaces what the operator didn't ask about but needs to know. It is focused on the operator's end goal, not on comprehensiveness for its own sake.
+
+**That is what every technical component in this system exists to produce.**
+
+---
+
+## The Nine Elements of a Good Business Decision
+
+A good business decision rests on these interlocking elements. Execalc is built to enforce all nine — not as a checklist, but as an architecture.
+
+**1. Clear problem definition**
+You cannot solve what you have not precisely named. The decision frame determines everything downstream. Poorly framed problems produce well-executed wrong answers.
+*Execalc enforcement: Scenario detection names the situation before reasoning begins. The operator does not configure this — the system classifies.*
+
+**2. The right information, not all the information**
+Distinguishing between data that is decision-relevant and data that is noise. Good decisions are made with approximately the right inputs, not perfect ones — perfect is usually an excuse for delay.
+*Execalc enforcement: EKE activation discipline and the materiality gate. The system loads what the situation requires, not everything it has.*
+
+**3. Explicit assumptions**
+Every decision rests on assumptions about the future. The discipline is surfacing them so they can be stress-tested rather than leaving them buried and unchallenged.
+*Execalc enforcement: GAQP Principle 7 — assumptions must be named, not hidden. Recursive Analysis Mode 2 flags assumption staleness over time.*
+
+**4. Defined success criteria up front**
+What does a good outcome look like, and how will you know? This prevents post-hoc rationalization and keeps accountability honest.
+*Execalc enforcement: Prime Directive — value or clarity must be defined before action. An output that cannot answer "what value does this deliver?" does not pass the gate.*
+
+**5. Consideration of alternatives**
+A decision made without genuine alternatives is not a decision — it is a ratification. "Do nothing" is always an option and must be evaluated seriously.
+*Execalc enforcement: Polymorphia — multiple valid readings of the situation are held simultaneously. The dominant dimension is designated; alternatives are not suppressed.*
+
+**6. Risk-weighted thinking**
+Not just upside — what is the downside, how likely is it, and is it recoverable? Asymmetric bets (high upside, limited downside) deserve a different bar than symmetric ones.
+*Execalc enforcement: Prime Directive Risk/Reward lens. Survivability test (PD-022). PSA Mode 1 surfaces latent risk before the recommendation is delivered.*
+
+**7. Decision rights clarity**
+Who actually makes this call? Ambiguity here creates paralysis or conflict. Clean decisions require clean ownership.
+*Execalc enforcement: Governance Enforcement Drivers. Polymorphia representation anchor — the system always knows whose interests it is serving before reasoning begins.*
+
+**8. A bias toward action at the margin**
+Once past roughly 70% confidence, continued analysis yields diminishing returns. The cost of delay is often invisible but real.
+*Execalc enforcement: PSA Mode 2 — execution design converts governed judgment into structured action pathways. The system does not stop at the recommendation.*
+
+**9. A feedback loop**
+Good decision-making is a skill that compounds — but only if outcomes are revisited and learned from. Most organizations skip this entirely.
+*Execalc enforcement: Recursive Analysis Mode 2 — Decision Outcomes feed back into the heuristic library. The system gets better at the operator's specific domain over time.*
+
+**The meta-principle:** A good decision is a good process, not a good outcome. Luck corrupts outcome-based evaluation. The question is whether, given what was knowable at the time, the right reasoning was applied — not whether it worked out.
+
+Execalc enforces the process. It cannot guarantee the outcome. It can guarantee the reasoning was governed.
+
+---
+
+## The Operator's Complete Environment
+
+Execalc is not a standalone judgment tool. It is the governed center of the operator's entire signal environment.
+
+The operator's world arrives through email, Slack, CRM, documents, and direct input. All of it carries signal. Most of it is noise. Execalc is the Intelligent Front Door that governs what surfaces, what is material, and what the next action is — before the operator's attention is spent on it.
+
+The operator does not open five tabs and synthesize across them. They open one front door. The front door has already read the email, parsed the Slack thread, checked it against memory, run the situation through the Prime Directive, and surfaced what actually matters alongside the recommended next move.
+
+This is the product surface that the governed judgment engine is building toward: not a chat interface with better reasoning, but the operational center of how the operator runs their business.
+
+---
+
 ## What Execalc Is Not
 Execalc is not:
 
