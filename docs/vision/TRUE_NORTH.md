@@ -96,15 +96,13 @@ Execalc enforces the process. It cannot guarantee the outcome. It can guarantee 
 
 ---
 
-## The Operator's Complete Environment
+## The Operator's Session Environment
 
-Execalc is not a standalone judgment tool. It is the governed center of the operator's entire signal environment.
+Within their Execalc session, the operator has a single governed interface for their internal decisions and judgment work. Email, Slack, CRM, and document inputs feed into that session as signal sources — but Execalc governs what is material and what the next action is, rather than leaving the operator to synthesize across disparate tools manually.
 
-The operator's world arrives through email, Slack, CRM, documents, and direct input. All of it carries signal. Most of it is noise. Execalc is the Intelligent Front Door that governs what surfaces, what is material, and what the next action is — before the operator's attention is spent on it.
+The operator does not open five tabs and synthesize across them. The session is the governed center. Signal arrives; Execalc filters, frames, and focuses it through the Prime Directive before the operator's attention is spent on it.
 
-The operator does not open five tabs and synthesize across them. They open one front door. The front door has already read the email, parsed the Slack thread, checked it against memory, run the situation through the Prime Directive, and surfaced what actually matters alongside the recommended next move.
-
-This is the product surface that the governed judgment engine is building toward: not a chat interface with better reasoning, but the operational center of how the operator runs their business.
+This is the current product surface. The Intelligent Front Door (see `docs/vision/INTELLIGENT_FRONT_DOOR_CONCEPT.md`) is a separate, later-stage product concept that governs organizational ingress from the outside world — distinct from the operator's internal session environment.
 
 ---
 
