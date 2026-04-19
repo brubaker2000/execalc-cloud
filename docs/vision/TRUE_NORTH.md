@@ -92,6 +92,35 @@ Execalc maintains controlled memory:
 
 ---
 
+## The Activation Threshold
+
+Execalc crosses from simulation to runtime at the moment three conditions are simultaneously true:
+
+1. **Decisions are structured** — every output follows the governed schema; Prime Directive lenses are evaluated; Polymorphia map is produced; output is traceable to the context that produced it.
+
+2. **Decisions are gated** — the Execution Boundary Engine is enforcing, not observing. Outputs do not reach the operator until they have cleared the boundary. BLOCK, ESCALATE, and RECOMPUTE are live states, not stubs.
+
+3. **Decisions are remembered** — admitted memory is being written automatically from governed outputs, and that memory activates in future sessions without the operator re-supplying context.
+
+Until all three are true, Execalc is a governed reasoning simulation — a system that applies the architecture deliberately rather than enforcing it structurally. The simulation is already more valuable than an ungoverned LLM. The runtime is a different category.
+
+**The gap between simulation and runtime is not architecture. The architecture is done. The gap is enforcement.**
+
+---
+
+## Simulation vs. Runtime — The Core Distinction
+
+An LLM applying Execalc doctrine deliberately produces better outputs than an ungoverned LLM. That is not the product.
+
+The product is a system that cannot produce ungoverned outputs — not because it is trying not to, but because the enforcement layer structurally prevents them. The difference is the same as the difference between a pilot following a checklist voluntarily and a fly-by-wire aircraft that cannot execute a maneuver outside its flight envelope regardless of what the pilot does.
+
+Execalc is not trying to be a more disciplined assistant.
+It is trying to be an enforcement architecture that happens to use a language model as its reasoning substrate.
+
+This distinction is what every competitor misses. They build better assistants. Execalc builds a governed machine.
+
+---
+
 ## Build True North
 The repository is the constitutional source of truth:
 
