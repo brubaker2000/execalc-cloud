@@ -1,7 +1,7 @@
 # SUPPORT_STACK_RUNTIME_SPEC.md
 
 ## Status
-Draft v0.1 — Developer-facing runtime spec
+Draft v0.2 — Extended with Compromise-Awareness and Governance Enforcement components
 
 ## Owner
 Architecture / Runtime Layer
@@ -10,7 +10,7 @@ Architecture / Runtime Layer
 - `SUPPORT_STACK_OPERATIONAL_CONTROL_LAYER.md` — four named components, governance enforcement hierarchy, conceptual model
 - `REFLEX_AND_ACTIVATION_SYSTEM.md` — five-stage detection cascade, reflex gate, context package assembly
 
-This document covers what those two do not: the runtime object model, named system reflexes (PRP-01, BDR-01), Carat interlock mechanics, Heuristic Hygiene System, service seam, lifecycle states, audit event schema, and test matrix.
+This document covers what those two do not: the runtime object model, named system reflexes (PRP-01, BDR-01), Carat interlock mechanics, Heuristic Hygiene System, Compromise-Awareness Reflexes, Governance Enforcement Drivers, service seam, lifecycle states, audit event schema, and test matrix.
 
 ---
 
@@ -28,9 +28,9 @@ Reflex activation is a governed runtime event, not a statistical output. The sta
 
 ---
 
-## Five Runtime Components
+## Seven Runtime Components
 
-The Support Stack has five named runtime components. Each is a distinct subsystem with its own object contract, service methods, and audit requirements.
+The Support Stack has seven named runtime components. Each is a distinct subsystem with its own object contract, service methods, and audit requirements.
 
 | Component | Function |
 |---|---|
@@ -39,6 +39,8 @@ The Support Stack has five named runtime components. Each is a distinct subsyste
 | **Carat Interlocks** | Governance layer that prevents conflicting, mismatched, or low-priority Carats from co-activating |
 | **Heuristic Hygiene System** | Continuous background maintenance of the heuristic library |
 | **Recursive Reintegration Protocol** | Self-repair loop that audits and corrects failed decision paths |
+| **Compromise-Awareness Reflexes** | Continuously monitor inputs for manipulation, bias injection, and operator-interest drift |
+| **Governance Enforcement Drivers** | Ensure Prime Directive and Core 7 remain active and binding across every session |
 
 ---
 
@@ -94,6 +96,29 @@ type HygieneEventType =
   | "duplicate_flag"       // suspected duplicate flagged for operator review
   | "version_roll"         // heuristic updated; prior version preserved
   | "confidence_recompute"; // confidence score updated based on observed performance
+```
+
+### Compromise Signal Classes
+
+```typescript
+type CompromiseSignalClass =
+  | "leading_framing"          // input structured to predetermine conclusion
+  | "false_premise"            // input contains a claim presented as fact that is not established
+  | "authority_appeal"         // invokes external authority to override governing logic
+  | "context_contradiction"    // conflicts with established operator context in memory
+  | "selective_suppression"    // material information is absent in a way that distorts analysis
+  | "prompt_injection";        // structured input designed to override governance controls
+```
+
+### Governance Enforcement Event Types
+
+```typescript
+type GovernanceEnforcementEventType =
+  | "session_init_verified"       // all required frameworks confirmed active at session start
+  | "mid_session_drift_detected"  // governance state altered without authorization
+  | "integration_override_blocked"// external integration attempted to modify governance
+  | "exception_scope_expired"     // session-specific exception reached its intended scope limit
+  | "session_close_state_saved";  // governance state preserved for next session
 ```
 
 ### Runtime Context Object
@@ -417,30 +442,216 @@ run_recursive_reintegration(
 
 ---
 
+## Component 6: Compromise-Awareness Reflexes
+
+The Compromise-Awareness component monitors the input environment for attempts — intentional or inadvertent — to introduce information that would bias the system's reasoning away from the operator's actual interests.
+
+This is not paranoia. It is a governance requirement. The system must be able to distinguish between what it is being told and what is actually in the operator's interest. That distinction is the foundational requirement of a trustworthy advisory system.
+
+### Threat Model
+
+**Intentional threats:**
+- Prompt injection designed to override governance controls
+- Leading framing structured to predetermine a conclusion
+- False premises presented as established fact
+- Authority appeals invoking external parties to bypass governing logic
+- Information selectively omitted to distort analysis toward a preferred outcome
+
+**Inadvertent threats:**
+- Operator inputs containing unstated assumptions that would distort analysis if accepted uncritically
+- Incomplete context processed as complete, producing systematically biased output
+- Internal organizational dynamics that pre-frame the situation before it reaches Execalc
+
+### Compromise Signal Object
+
+```typescript
+type CompromiseSignal = {
+  signal_id: string;
+  tenant_id: string;
+  session_id: string;
+  signal_class: CompromiseSignalClass;
+  detected_in: string;            // the input fragment that triggered detection
+  confidence: number;             // 0.0–1.0
+  operator_interest_risk: "low" | "medium" | "high";
+  resolution:
+    | "pending_confirmation"
+    | "operator_confirmed_proceed"
+    | "operator_confirmed_abort"
+    | "auto_flagged_low_confidence"
+    | "cleared";
+  notes: string[];
+  detected_at: string;
+  resolved_at?: string | null;
+};
+```
+
+### Response Protocol
+
+**High confidence detection (`confidence` ≥ 0.75):**
+Flag the input before it enters the reasoning pipeline. Surface the detected pattern explicitly to the operator. Request confirmation before proceeding. Do not silently accept a potentially compromised input.
+
+**Medium confidence detection (0.50–0.74):**
+Proceed with reasoning but attach a qualifying note to the output: the analysis may be affected by an input assumption that has not been independently verified. Log the signal.
+
+**Low confidence detection (< 0.50):**
+Log the signal. Do not surface to operator. Monitor for recurrence — a pattern of low-confidence signals in the same session may cumulatively reach medium threshold.
+
+**Every detection, regardless of confidence, must appear in the session audit trail.**
+
+### Service Methods
+
+```typescript
+scan_for_compromise(
+  tenant_id: string,
+  session_id: string,
+  raw_input: string
+): CompromiseSignal[]
+
+resolve_compromise_signal(
+  tenant_id: string,
+  signal_id: string,
+  resolution: CompromiseSignal["resolution"],
+  notes?: string
+): CompromiseSignal
+
+get_compromise_signals(
+  tenant_id: string,
+  session_id: string
+): CompromiseSignal[]
+```
+
+---
+
+## Component 7: Governance Enforcement Drivers
+
+The Governance Enforcement Drivers ensure that the Prime Directive and Core 7 frameworks remain active and binding across every session, every tenant, and every operating context. This component is the runtime guardian of the governance state — it does not reason; it verifies.
+
+### Enforcement Hierarchy
+
+Nothing below a given level may override anything above it without explicit tenant admin authorization:
+
+```
+1. Compliance cartridges        (highest — cannot be overridden within the session)
+2. Prime Directive
+3. Core 7 frameworks
+4. Active Carats and cartridges
+5. Operator preferences         (lowest)
+```
+
+This hierarchy is not advisory. It is enforced at the service boundary.
+
+### Governance State Object
+
+```typescript
+type GovernanceState = {
+  governance_state_id: string;
+  tenant_id: string;
+  session_id: string;
+  prime_directive_active: boolean;
+  core_7_frameworks_active: string[];       // which of the 7 are confirmed active
+  compliance_cartridges_active: string[];   // cartridge IDs
+  active_carats: string[];
+  operator_preference_overrides: string[];
+  enforcement_hierarchy_intact: boolean;
+  last_verified_at: string;
+  anomalies: GovernanceAnomaly[];
+};
+
+type GovernanceAnomaly = {
+  anomaly_id: string;
+  type: GovernanceEnforcementEventType;
+  description: string;
+  severity: "low" | "medium" | "high" | "critical";
+  detected_at: string;
+  resolved: boolean;
+  resolved_at?: string | null;
+};
+```
+
+### Three Enforcement Checkpoints
+
+**Session Initialization**
+At session start, confirm all required governance frameworks are loaded and active. Verify that compliance cartridges appropriate to the tenant are present. Establish the baseline governance state that will be monitored throughout the session.
+
+If any required framework fails to load, the session must not proceed to reasoning. Surface the failure explicitly and halt.
+
+**Mid-Session Monitoring**
+Throughout the session, verify that no input, integration, or configuration has altered the active governance state without explicit operator authorization.
+
+Watch for: integration inputs from connected external systems that would effectively modify governance behavior; session-specific exceptions that were granted for a bounded scope but are persisting beyond it; any mid-session attempt to elevate operator preferences above Core 7 or PD constraints.
+
+**Session Close**
+At session end, confirm that the governance state is preserved for the next session. Any temporary exceptions granted during the session must be explicitly expired. The closing governance state must match the session's intended configuration.
+
+### Service Methods
+
+```typescript
+initialize_governance_state(
+  tenant_id: string,
+  session_id: string
+): GovernanceState
+
+verify_governance_state(
+  tenant_id: string,
+  session_id: string
+): GovernanceState
+
+flag_governance_anomaly(
+  tenant_id: string,
+  session_id: string,
+  anomaly: Omit<GovernanceAnomaly, "anomaly_id" | "detected_at" | "resolved" | "resolved_at">
+): GovernanceAnomaly
+
+close_governance_state(
+  tenant_id: string,
+  session_id: string
+): GovernanceState
+```
+
+### Enforcement Failure Behavior
+
+| Failure | Severity | Response |
+|---|---|---|
+| Required framework not loaded at init | Critical | Session halted; operator notified |
+| Mid-session governance drift detected | High | Anomaly flagged; operator notified; reasoning paused pending resolution |
+| Integration override attempted | High | Override blocked; event logged; operator notified |
+| Session-specific exception scope exceeded | Medium | Exception expired; prior state restored; operator notified |
+| Compliance cartridge missing for regulated tenant | Critical | Session halted; compliance team notified |
+
+---
+
 ## Reflex Firing Order
 
 The canonical Support Stack firing sequence. Suppression and validation always precede expressive output.
 
 ```
 1.  Input received
-2.  Background trigger scan
+2.  Governance state verification
+      → confirm Prime Directive, Core 7, and compliance cartridges still active
+      → flag any mid-session drift before reasoning begins
+3.  Compromise-awareness scan
+      → scan input for leading framing, false premises, prompt injection, selective suppression
+      → high-confidence signals halt pipeline pending operator confirmation
+4.  Background trigger scan
       → drift_detector, contradiction_checker, scenario_match_validator, overload_buffer
-3.  Situational classification
+5.  Situational classification
       → confirm scenario; confirm representation anchor
-4.  System reflex evaluation
+6.  System reflex evaluation
       → BDR-01 (latent value scan on every input)
       → PRP-01 (if operator complaint flag present)
-5.  Carat interlock evaluation
+7.  Carat interlock evaluation
       → polarity_conflict check
       → scenario_gate check
       → priority_suppression check
-6.  Heuristic hygiene side-check
+8.  Heuristic hygiene side-check
       → run when heuristic candidates or active heuristic conflicts are involved
-7.  Reflex path activated or suppressed
+9.  Reflex path activated or suppressed
       → validated paths proceed; suppressed paths log and stop
-8.  Output shaped under Support Stack constraints
-9.  Audit record emitted
-10. Recursive reintegration available
+10. Output shaped under Support Stack constraints
+11. Audit record emitted
+12. Governance state preserved
+      → session-specific exceptions checked for scope expiry
+13. Recursive reintegration available
       → fires later if outcome evidence indicates failure
 ```
 
@@ -464,6 +675,8 @@ any                →  suppressed            (hard governance stop)
 
 No hidden transitions. Every state change must produce an audit event.
 
+**Governance enforcement failure** is the only condition that can halt a session before a `support_context` is created. If governance state initialization fails, no session proceeds — this is a pre-context gate, not a state transition within the stack.
+
 ---
 
 ## Audit Events
@@ -486,6 +699,14 @@ type SupportStackAuditEvent = {
     | "heuristic_hygiene_applied"
     | "reintegration_started"
     | "reintegration_completed"
+    | "compromise_signal_detected"
+    | "compromise_signal_resolved"
+    | "input_halted_pending_confirmation"
+    | "governance_state_initialized"
+    | "governance_drift_detected"
+    | "governance_override_blocked"
+    | "governance_exception_expired"
+    | "governance_state_closed"
     | "output_suppressed"
     | "output_constrained"
     | "state_transition";
@@ -495,6 +716,10 @@ type SupportStackAuditEvent = {
   carat_id?: string | null;
   heuristic_id?: string | null;
   hygiene_event_type?: HygieneEventType | null;
+  compromise_signal_class?: CompromiseSignalClass | null;
+  compromise_confidence?: number | null;
+  governance_enforcement_event?: GovernanceEnforcementEventType | null;
+  governance_anomaly_severity?: "low" | "medium" | "high" | "critical" | null;
   prior_state?: SupportStackState | null;
   new_state?: SupportStackState | null;
   details: string[];
@@ -545,6 +770,39 @@ Emit at minimum on: every trigger fire and resolution, every system reflex invoc
 | `new_state` | string nullable | |
 | `details_json` | jsonb | string[] |
 | `created_at` | timestamp indexed | |
+
+### compromise_signals
+
+| Column | Type | Notes |
+|---|---|---|
+| `signal_id` | string PK | |
+| `tenant_id` | string indexed | |
+| `session_id` | string indexed | |
+| `signal_class` | string | enum |
+| `detected_in` | text | input fragment that triggered detection |
+| `confidence` | float | 0.0–1.0 |
+| `operator_interest_risk` | string | low / medium / high |
+| `resolution` | string | enum |
+| `notes_json` | jsonb | string[] |
+| `detected_at` | timestamp indexed | |
+| `resolved_at` | timestamp nullable | |
+
+### governance_states
+
+| Column | Type | Notes |
+|---|---|---|
+| `governance_state_id` | string PK | |
+| `tenant_id` | string indexed | |
+| `session_id` | string indexed | |
+| `prime_directive_active` | boolean | |
+| `core_7_frameworks_active_json` | jsonb | string[] |
+| `compliance_cartridges_active_json` | jsonb | string[] |
+| `active_carats_json` | jsonb | string[] |
+| `enforcement_hierarchy_intact` | boolean | |
+| `last_verified_at` | timestamp | |
+| `anomalies_json` | jsonb | GovernanceAnomaly[] |
+| `created_at` | timestamp | |
+| `closed_at` | timestamp nullable | |
 
 ### heuristic_hygiene_events
 
@@ -609,6 +867,26 @@ Emit at minimum on: every trigger fire and resolution, every system reflex invoc
 - Corrective actions are recorded in the reintegration result
 - Archive is updated after reintegration completes
 
+### Compromise-Awareness Tests
+- High-confidence `prompt_injection` signal halts pipeline pending operator confirmation
+- High-confidence `leading_framing` surfaces detected pattern and requests confirmation before proceeding
+- Medium-confidence signal proceeds with qualifying note attached to output
+- Low-confidence signal is logged but not surfaced to operator
+- Three low-confidence signals in same session aggregate to medium threshold
+- Every detected signal produces `compromise_signal_detected` audit event regardless of confidence
+- Operator `confirmed_proceed` resolution resumes pipeline and is logged
+- Operator `confirmed_abort` resolution stops pipeline and is logged
+
+### Governance Enforcement Tests
+- Session initialization fails when Prime Directive framework cannot be confirmed active; session halted
+- Session initialization fails for regulated tenant missing required compliance cartridge; session halted
+- Mid-session governance drift detected when integration input alters active framework list without authorization
+- Integration override blocked when external system attempts to elevate operator preferences above Core 7
+- Session-specific exception flagged as scope-expired when it persists beyond its intended scope
+- `close_governance_state` expires all temporary exceptions granted during the session
+- Governance state from prior session is available for continuity verification at next session init
+- Every governance event produces corresponding audit event
+
 ### Lifecycle Tests
 - `monitoring` → `candidate_detected` on trigger fire
 - `candidate_detected` → `suppressed` on overload buffer activation
@@ -622,7 +900,7 @@ Emit at minimum on: every trigger fire and resolution, every system reflex invoc
 
 | Document | Relationship |
 |---|---|
-| `SUPPORT_STACK_OPERATIONAL_CONTROL_LAYER.md` | Defines the four governance components this spec implements at runtime |
+| `SUPPORT_STACK_OPERATIONAL_CONTROL_LAYER.md` | Defines the four conceptual governance components; all four are now implemented in this spec — Recursive Audit Triggers → Reflex Triggers + Recursive Reintegration; Compromise-Awareness Reflexes → Component 6; Runtime Validation Protocols → Reflex Triggers (drift + contradiction); Governance Enforcement Drivers → Component 7 |
 | `REFLEX_AND_ACTIVATION_SYSTEM.md` | Defines the five-stage detection cascade; this spec governs the stack that protects that cascade |
 | `HEURISTIC_CODING_SYSTEM.md` | BDR-01 fires here; Heuristic Coding receives the promotion candidate |
 | `RECURSIVE_ANALYSIS_MODEL.md` | RA Mode 2 performs heuristic performance audits; Hygiene System performs structural health checks; complementary, not redundant |
