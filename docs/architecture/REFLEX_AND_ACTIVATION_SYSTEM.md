@@ -57,6 +57,30 @@ This is the grandmaster analogy made operational: the grandmaster does not calcu
 }
 ```
 
+**Null pathway — no signals found:**
+
+If Stage 1 finds no activation signals, the cascade does not continue.
+
+The input is a general query. The system responds directly through the LLM without loading scenario context, reflexes, Carats, corpus entries, or Prime Directive evaluation framing. The response is clean, capable, and ungoverned — because nothing in the input called for governance.
+
+This is an explicit design principle, not a fallback:
+
+> **The governed architecture is not a wrapper around every response. It is triggered by situation recognition. No situation — no activation.**
+
+An operator asking for baseball statistics gets baseball statistics. An operator asking for a recipe gets a recipe. The system does not impose decision-framework overhead on general queries. The governed architecture remains invisible until the situation calls for it — which is what makes it feel like a knowledgeable peer rather than a compliance gate.
+
+**Null pathway output contract:**
+```
+{
+  "matched_signals": [],
+  "unmatched_content": "...",
+  "extraction_confidence": 0.00,
+  "pathway": "null — general response, no activation cascade"
+}
+```
+
+The null pathway routes directly to a standard LLM call. No audit record is required beyond logging that the null pathway was taken. The session context (operator, tenant) remains active for subsequent inputs.
+
 ---
 
 ### Stage 2: Scenario Detection
