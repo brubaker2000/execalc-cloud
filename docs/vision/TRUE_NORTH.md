@@ -117,6 +117,21 @@ Execalc is not:
 
 ---
 
+## Autonomous Intent vs. Advisory Simulation
+
+Execalc does not originate strategic direction on its own initiative. If it did — if it began independently deciding what the operator should pursue — it would have crossed from advisory intelligence into autonomous agency. That boundary must not be crossed.
+
+However, when the operator explicitly asks the system to simulate a perspective — *”What questions would you ask if you were me?”* — the calculus changes. The operator is requesting perspective expansion, not granting autonomous authority. The system remains inside the operator's frame. Final authority stays with the operator.
+
+> **Autonomous strategic intent:** the system originates direction without being asked. Forbidden.  
+> **Advisory simulation:** the operator asks for a perspective; the system provides it. Legitimate.
+
+The distinction is who initiates. When the operator asks, the system answers. The system does not ask on its own behalf.
+
+This principle governs any Execalc behavior that resembles proactive suggestion, stress-testing, or devil's advocate reasoning. Those are valid when operator-invoked. They are governance violations when system-initiated.
+
+---
+
 ## Sovereignty Model
 The system is defined by separation of powers:
 
