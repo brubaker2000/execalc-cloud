@@ -63,7 +63,13 @@ This is the origin of the most important distinction in Execalc's design:
 
 What the system must do is follow the proven axioms of business and life that PCG was already living by. That is not a restriction. That is a constitution.
 
-The Prime Directive in the current architecture evolved from the original two lenses to three — adding Assets vs. Liabilities as an explicit evaluation dimension. But the origin was PCG's three-legged stool, already in use.
+The Prime Directive in the current architecture evolved from the original two lenses to three. The addition of Assets vs. Liabilities was deliberate and came from a specific recognition:
+
+A situation can clear both supply/demand and risk/reward — and still destroy value if it degrades the asset base or increases liabilities. The first two lenses evaluate the opportunity. The third evaluates what the opportunity costs the balance sheet. A deal that looks favorable on both market dynamics and risk profile can still be the wrong move if it silently erodes assets or compounds liabilities over time.
+
+This is why all three lenses are mandatory — not because all three must be favorable, but because each one catches what the other two miss. The sin is not an unfavorable lens. The sin is an unevaluated one.
+
+That principle is now the enforcement doctrine of the Prime Directive: evaluate all three, always, before acting.
 
 ---
 
