@@ -31,6 +31,29 @@ This is the grandmaster analogy made operational: the grandmaster does not calcu
 
 ---
 
+## Stage 0: Strategic Terrain Classification
+
+Before signal extraction begins, every input is classified by **strategic terrain** — the problem type that the input belongs to. This is the enforced first-pass ingress tag.
+
+Terrain classification fires before polarity detection, before thinker activation, and before carat selection. Without it, Polymorphia activates later than it should, and scenario matching operates on raw signal rather than on a pre-classified problem frame.
+
+**Terrain classes (non-exhaustive):**
+- Competitive war
+- Capital structure / allocation
+- Internal alignment / execution breakdown
+- Reputation / signal integrity
+- Deal / transaction
+- Operational bottleneck
+- Strategic drift
+- Market entry / expansion
+- Relationship / negotiation
+
+**Rule:** Every input receives a terrain tag before the cascade continues. If the terrain is genuinely ambiguous, it is flagged as such — not silently defaulted. The terrain tag is carried through all subsequent stages and appears in the run receipt.
+
+**Model tier:** Labor (rule-based or Haiku-class — this is classification, not judgment)
+
+---
+
 ## The Five-Stage Detection Cascade
 
 ### Stage 1: Signal Extraction
@@ -242,6 +265,23 @@ The following reflexes are pre-loaded for the most critical scenarios. Full regi
 | 18 — Competitive Threat | Are we fighting or flanking? | Diagnostic | HTL-0023 |
 | 14 — Strategic Drift | Name the three most important things | Diagnostic | HTL-0003 |
 | 14 — Strategic Drift | What would you stop doing today? | Framework | HTL-0019 |
+
+---
+
+## Explainability vs. Traceability
+
+These are not the same thing and must not be treated as such.
+
+**Explainability** is a narrative. It is the system's ability to produce a coherent account of why something happened. Explainability is useful for operator communication. It is not sufficient for governance.
+
+**Traceability** is a record. It is the system's ability to prove — from auditable artifacts — what logic fired, under what constraints, with what result. Traceability does not depend on the model's ability to articulate its reasoning. It depends on the runtime's audit trail.
+
+Execalc commits to traceability. Explainability is a secondary output — useful when it can be produced, but never a substitute for the audit record.
+
+> If the run receipt exists and the explanation does not, governance is intact.  
+> If the explanation exists and the run receipt does not, governance has failed.
+
+This distinction matters for regulated environments, legal review, and enterprise buyers. They do not need the system to tell a good story. They need to be able to verify what happened.
 
 ---
 

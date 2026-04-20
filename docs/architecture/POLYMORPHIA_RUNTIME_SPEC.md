@@ -41,6 +41,21 @@ Multiple lenses may be composed, but not blended into an untraceable answer. Len
 ### 5. Constrained Fallback Invariant
 If loyalty, entity structure, or lens integrity is unclear, the subsystem degrades safely rather than fabricating coherence.
 
+### 6. Read-Only Lens Invariant
+Polymorphic lenses may observe, annotate, surface tension, and contribute perspective to reasoning. They may not write to memory, trigger execution, or produce governed output independently.
+
+A lens is an analytical instrument, not an actor. The Prime Directive is the downstream adjudicator. The lens provides input to that evaluation — it does not replace it.
+
+**Specifically prohibited for any active lens:**
+- Writing to session memory or operator memory
+- Triggering reflex activation
+- Producing output that reaches the operator without passing the Prime Directive gate
+- Initiating execution pathways
+
+**Violation consequence:** If a lens produces output that bypasses the evaluation gate, the output is invalid and must be discarded. The lens has contaminated the reasoning frame. This is a governance failure, not a reasoning error.
+
+This invariant prevents the most common Polymorphia failure mode: a lens that was intended to provide perspective quietly becoming a decision-maker.
+
 ---
 
 ## Runtime Modes

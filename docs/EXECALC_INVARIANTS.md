@@ -112,6 +112,22 @@ D) Language Work (the LLM)
 3) Is it just wording/formatting?
 - If yes: implement in prompts/output schemas, not enforcement code.
 
+### Build Law #001 — v1 Must Not Preclude v2
+
+No decision in Build v1 shall preclude or hinder Build v2.
+
+This means:
+- No hard vendor lock-in that cannot be swapped at the middleware layer
+- No data schemas that cannot evolve without destroying existing records
+- No API contracts that cannot be versioned
+- No integrations embedded so deeply that replacing them requires rebuilding the spine
+
+The goal is a modular architecture — a spine that can carry new components, not cement that hardens around the first implementation. When evaluating any v1 architectural decision, the test is: *does this prevent the next stage?* If yes, it must be redesigned.
+
+This law applies to all build decisions: infrastructure, integrations, data models, and API surfaces.
+
+---
+
 ### 11.3 “The platform dominates the model” (made precise)
 
 The platform controls:
