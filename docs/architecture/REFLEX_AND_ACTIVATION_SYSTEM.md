@@ -65,9 +65,11 @@ The input is a general query. The system responds directly through the LLM witho
 
 This is an explicit design principle, not a fallback:
 
-> **The governed architecture is not a wrapper around every response. It is triggered by situation recognition. No situation — no activation.**
+> **The governed architecture is not a wrapper around every response. It is triggered by situation recognition. No situation — no activation. But no activation does not mean no capability.**
 
-An operator asking for baseball statistics gets baseball statistics. An operator asking for a recipe gets a recipe. The system does not impose decision-framework overhead on general queries. The governed architecture remains invisible until the situation calls for it — which is what makes it feel like a knowledgeable peer rather than a compliance gate.
+The null pathway is not a degraded experience. The operator has access to a fully capable general-purpose assistant with internet access — the full power of the underlying LLM and its connected resources. An operator asking for baseball statistics gets baseball statistics. An operator asking for a recipe gets a recipe. An operator researching a topic gets web-assisted research.
+
+The governed architecture remains invisible until the situation calls for it — which is what makes the system feel like a knowledgeable peer rather than a compliance gate. The peer is always capable. It is selectively governed.
 
 **Null pathway output contract:**
 ```
