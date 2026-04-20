@@ -71,6 +71,27 @@ This is why all three lenses are mandatory — not because all three must be fav
 
 That principle is now the enforcement doctrine of the Prime Directive: evaluate all three, always, before acting.
 
+### The Lenses Require Polymorphia
+
+The three lenses do not operate independently. They are the architectural reason Polymorphia is necessary.
+
+Each lens produces multiple valid readings depending on who is looking and from what position:
+
+- **Supply/Demand** reads differently from the buyer's seat than the seller's. What looks like leverage from one position looks like exposure from another.
+- **Risk/Reward** reads differently over a 90-day horizon than a 3-year one. The same bet is asymmetric or reckless depending on the time frame held.
+- **Assets/Liabilities** reads differently to the operator than to the counterparty, the capital partner, or the regulator.
+
+If each lens is evaluated from a single perspective, the result is a locally coherent answer that misses the interactions between positions and time horizons. Decisions fail not because the lenses were wrong but because they were applied flatly.
+
+The three lenses demand simultaneous multi-perspective evaluation. That is Polymorphia's function.
+
+The Prime Directive without Polymorphia produces flat lens checks — necessary but insufficient. Polymorphia without the Prime Directive is multi-perspective thinking without a governance anchor — interesting but ungoverned. Together they form the cognitive spine of the system:
+
+> The Prime Directive defines what must be evaluated.
+> Polymorphia defines how many ways it must be seen before a conclusion is drawn.
+
+This is not an architectural coincidence. The CRM problem that seeded Polymorphia and the three-legged stool that became the Prime Directive were ideated together. They needed each other before either was fully understood.
+
 ---
 
 ## The Executive Knowledge Engine — The Thinker Bench
