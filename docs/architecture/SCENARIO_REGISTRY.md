@@ -1,13 +1,13 @@
 # SCENARIO_REGISTRY.md
 
 ## Status
-Draft v0.1 — runtime-ready structure; activation logic and Carat mapping pending
+v1.0 — Merged and rationalized from two independent session registries. Supersedes Draft v0.1.
 
 ## Owner
 Executive Knowledge Engine (EKE)
 
 ## Purpose
-This registry defines the 25 canonical executive-grade scenarios that form the primary trigger layer of Execalc's cognition engine.
+This registry defines the canonical executive-grade scenarios that form the primary trigger layer of Execalc's cognition engine.
 
 These scenarios answer the first and most important question the runtime must resolve:
 
@@ -23,13 +23,11 @@ Each scenario is defined as a triggerable object with activation logic, not a ca
 
 ---
 
-## Current Code Gap
+## Null Scenario Rule
 
-The existing `engine.py` implementation contains only two hardcoded scenario types:
-- `draft_trade`
-- `feasibility`
+If no scenario can be confidently classified, the runtime enters **Clarification Mode** — it does not produce advice. It surfaces the ambiguity to the operator and requests clarifying input before proceeding. Clarification Mode is a governed outcome, not a failure state.
 
-This registry replaces that stub with the full governed scenario classification layer.
+When ambiguity is unresolvable, the runtime may use **Opportunity Discovery** (F.4) as the broadest safe container while clarification is sought.
 
 ---
 
@@ -43,315 +41,477 @@ Each scenario entry contains:
 
 ---
 
-## I. Growth & Opportunity Scenarios
+## A. Strategy & Market
 
-### 1. Market Expansion
+### A.1 Go-To-Market Formation
 
-**Definition:** Entering new markets, geographies, or customer segments.
+**Definition:** How the product or service reaches and converts customers — entering, repositioning, or scaling in a market.
 
-**Trigger Conditions:** Growth plateau, new demand signals, competitor expansion.
+**Trigger Conditions:** Low conversion, misaligned channels, weak pipeline, new product launch, market repositioning.
 
-**Primary Output:** Entry strategy, risk map, resource allocation.
+**Primary Output:** Channel mix, messaging architecture, funnel design, launch sequencing.
 
-**Activation Signals:** "expand into," "new market," "international," "new segment"
-
----
-
-### 2. Revenue Acceleration
-
-**Definition:** Increasing top-line growth within the current business model.
-
-**Trigger Conditions:** Growth targets unmet, scaling opportunity identified.
-
-**Primary Output:** Levers for growth (pricing, channel, product mix).
-
-**Activation Signals:** "increase revenue," "growth stalled," "scale faster"
+**Activation Signals:** "GTM," "go to market," "sales funnel," "lead conversion," "launch strategy"
 
 ---
 
-### 3. Pricing and Positioning
+### A.2 Competitive Conflict
 
-**Definition:** Determining value capture and market perception.
+**Definition:** Active adversary behavior — market share battles, pricing wars, zero-sum competitive dynamics.
 
-**Trigger Conditions:** Margin pressure, commoditization risk, repositioning need.
+**Trigger Conditions:** New entrant, pricing pressure, competitor product launch, losing share.
 
-**Primary Output:** Pricing strategy, positioning narrative, elasticity analysis.
+**Primary Output:** Counter-strategy, asymmetric response, positioning defense.
 
-**Activation Signals:** "pricing," "discounting," "premium vs volume"
+**Activation Signals:** "competitor," "they launched," "losing share," "price war," "market share"
 
 ---
 
-### 4. Product Strategy
+### A.3 Strategic Positioning
+
+**Definition:** Clarifying what game we are playing — and what we will not do.
+
+**Trigger Conditions:** Unclear competitive identity, "stuck in the middle" positioning, strategic drift toward commoditization.
+
+**Primary Output:** Positioning clarity, strategic identity, explicit tradeoffs between what is and is not pursued.
+
+**Activation Signals:** "what are we," "our positioning," "why would someone choose us," "what we stand for"
+
+---
+
+### A.4 Pricing and Positioning
+
+**Definition:** Determining value capture mechanics and market price perception.
+
+**Trigger Conditions:** Margin pressure, commoditization risk, price-sensitivity signals, repositioning need.
+
+**Primary Output:** Pricing strategy, positioning narrative, elasticity analysis, premium vs. volume decision.
+
+**Activation Signals:** "pricing," "discounting," "premium vs volume," "price point," "margin"
+
+---
+
+### A.5 Market Entry / Exit
+
+**Definition:** Launching into or withdrawing from a market, geography, or vertical — a discrete go/no-go decision.
+
+**Trigger Conditions:** New market opportunity, failed market, strategic withdrawal, geographic expansion decision.
+
+**Primary Output:** Entry/exit analysis, sequencing, resource requirements, risk map.
+
+**Activation Signals:** "enter the market," "pull out of," "launch in," "exit the vertical," "new geography"
+
+---
+
+### A.6 Market Expansion
+
+**Definition:** Growing within an existing market — new segments, deeper penetration, broader reach.
+
+**Trigger Conditions:** Growth plateau, new demand signals, competitor expansion creating space.
+
+**Primary Output:** Expansion strategy, segment prioritization, resource allocation.
+
+**Activation Signals:** "expand into," "new segment," "international," "adjacent market," "grow the base"
+
+---
+
+### A.7 Disruption Threat
+
+**Definition:** The existing business model is under threat from new technology, new entrants, or behavior shifts.
+
+**Trigger Conditions:** Emerging competitor with fundamentally different model, technology shift, customer behavior change threatening current revenue.
+
+**Primary Output:** Threat assessment, response options (adapt / counter / accelerate own disruption).
+
+**Activation Signals:** "disrupting us," "new model is threatening," "our business model is at risk," "they're doing it differently"
+
+---
+
+### A.8 Innovation and Disruption
+
+**Definition:** Creating new models or breaking existing ones — being the disruptor, not the disrupted.
+
+**Trigger Conditions:** Stagnation, disruptive opportunity, market white space identified.
+
+**Primary Output:** Innovation strategy, new model design, disruption sequencing.
+
+**Activation Signals:** "new model," "disrupt," "reinvent," "we could change how this works"
+
+---
+
+### A.9 Product Strategy
 
 **Definition:** Deciding what to build, enhance, or retire.
 
-**Trigger Conditions:** Feature sprawl, unclear roadmap, competitive gaps.
+**Trigger Conditions:** Feature sprawl, unclear roadmap, competitive gaps, resource constraints on build.
 
-**Primary Output:** Product roadmap, prioritization, tradeoffs.
+**Primary Output:** Product roadmap, prioritization framework, tradeoff matrix.
 
-**Activation Signals:** "roadmap," "feature," "product direction"
-
----
-
-### 5. Go-To-Market Strategy
-
-**Definition:** How the product reaches and converts customers.
-
-**Trigger Conditions:** Low conversion, misaligned channels, weak pipeline.
-
-**Primary Output:** Channel mix, messaging, funnel optimization.
-
-**Activation Signals:** "GTM," "sales funnel," "lead conversion"
+**Activation Signals:** "roadmap," "feature priority," "product direction," "build vs buy," "what to build next"
 
 ---
 
-## II. Deal and Capital Scenarios
+### A.10 Revenue Acceleration
 
-### 6. Deal Origination
+**Definition:** Increasing top-line growth within the current business model.
 
-**Definition:** Identifying and sourcing opportunities (M&A, partnerships, trades).
+**Trigger Conditions:** Growth targets unmet, scaling opportunity identified, revenue stall.
 
-**Trigger Conditions:** Strategic growth need, market scanning.
+**Primary Output:** Growth levers (pricing, channel, product mix, customer expansion).
 
-**Primary Output:** Target list, deal theses, outreach strategy.
-
-**Activation Signals:** "looking for deals," "targets," "opportunities"
+**Activation Signals:** "increase revenue," "growth stalled," "scale faster," "top line," "grow faster"
 
 ---
 
-### 7. Negotiation
+### A.11 Partnership Strategy
 
-**Definition:** Structuring and closing agreements under tension.
+**Definition:** Forming strategic alliances to create leverage, fill capability gaps, or accelerate market access.
 
-**Trigger Conditions:** Active deal discussions, conflicting interests.
+**Trigger Conditions:** Capability gaps, channel needs, scaling requirement, ecosystem play.
 
-**Primary Output:** Leverage map, concession strategy, BATNA analysis.
+**Primary Output:** Partner identification, deal structure, governance model, alignment criteria.
 
-**Activation Signals:** "offer," "counter," "terms," "leverage"
-
----
-
-### 8. Due Diligence
-
-**Definition:** Validating assumptions and uncovering hidden risks.
-
-**Trigger Conditions:** Pending deal or major decision.
-
-**Primary Output:** Risk audit, assumption validation, red flags.
-
-**Activation Signals:** "verify," "diligence," "concerns," "unknowns"
+**Activation Signals:** "partner," "collaboration," "joint venture," "strategic alliance," "work together"
 
 ---
 
-### 9. Capital Allocation
+## B. Capital & Finance
 
-**Definition:** Deploying financial resources across opportunities.
+### B.1 Capital Raise
 
-**Trigger Conditions:** Budgeting decisions, investment tradeoffs.
+**Definition:** Sourcing equity, debt, structured finance, or hybrid capital.
 
-**Primary Output:** ROI ranking, capital deployment plan.
+**Trigger Conditions:** Growth capital needed, runway concern, strategic acquisition requiring funding, recapitalization.
 
-**Activation Signals:** "where to invest," "budget," "allocation"
+**Primary Output:** Capital structure options, investor targeting, terms positioning, raise sequencing.
 
----
-
-### 10. Exit Strategy
-
-**Definition:** Planning liquidity events or strategic exits.
-
-**Trigger Conditions:** Maturity stage, acquisition interest.
-
-**Primary Output:** Timing, valuation strategy, buyer targeting.
-
-**Activation Signals:** "sell," "exit," "acquisition," "IPO"
+**Activation Signals:** "raise capital," "fundraise," "investors," "term sheet," "valuation," "round"
 
 ---
 
-## III. Organizational and Execution Scenarios
+### B.2 Capital Allocation
 
-### 11. Team Building
+**Definition:** Deploying financial resources across competing opportunities.
 
-**Definition:** Hiring, structuring, and upgrading talent.
+**Trigger Conditions:** Budgeting decisions, investment tradeoffs, reallocation under constraint.
 
-**Trigger Conditions:** Skill gaps, scaling team, underperformance.
+**Primary Output:** ROI ranking, capital deployment plan, allocation rationale.
 
-**Primary Output:** Hiring plan, org design, role clarity.
-
-**Activation Signals:** "hire," "team," "roles," "talent gap"
+**Activation Signals:** "where to invest," "budget," "allocation," "deploy capital," "prioritize spend"
 
 ---
 
-### 12. Executive Alignment
+### B.3 M&A / Roll-Up
 
-**Definition:** Resolving leadership misalignment and internal friction.
+**Definition:** Acquisitions, mergers, integrations, or consolidation plays.
 
-**Trigger Conditions:** Conflicting priorities, political tension.
+**Trigger Conditions:** Inorganic growth strategy, consolidation opportunity, strategic capability acquisition.
 
-**Primary Output:** Alignment map, decision clarity, authority structure.
+**Primary Output:** Deal thesis, target analysis, integration considerations, valuation framework.
 
-**Activation Signals:** "disagreement," "misaligned," "leadership conflict"
-
----
-
-### 13. Execution Infrastructure
-
-**Definition:** Fixing broken systems, workflows, or operating models.
-
-**Trigger Conditions:** Bottlenecks, missed deadlines, inefficiency.
-
-**Primary Output:** System redesign, process correction.
-
-**Activation Signals:** "slow," "broken process," "inefficiency"
+**Activation Signals:** "acquire," "merger," "roll-up," "buy," "consolidate," "M&A"
 
 ---
 
-### 14. Strategic Drift
+### B.4 Valuation Dispute
 
-**Definition:** Loss of focus or deviation from core mission.
+**Definition:** Misalignment on worth, pricing, or intrinsic value between parties.
 
-**Trigger Conditions:** Scattered initiatives, unclear priorities.
+**Trigger Conditions:** Deal negotiations with valuation gaps, investor disagreement, internal valuation conflict.
 
-**Primary Output:** Refocus plan, priority reset.
+**Primary Output:** Valuation framework, gap analysis, negotiation positioning on value.
 
-**Activation Signals:** "too many things," "unclear direction"
-
----
-
-### 15. Judgment Compression
-
-**Definition:** Overload of decisions requiring prioritization.
-
-**Trigger Conditions:** Decision fatigue, too many simultaneous choices.
-
-**Primary Output:** Ranked decisions, simplified options.
-
-**Activation Signals:** "too many decisions," "overwhelmed"
+**Activation Signals:** "valuation," "what is it worth," "they think it's worth," "disagree on price," "fair value"
 
 ---
 
-## IV. Risk and Defense Scenarios
+### B.5 Liquidity / Exit Strategy
 
-### 16. Crisis Management
+**Definition:** Planning liquidity events — IPO, sale, recapitalization, or harvest.
 
-**Definition:** Responding to immediate threats or failures.
+**Trigger Conditions:** Maturity stage, acquisition interest, investor pressure, strategic transition.
 
-**Trigger Conditions:** PR issues, operational breakdowns.
+**Primary Output:** Timing strategy, valuation preparation, buyer targeting, process design.
 
-**Primary Output:** Containment strategy, communication plan.
-
-**Activation Signals:** "urgent," "crisis," "problem now"
+**Activation Signals:** "sell," "exit," "acquisition," "IPO," "liquidity," "harvest"
 
 ---
 
-### 17. Risk Mitigation
+### B.6 Deal Origination
 
-**Definition:** Identifying and reducing exposure to downside.
+**Definition:** Identifying and sourcing opportunities — M&A targets, partnerships, trades, investments.
 
-**Trigger Conditions:** Uncertain environment, vulnerability detected.
+**Trigger Conditions:** Strategic growth need, market scanning, mandate to find opportunities.
 
-**Primary Output:** Risk map, mitigation plan.
+**Primary Output:** Target list, deal theses, outreach strategy, opportunity ranking.
 
-**Activation Signals:** "risk," "exposure," "downside"
-
----
-
-### 18. Competitive Threat
-
-**Definition:** Responding to competitor moves.
-
-**Trigger Conditions:** New entrant, pricing pressure, innovation threat.
-
-**Primary Output:** Counter-strategy.
-
-**Activation Signals:** "competitor," "they launched," "losing share"
+**Activation Signals:** "looking for deals," "find targets," "source opportunities," "deal flow"
 
 ---
 
-### 19. Regulatory and Compliance
+### B.7 Due Diligence
 
-**Definition:** Navigating legal and regulatory constraints.
+**Definition:** Validating assumptions and uncovering hidden risks before committing.
 
-**Trigger Conditions:** Policy changes, compliance risk.
+**Trigger Conditions:** Pending deal, major investment, partnership under consideration.
 
-**Primary Output:** Compliance strategy, risk avoidance.
+**Primary Output:** Risk audit, assumption validation, red flags, go/no-go recommendation.
 
-**Activation Signals:** "regulation," "legal," "compliance"
+**Activation Signals:** "verify," "diligence," "what are we missing," "concerns," "unknowns," "validate"
+
+---
+
+## C. Organizational & Leadership
+
+### C.1 Executive Alignment
+
+**Definition:** Resolving leadership misalignment, cultural fracture, or decision gridlock.
+
+**Trigger Conditions:** Conflicting priorities, political tension, decision paralysis at the top.
+
+**Primary Output:** Alignment map, decision clarity, authority structure recommendation.
+
+**Activation Signals:** "disagreement," "misaligned," "leadership conflict," "we can't agree," "politics"
+
+---
+
+### C.2 Leadership Transition
+
+**Definition:** New CEO, founder shift, board change, or succession planning.
+
+**Trigger Conditions:** Planned or unplanned leadership change, succession urgency, board restructuring.
+
+**Primary Output:** Transition plan, authority handoff design, stability strategy, communication framework.
+
+**Activation Signals:** "new CEO," "founder stepping back," "succession," "board change," "leadership change"
+
+---
+
+### C.3 Team Building
+
+**Definition:** Hiring, structuring, and upgrading talent to match strategic needs.
+
+**Trigger Conditions:** Skill gaps, scaling team, role ambiguity, underperformance.
+
+**Primary Output:** Hiring plan, org design, role clarity, capability gap assessment.
+
+**Activation Signals:** "hire," "team," "roles," "talent gap," "org structure," "who do we need"
+
+---
+
+### C.4 Team Performance Breakdown
+
+**Definition:** Dysfunction, morale collapse, execution failure within an existing team.
+
+**Trigger Conditions:** Missed targets, team conflict, disengagement, trust breakdown.
+
+**Primary Output:** Diagnosis, intervention strategy, performance recovery plan.
+
+**Activation Signals:** "team isn't performing," "morale," "dysfunction," "execution failure," "they're not working"
+
+---
+
+### C.5 Culture & Incentives
+
+**Definition:** Values drift, incentive misalignment, or behavior distortion undermining strategy.
+
+**Trigger Conditions:** Stated values and actual behavior diverging, comp plan driving wrong behavior, culture degrading under growth pressure.
+
+**Primary Output:** Incentive redesign, culture intervention, alignment between values and behavior.
+
+**Activation Signals:** "culture," "incentives," "comp plan," "values," "behavior," "what we're rewarding"
+
+---
+
+## D. Operations & Execution
+
+### D.1 Execution Infrastructure
+
+**Definition:** Systems, processes, or tooling not supporting the strategy.
+
+**Trigger Conditions:** Bottlenecks, missed deadlines, operational inefficiency, systems failing under scale.
+
+**Primary Output:** System redesign, process correction, operational architecture.
+
+**Activation Signals:** "slow," "broken process," "inefficiency," "systems can't handle it," "ops"
+
+---
+
+### D.2 Scale Stress
+
+**Definition:** Growth outpacing people, systems, or governance — the organization is breaking under its own momentum.
+
+**Trigger Conditions:** Rapid growth creating chaos, processes built for a smaller business, governance gaps appearing under scale.
+
+**Primary Output:** Scale diagnosis, structural intervention, prioritization of what to fix first.
+
+**Activation Signals:** "growing too fast," "can't keep up," "scaling issues," "things are breaking," "we weren't built for this"
+
+---
+
+### D.3 Operational Bottleneck
+
+**Definition:** A specific flow constraint limiting throughput or outcomes.
+
+**Trigger Conditions:** Single point of failure identified, throughput limit reached, constraint visible.
+
+**Primary Output:** Constraint identification, removal strategy, system redesign around the bottleneck.
+
+**Activation Signals:** "bottleneck," "constraint," "backed up," "slowing everything down," "the problem is X"
+
+---
+
+### D.4 Resource Optimization
+
+**Definition:** Improving efficiency and output within existing resource constraints.
+
+**Trigger Conditions:** Underperformance, waste detected, cost pressure, productivity gap.
+
+**Primary Output:** Optimization plan, waste elimination, efficiency lever identification.
+
+**Activation Signals:** "inefficient," "waste," "optimize," "do more with less," "underperforming"
+
+---
+
+## E. Risk, Crisis & Control
+
+### E.1 Crisis Management
+
+**Definition:** Responding to acute threats — legal, reputational, financial, or operational.
+
+**Trigger Conditions:** Active crisis requiring immediate containment, time-compressed threat.
+
+**Primary Output:** Containment strategy, communication plan, survivability assessment.
+
+**Activation Signals:** "urgent," "crisis," "problem right now," "we have a situation," "emergency"
+
+---
+
+### E.2 Risk Exposure Assessment
+
+**Definition:** Identifying unknown downside, tail risk, or asymmetric fragility.
+
+**Trigger Conditions:** Uncertain environment, vulnerability suspected but not quantified, pre-commitment review.
+
+**Primary Output:** Risk map, exposure quantification, fragility analysis.
+
+**Activation Signals:** "what could go wrong," "what are we exposed to," "tail risk," "fragility," "unknown downside"
+
+---
+
+### E.3 Risk Mitigation
+
+**Definition:** Reducing or managing identified exposure to downside.
+
+**Trigger Conditions:** Known risks requiring active management, hedging decisions, risk transfer options.
+
+**Primary Output:** Mitigation plan, risk reduction options, hedge design.
+
+**Activation Signals:** "risk," "exposure," "downside," "protect," "hedge," "reduce risk"
+
+---
+
+### E.4 Regulatory / Compliance Pressure
+
+**Definition:** External rule changes, enforcement risk, or compliance obligations.
+
+**Trigger Conditions:** Policy changes, regulatory inquiry, compliance gap identified.
+
+**Primary Output:** Compliance strategy, risk avoidance, regulatory positioning.
+
+**Activation Signals:** "regulation," "legal," "compliance," "enforcement," "regulator"
 
 *Note: When a Compliance Cartridge is active (see `COMPLIANCE_CARTRIDGE_ARCHITECTURE.md`), this scenario inherits elevated priority and the compliance gate runs before any other evaluation.*
 
 ---
 
-### 20. Reputation and PR
+### E.5 Reputation and PR
 
-**Definition:** Managing perception and brand integrity.
+**Definition:** Managing perception, brand integrity, and public narrative.
 
-**Trigger Conditions:** Public scrutiny, brand risk.
+**Trigger Conditions:** Public scrutiny, brand risk, media exposure, stakeholder perception shift.
 
-**Primary Output:** Messaging strategy, reputation defense.
+**Primary Output:** Messaging strategy, reputation defense, narrative control.
 
-**Activation Signals:** "press," "brand," "reputation"
-
----
-
-## V. Strategic Insight and Optimization Scenarios
-
-### 21. Opportunity Discovery
-
-**Definition:** Identifying unseen upside.
-
-**Trigger Conditions:** Ambiguous situation, unexplored space.
-
-**Primary Output:** Opportunity map.
-
-**Activation Signals:** "what are we missing," "hidden opportunity," "untapped"
+**Activation Signals:** "press," "brand," "reputation," "public," "narrative," "perception"
 
 ---
 
-### 22. Resource Optimization
+## F. Decision Dynamics
 
-**Definition:** Improving efficiency and output.
+### F.1 Judgment Compression
 
-**Trigger Conditions:** Underperformance, waste detected.
+**Definition:** Too many variables, not enough time, high consequence — decision overload.
 
-**Primary Output:** Optimization plan.
+**Trigger Conditions:** Decision fatigue, simultaneous high-stakes choices, cognitive overload.
 
-**Activation Signals:** "inefficient," "waste," "optimize"
+**Primary Output:** Ranked decisions, simplified options, decision sequencing.
 
----
-
-### 23. Scenario Planning
-
-**Definition:** Modeling future possibilities.
-
-**Trigger Conditions:** Uncertainty, long-term decisions.
-
-**Primary Output:** Scenario trees, probability paths.
-
-**Activation Signals:** "what if," "future," "forecast"
+**Activation Signals:** "too many decisions," "overwhelmed," "don't know where to start," "paralyzed"
 
 ---
 
-### 24. Innovation and Disruption
+### F.2 Information Asymmetry
 
-**Definition:** Creating new models or breaking existing ones.
+**Definition:** Others know more than you — or you know more than them. Managing the knowledge gap strategically.
 
-**Trigger Conditions:** Stagnation, disruptive opportunity.
+**Trigger Conditions:** Negotiation with information imbalance, due diligence uncertainty, counterparty with hidden information.
 
-**Primary Output:** Innovation strategy.
+**Primary Output:** Asymmetry map, information acquisition strategy, leverage implications.
 
-**Activation Signals:** "new model," "disrupt," "reinvent"
+**Activation Signals:** "they know more," "what do they know," "information advantage," "what aren't we being told"
 
 ---
 
-### 25. Partnership Strategy
+### F.3 Negotiation / Deal Dynamics
 
-**Definition:** Forming alliances to create leverage.
+**Definition:** Structuring and closing agreements under tension — terms, leverage, signaling, closure.
 
-**Trigger Conditions:** Capability gaps, scaling need.
+**Trigger Conditions:** Active deal discussions, conflicting interests, terms negotiation.
 
-**Primary Output:** Partner identification, deal structure.
+**Primary Output:** Leverage map, concession strategy, BATNA analysis, closure sequencing.
 
-**Activation Signals:** "partner," "collaboration," "joint venture"
+**Activation Signals:** "offer," "counter," "terms," "leverage," "closing," "they want"
+
+---
+
+### F.4 Opportunity Discovery
+
+**Definition:** Identifying unseen upside in an ambiguous or underexplored situation.
+
+**Trigger Conditions:** Ambiguous situation, unexplored space, operator doesn't know what they're looking for yet.
+
+**Primary Output:** Opportunity map, candidate thesis, activation for deeper scenario.
+
+**Activation Signals:** "what are we missing," "hidden opportunity," "untapped," "what should we be thinking about"
+
+*Note: This scenario is the default container when input is governed but no specific scenario can be confidently classified. It initiates Clarification Mode.*
+
+---
+
+## G. Time & Momentum
+
+### G.1 Timing & Optionality
+
+**Definition:** Whether to act now, wait, or create flexibility — the decision about when to decide.
+
+**Trigger Conditions:** Time-sensitive opportunity, reversibility considerations, option value at stake.
+
+**Primary Output:** Timing analysis, optionality preservation strategy, action vs. wait recommendation.
+
+**Activation Signals:** "when to move," "is it too early," "window closing," "keep options open," "now or later"
+
+---
+
+### G.2 Strategic Drift
+
+**Definition:** Loss of focus, dilution of mission, or slow erosion of competitive edge.
+
+**Trigger Conditions:** Scattered initiatives, unclear priorities, mission creep, slow decline in competitive differentiation.
+
+**Primary Output:** Refocus plan, priority reset, drift diagnosis.
+
+**Activation Signals:** "too many things," "unclear direction," "lost focus," "we used to be known for"
 
 ---
 
@@ -359,31 +519,46 @@ Each scenario entry contains:
 
 | # | Name | Bucket | Key Signals |
 |---|---|---|---|
-| 1 | Market Expansion | Growth | expand into, new market |
-| 2 | Revenue Acceleration | Growth | increase revenue, scale faster |
-| 3 | Pricing and Positioning | Growth | pricing, discounting |
-| 4 | Product Strategy | Growth | roadmap, feature |
-| 5 | Go-To-Market Strategy | Growth | GTM, sales funnel |
-| 6 | Deal Origination | Deal & Capital | looking for deals, targets |
-| 7 | Negotiation | Deal & Capital | offer, counter, leverage |
-| 8 | Due Diligence | Deal & Capital | verify, diligence, unknowns |
-| 9 | Capital Allocation | Deal & Capital | budget, allocation |
-| 10 | Exit Strategy | Deal & Capital | sell, exit, IPO |
-| 11 | Team Building | Org & Execution | hire, talent gap |
-| 12 | Executive Alignment | Org & Execution | misaligned, leadership conflict |
-| 13 | Execution Infrastructure | Org & Execution | broken process, inefficiency |
-| 14 | Strategic Drift | Org & Execution | too many things, unclear direction |
-| 15 | Judgment Compression | Org & Execution | too many decisions, overwhelmed |
-| 16 | Crisis Management | Risk & Defense | urgent, crisis |
-| 17 | Risk Mitigation | Risk & Defense | risk, exposure, downside |
-| 18 | Competitive Threat | Risk & Defense | competitor, losing share |
-| 19 | Regulatory and Compliance | Risk & Defense | regulation, legal, compliance |
-| 20 | Reputation and PR | Risk & Defense | press, brand, reputation |
-| 21 | Opportunity Discovery | Strategic Insight | what are we missing |
-| 22 | Resource Optimization | Strategic Insight | inefficient, optimize |
-| 23 | Scenario Planning | Strategic Insight | what if, forecast |
-| 24 | Innovation and Disruption | Strategic Insight | disrupt, reinvent |
-| 25 | Partnership Strategy | Strategic Insight | partner, joint venture |
+| A.1 | Go-To-Market Formation | Strategy & Market | GTM, sales funnel, launch |
+| A.2 | Competitive Conflict | Strategy & Market | competitor, losing share |
+| A.3 | Strategic Positioning | Strategy & Market | what we stand for, positioning |
+| A.4 | Pricing and Positioning | Strategy & Market | pricing, margin, premium |
+| A.5 | Market Entry / Exit | Strategy & Market | enter the market, pull out |
+| A.6 | Market Expansion | Strategy & Market | expand into, new segment |
+| A.7 | Disruption Threat | Strategy & Market | disrupting us, model at risk |
+| A.8 | Innovation and Disruption | Strategy & Market | disrupt, reinvent, new model |
+| A.9 | Product Strategy | Strategy & Market | roadmap, feature priority |
+| A.10 | Revenue Acceleration | Strategy & Market | grow faster, top line |
+| A.11 | Partnership Strategy | Strategy & Market | partner, joint venture |
+| B.1 | Capital Raise | Capital & Finance | fundraise, investors, round |
+| B.2 | Capital Allocation | Capital & Finance | budget, allocation, deploy |
+| B.3 | M&A / Roll-Up | Capital & Finance | acquire, merger, consolidate |
+| B.4 | Valuation Dispute | Capital & Finance | what is it worth, valuation gap |
+| B.5 | Liquidity / Exit Strategy | Capital & Finance | sell, exit, IPO |
+| B.6 | Deal Origination | Capital & Finance | find targets, deal flow |
+| B.7 | Due Diligence | Capital & Finance | verify, validate, unknowns |
+| C.1 | Executive Alignment | Org & Leadership | leadership conflict, misaligned |
+| C.2 | Leadership Transition | Org & Leadership | new CEO, succession |
+| C.3 | Team Building | Org & Leadership | hire, talent gap, org structure |
+| C.4 | Team Performance Breakdown | Org & Leadership | dysfunction, not performing |
+| C.5 | Culture & Incentives | Org & Leadership | values, comp plan, behavior |
+| D.1 | Execution Infrastructure | Operations | broken process, systems |
+| D.2 | Scale Stress | Operations | scaling issues, growing too fast |
+| D.3 | Operational Bottleneck | Operations | constraint, backed up |
+| D.4 | Resource Optimization | Operations | inefficient, optimize |
+| E.1 | Crisis Management | Risk & Control | urgent, crisis, right now |
+| E.2 | Risk Exposure Assessment | Risk & Control | what could go wrong, tail risk |
+| E.3 | Risk Mitigation | Risk & Control | reduce risk, hedge, protect |
+| E.4 | Regulatory / Compliance Pressure | Risk & Control | regulation, legal, compliance |
+| E.5 | Reputation and PR | Risk & Control | press, brand, reputation |
+| F.1 | Judgment Compression | Decision Dynamics | overwhelmed, too many decisions |
+| F.2 | Information Asymmetry | Decision Dynamics | they know more, information gap |
+| F.3 | Negotiation / Deal Dynamics | Decision Dynamics | offer, terms, leverage |
+| F.4 | Opportunity Discovery | Decision Dynamics | what are we missing, untapped |
+| G.1 | Timing & Optionality | Time & Momentum | when to move, window closing |
+| G.2 | Strategic Drift | Time & Momentum | lost focus, too many things |
+
+**Total: 37 scenarios**
 
 ---
 
@@ -397,19 +572,22 @@ A single session may activate multiple scenarios simultaneously. The runtime mus
 - audit visibility into which scenarios were detected but not activated as primary
 
 ### Scenario Confidence
-Scenario detection should carry a confidence score. Low-confidence detection should surface the ambiguity to the operator rather than silently routing to an incorrect scenario.
+Scenario detection carries a confidence score. Low-confidence detection surfaces the ambiguity to the operator rather than silently routing to an incorrect scenario. Confidence threshold for automatic routing: 0.70. Below threshold → Clarification Mode.
 
-### Escalation Path
-If no scenario can be confidently classified, the runtime defaults to Opportunity Discovery (Scenario 21) as the broadest safe container and requests clarifying input from the operator.
+### Clarification Mode
+If no scenario reaches 0.70 confidence, the runtime enters Clarification Mode. It surfaces the top 2–3 candidates to the operator and requests clarification before proceeding. It does not produce advice under ambiguous classification. Clarification Mode is a governed outcome, not a degraded state.
+
+### Registry Freeze
+This registry is rationalized from two independent session registries and supersedes both. Additions require explicit governance review — scenarios are not added casually. The registry may be extended in future phases; it may not be silently modified.
 
 ---
 
 ## Required Follow-On Work
 
-1. **Carat mapping** — attach relevant Carats and heuristics to each scenario (highest priority next step)
-2. **Confidence weighting logic** — how certain must signal detection be before routing to a scenario
-3. **API endpoint mapping** — map each scenario to its decision artifact template and execution path
-4. **Deep-spec layer** — full input/output contracts, Prime Directive overlays, and execution logic for each scenario (recommend prioritizing top 10 first)
+1. **Carat mapping** — attach eligible Carats to each scenario (see `CARAT_REGISTRY_PHASE1.md`)
+2. **Confidence weighting logic** — signal scoring and threshold calibration
+3. **API endpoint mapping** — map each scenario to its decision artifact template
+4. **Deep-spec layer** — full input/output contracts and Prime Directive overlays per scenario
 5. **Multi-scenario arbitration rules** — what happens when scenarios conflict
 
 ---
