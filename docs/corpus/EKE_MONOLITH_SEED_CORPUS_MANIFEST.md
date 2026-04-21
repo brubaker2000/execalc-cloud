@@ -153,8 +153,63 @@ Themes present in the corpus (from Tag Cluster and Strategic Theme columns):
 
 ---
 
+## Corpus Tagging Gap — Build Prerequisite (Stage 8/9)
+
+**Status: Known gap. Not yet resolved. Not a doctrine gap — a data gap.**
+
+### Activation Routing Cannot Work Yet
+
+The schema includes three fields that are required for activation routing:
+- **Trigger Phrase(s)** — natural language signals that should activate this entry
+- **Scenario Tags** — which of the 37 scenarios this entry is eligible to support
+- **Polarity Tags** — behavioral posture tags (Aggressive, Deliberate, Contrarian, etc.)
+
+**All three fields are currently empty across all 230 entries.**
+
+The activation layer is architecturally specified in `CARAT_ACTIVATION_DISCIPLINE.md` and `EXECUTIVE_KNOWLEDGE_ENGINE_ACTIVATION_AND_SIGNALING_MODEL.md`. The routing logic knows *how* to activate specific thinkers for specific scenarios. It cannot yet route correctly because the corpus has no scenario or trigger data to route against.
+
+This is a Stage 8/9 build prerequisite. Until these fields are populated, corpus activation defaults to broad injection rather than targeted scenario-driven retrieval. Targeted retrieval is the architectural goal.
+
+### Coverage Gaps Identified
+
+Analysis of the corpus against the 37 Scenario Registry entries reveals uneven coverage:
+
+| Coverage Level | Scenario Buckets |
+|---|---|
+| Strong | Competitive Conflict, Capital & Finance, Leadership & Execution |
+| Thin | Supply/Demand dynamics, Negotiation / Deal Dynamics |
+| Thin | Operational bottlenecks, Resource optimization, Scale Stress |
+| Absent or weak | Regulatory/Compliance, Crisis Management (limited to Survivability First) |
+
+The PM (Perry Marshall) set addresses some of the signal/noise and revenue gaps, but it is cartridge-eligible rather than monolith baseline. The JA (Jay Abraham) set covers revenue strategy but is too narrow for operational use.
+
+### Two-Asset-Class Distinction
+
+The corpus contains two functionally distinct asset classes that require different tagging and activation logic:
+
+| Asset Class | What It Is | Activation Logic |
+|---|---|---|
+| **Framework Library** | Mental models, structured methodologies (Cynefin, OODA, Theory of Constraints, etc.) | Feeds the carat/lens-routing layer — activates as reasoning posture overlays |
+| **Nugget Library** | Thinker-attributed atomic insights, behavioral heuristics | Feeds the reflex/thinker invocation layer — activates by author signal and scenario signal |
+
+These two classes are currently mixed in the same schema. When activation tagging is built (Stage 8/9), entries should be tagged by asset class so the routing layer can distinguish between loading a framework overlay vs. injecting a thinker nugget.
+
+### Action Required (Stage 8/9)
+
+Before the activation layer can route correctly:
+
+1. Tag all 230 entries with eligible Scenario IDs from `SCENARIO_REGISTRY.md` (37 scenarios)
+2. Populate Trigger Phrase(s) with specific natural language activation signals
+3. Assign asset class: Framework Library vs. Nugget Library
+4. Verify Polarity Tags are populated with values from the standard vocabulary
+5. Resolve coverage gaps in thin/absent scenario categories — either by corpus expansion or by flagging those scenarios as corpus-light at runtime
+
+This work is not in scope before Stage 8. It is registered here so it is not lost.
+
+---
+
 ## Maintenance Note
 
 This manifest is the governance anchor for the corpus. The corpus data file (`EKE_MONOLITH_SEED_CORPUS.md`) is the content. If they conflict, this manifest governs.
 
-Last updated: 2026-04-14
+Last updated: 2026-04-21
