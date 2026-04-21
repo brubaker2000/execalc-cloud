@@ -5,6 +5,23 @@ from typing import Any, Dict, List
 
 from src.service.decision_loop.models import DecisionReport, Scenario, SensitivityVariable
 from src.service.decision_loop.support_stack import support_stack_trace
+from src.service.stability.invariants import evaluate_stability_invariants
+from src.service.stability.drift_monitor import evaluate_runtime_drift
+from src.service.stability.decision_guardrails import evaluate_decision_guardrails
+
+
+def apply_governance_checks(action_payload: Dict[str, Any]) -> Dict[str, Any]:
+    invariant_result = evaluate_stability_invariants(action_payload)
+    drift_result = evaluate_runtime_drift(action_payload)
+    guardrail_result = evaluate_decision_guardrails(action_payload)
+    return {
+        "invariants_ok": invariant_result.ok,
+        "invariant_violations": invariant_result.violations,
+        "drift_detected": drift_result.drift_detected,
+        "drift_reasons": drift_result.reasons,
+        "guardrails_ok": guardrail_result.ok,
+        "guardrail_violations": guardrail_result.violations,
+    }
 
 
 CRITICAL_FIELDS_BY_SCENARIO: Dict[str, List[str]] = {
@@ -301,6 +318,16 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
     prime = _build_prime_directive_assessments(scenario, sensitivity)
     polymorphia = _build_polymorphia_fields(scenario, sensitivity)
 
+    action_payload: Dict[str, Any] = {
+        "proposal_id": scenario.scenario_id,
+        "governing_objective": scenario.governing_objective,
+        "assumptions": scenario.assumptions,
+        "constraints": scenario.constraints,
+        "scenario_type": scenario.scenario_type,
+        "created_at": scenario.created_at.isoformat() if scenario.created_at else None,
+    }
+    governance = apply_governance_checks(action_payload)
+
     execution_trace = {
         "scenario_type": scenario.scenario_type,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -311,6 +338,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "generated prime directive assessments",
             "generated polymorphia fields",
             "generated support stack trace",
+            "applied governance checks",
         ],
         "context_used": {
             "decision_horizon": scenario.decision_horizon,
@@ -320,6 +348,7 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "decision_notes_present": bool(scenario.decision_notes),
         },
         "support_stack": support_stack_trace(missing_critical_fields=[s.name for s in sensitivity]),
+        "governance": governance,
     }
 
     audit = {
