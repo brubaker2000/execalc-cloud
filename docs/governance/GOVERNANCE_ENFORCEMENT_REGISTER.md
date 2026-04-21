@@ -388,3 +388,28 @@ This document provides the bridge between:
 - future auditability
 
 Together with the Strategic Mesh Governance Mapping, it forms the operational backbone of Execalc governance.
+
+---
+
+# Support Stack Fusebox — Candidate Backlog
+
+The following runtime safeguards have been identified as candidates for the Support Stack Fusebox. They are not yet implemented. They are registered here so they are not lost and can be prioritized when the Support Stack build reaches the relevant stage.
+
+Each candidate is mapped to its relevant enforcement domain above.
+
+| Candidate Name | Enforcement Domain | Failure Mode Prevented |
+|---|---|---|
+| `decision_artifact_schema_enforcer` | Decision Artifact Structure (§6) | Strategic endpoints returning unstructured or partial output |
+| `critical_output_structure_guard` | Decision Artifact Structure (§6) | Critical workflow terminating in free-form text |
+| `report_shape_validator` | Runtime Object Integrity (§5) | Malformed or incomplete decision report objects |
+| `execution_gate_reflex` | Authorized Execution (§7) | Tool or agent action proceeding without governance checkpoint |
+| `governance_checkpoint_enforcer` | Authorized Execution (§7) | Downstream execution bypassing intent validation |
+| `authorization_audit_reflex` | Authorized Execution (§7) | Approved and blocked execution events not appearing in audit trail |
+| `confidence_integrity_guard` | Decision Artifact Structure (§6) | Confidence field absent, defaulted incorrectly, or tampered with |
+| `uncertainty_disclosure_enforcer` | Decision Artifact Structure (§6) | Speculative reasoning surfaced as settled judgment |
+| `sensitivity_floor_reflex` | Decision Artifact Structure (§6) | Sensitivity analysis missing when inputs are incomplete |
+| `reasoning_drift_guard` | Scenario Framing (§1) | Reasoning drifting from governed scenario structure into free-form generation |
+| `determinism_enforcement_reflex` | Runtime Object Integrity (§5) | Critical path producing non-deterministic outputs |
+| `critical_path_structure_validator` | Runtime Object Integrity (§5) | Governed workflow operating without schema-validated inputs |
+
+These candidates should be reviewed when the Support Stack Fusebox layer is built. Priority should track the enforcement domains most at risk during the active build stage.
