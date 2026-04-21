@@ -1,6 +1,6 @@
 # Execalc
 
-**Governed, normative, and informed intelligence infrastructure for executive judgment.**
+**Execalc is an AI-driven executive operating system that governs judgment above the language model — synthesizing qualitative intelligence, enforcing economic discipline, and delivering institutional-grade decision clarity in real time.**
 
 ---
 
@@ -123,6 +123,15 @@ The architecture is governed by a doctrine hierarchy maintained in `docs/`:
 | `docs/architecture/RUNTIME_REASONING_SEPARATION.md` | Why the platform governs the model, not the reverse |
 | `docs/product/JUDGMENT_SUPERSTRATE_POSITIONING.md` | Competitive positioning doctrine |
 | `docs/governance/SECURITY_POSTURE_AND_COMPLIANCE_DESIGNATION.md` | Compliance readiness and designation process |
+| `docs/product/MARKET_DISRUPTION_THESIS.md` | Five-shift competitive displacement frame |
+
+---
+
+## Planned Surfaces (Not Yet Built)
+
+| Surface | Status | Notes |
+|---|---|---|
+| Voice-first interface | Planned | Execalc is designed for executive-native voice interaction with no prompt engineering required. Architecture is UI-agnostic; voice is a future interaction surface, not a current build target. |
 
 ---
 
