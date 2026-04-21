@@ -99,6 +99,7 @@ Primary anchors:
 - `docs/architecture/EXECALC_RUNTIME_OBJECT_MODEL.md`
 
 Supporting anchors:
+- `docs/architecture/EXECALC_LAYER_MODEL.md`
 - `docs/architecture/ORGANIZATIONAL_COGNITION_MODEL.md`
 - `docs/architecture/INTER_ORG_INTERACTION_MODEL.md`
 - `docs/architecture/EXECUTIVE_KNOWLEDGE_ENGINE_STRATA.md`
