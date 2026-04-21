@@ -373,6 +373,20 @@ Support Stack
 
 The Reflex System should eventually maintain its own invocation registry and activation audit trail.
 
+### Named Reflex: SND-01 — Structural Necessity Detection
+
+**Classification:** Meta-Reflex
+
+**Behavior:** Fires when a required prerequisite for a governed reasoning path is absent. Interrupts all downstream framework invocations until the missing prerequisite is resolved or explicitly acknowledged.
+
+**Scope:** Universal — SND-01 is not scenario-specific. It activates across all scenarios whenever a prerequisite condition is unmet.
+
+**Failure mode prevented:** Premature execution — reasoning proceeding without a structurally required input, leading to invalid or ungoverned outputs.
+
+**Priority:** Highest reflex priority. SND-01 supersedes conditional reflex activation. No framework should proceed past SND-01 in an unresolved state.
+
+**Build note:** SND-01 requires a formal prerequisite registry — a machine-readable list of what each reasoning path requires before it can proceed. This registry is a pending build item. Until it exists, SND-01 operates as a governed principle rather than a runtime gate.
+
 ---
 
 # Why This Register Exists

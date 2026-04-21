@@ -71,6 +71,19 @@ The internal architecture of how these eight components interoperate is defined 
 
 ---
 
+## Prime Directive Lieutenants
+
+Prime Directive Lieutenants are governed analytical components that serve the Prime Directive but are not Core 7 frameworks. They do not reason independently. They are invoked conditionally to sharpen the Prime Directive evaluation before a conclusion is reached.
+
+| Component | Function | Activation | Failure Mode Prevented |
+|---|---|---|---|
+| **SWOT Overlay** | Surfaces structural strengths, weaknesses, opportunities, and threats before conclusions are drawn | Conditional — invoked before synthesis in complex multi-factor scenarios | Blind spots in the Prime Directive evaluation |
+| **Balance Sheet Signal** | Flags hidden asset value or unacknowledged debt loads — informational only, does not produce recommendations | Conditional — fires when capital structure or asset valuation is material to the scenario | Missed value or fatal debt obscured by narrative |
+
+Prime Directive Lieutenants are invoked by the Reflex Engine when signals warrant. They feed the Prime Directive evaluation — they do not override it. Formal invocation rules are a pending build item.
+
+---
+
 ## Midstream — The Substrate Layer
 
 The substrate layer is the raw prediction engine: large language models and their supporting infrastructure.
@@ -87,6 +100,20 @@ The substrate is powerful. It is also ungoverned, stateless, and indifferent to 
 **The substrate is not the product. It is the raw material the EIL governs.**
 
 Execalc is model-agnostic. The substrate can be swapped. The EIL does not change when the underlying model does.
+
+### Midstream Capability Components (Stage 8/9 Build Targets)
+
+The substrate layer requires five governed service components to function at production scale. These are planned, not yet built. Technology class is specified; specific vendor selection is deferred.
+
+| Component | Function | Technology Class | Dependency | Failure Mode Prevented |
+|---|---|---|---|---|
+| **Semantic Ingestion** | Text normalization and pre-vectorization | Embedding model (OpenAI/Anthropic embeddings class) | None | Garbage vectors entering memory |
+| **Vector Indexing** | Semantic recall — structured retrieval against the EKE corpus and memory store | Vector DB (Weaviate / Pinecone class) | Semantic Ingestion | Memory loss; unrecoverable context |
+| **Temporal Tracking** | Tracks how signals, claims, and positions change over time | Time-series store | Vector Indexing | No trend detection; static memory |
+| **Attention Metrics** | Topic emergence and decay — identifies what is gaining or losing signal weight | Analytics engine | Temporal Tracking | False signal; stale activation |
+| **Contributor Scoring** | Credibility weighting per source or thinker — feeds EKE activation weighting | Relational DB | Persistent Memory | Status bias; unweighted source injection |
+
+These five components are prerequisites for the EKE activation layer to route correctly at scale. They are build scope for Stage 8/9 and should be reviewed when the EKE corpus tagging work (documented in `docs/corpus/EKE_MONOLITH_SEED_CORPUS_MANIFEST.md`) is underway.
 
 ---
 
