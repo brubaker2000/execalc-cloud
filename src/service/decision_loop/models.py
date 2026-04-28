@@ -30,6 +30,10 @@ class Scenario:
     domain: Optional[str] = None
     urgency: Optional[str] = None
     source_surface: Optional[str] = None
+    workspace_id: Optional[str] = None
+    project_id: Optional[str] = None
+    chat_id: Optional[str] = None
+    thread_id: Optional[str] = None
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
@@ -95,6 +99,57 @@ class DecisionReport:
             "audit": self.audit,
         }
 
+
+
+BoundaryStatus = Literal["ALLOW", "BLOCK", "RECOMPUTE", "ESCALATE"]
+
+
+@dataclass(frozen=True)
+class ActionProposal:
+    proposal_id: str
+    tenant_id: str
+    user_id: str
+    action_type: str
+    target_ref: Optional[str] = None
+    payload: Dict[str, Any] = field(default_factory=dict)
+    decision_envelope_id: Optional[str] = None
+    issued_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    expires_at: Optional[datetime] = None
+    authority_context: Dict[str, Any] = field(default_factory=dict)
+    risk_level: str = "unknown"
+    requires_human_review: bool = False
+
+
+@dataclass(frozen=True)
+class ExecutionSnapshot:
+    snapshot_time: datetime = field(default_factory=lambda: datetime.now(UTC))
+    tenant_id: str = ""
+    user_id: str = ""
+    current_authority: Dict[str, Any] = field(default_factory=dict)
+    current_state_hash: Optional[str] = None
+    constraint_flags: List[str] = field(default_factory=list)
+    policy_flags: List[str] = field(default_factory=list)
+    required_inputs_present: bool = True
+    risk_posture: str = "normal"
+    execution_window_open: bool = True
+
+
+@dataclass(frozen=True)
+class BoundaryDecision:
+    status: BoundaryStatus
+    reasons: List[str] = field(default_factory=list)
+    blocking_checks: List[str] = field(default_factory=list)
+    requires_human_review: bool = False
+    audit_payload: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "status": self.status,
+            "reasons": self.reasons,
+            "blocking_checks": self.blocking_checks,
+            "requires_human_review": self.requires_human_review,
+            "audit_payload": self.audit_payload,
+        }
 
 # Backward-compatible aliases while callers and API surfaces still refer to the
 # stage-specific or older names.

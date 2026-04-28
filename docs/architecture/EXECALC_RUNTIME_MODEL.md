@@ -205,11 +205,25 @@ These components include:
 - Diagnostic Executor
 - Reflex Registry
 - Decision Artifact Builder
+- Action Proposal Builder
+- Execution Boundary Engine
 - Authorization Gate
 - Runtime Audit Trail
 
 The runtime model defines the layers.
 The scaffolding defines the machinery that moves through those layers.
+
+The Execution Boundary Engine is the commit-time revalidation layer between judgment and action.
+Its job is to determine whether a proposed action is still valid at execution time.
+
+It may return:
+- ALLOW
+- BLOCK
+- RECOMPUTE
+- ESCALATE
+
+This means Execalc's runtime is not only a decision runtime.
+It is a decision-plus-execution-governance runtime.
 
 ---
 
@@ -254,10 +268,16 @@ Signal or operator input
 → Prime Directive and governance evaluation  
 → Structured executive output  
 → DecisionArtifact creation  
-→ AuthorizationObject creation when execution is permitted  
+→ ActionProposal creation when action is contemplated  
+→ Execution Boundary Engine revalidation at commit time  
+→ ALLOW / BLOCK / RECOMPUTE / ESCALATE  
+→ AuthorizationObject creation only when execution is permitted  
 → Journal or audit persistence where appropriate
 
 This is the working runtime path that turns input into governed value.
+
+A decision that is valid at reasoning time may be invalid at execution time.
+The Execution Boundary Engine exists to prevent stale, unauthorized, or risk-shifted decisions from passing directly into action.
 
 ---
 

@@ -31,6 +31,10 @@ class TestDecisionService(unittest.TestCase):
                 "risk_surface": "medium",
                 "assumptions": "counterparty is motivated",
                 "decision_notes": "Need flexibility without giving away too much upside",
+                "workspace_id": "workspace_execalc",
+                "project_id": "project_stage8",
+                "chat_id": "chat_execalc",
+                "thread_id": "thread_seed_001",
             },
             persist_fn=persist_fn,
         )
@@ -38,11 +42,45 @@ class TestDecisionService(unittest.TestCase):
         self.assertTrue(out["ok"])
         self.assertIn("report", out)
         self.assertIn("audit", out)
+        self.assertIn("execution_boundary", out)
+        self.assertEqual(out["execution_boundary"]["status"], "ALLOW")
+        self.assertIn("execution_boundary", out["audit"])
+        self.assertEqual(
+            out["audit"]["execution_boundary"]["status"],
+            out["execution_boundary"]["status"],
+        )
         self.assertEqual(out["audit"]["tenant_id"], "tenant_test_001")
         self.assertEqual(out["audit"]["user_id"], "test_user")
         self.assertEqual(out["audit"]["scenario_type"], "draft_trade")
+        self.assertEqual(out["audit"]["workspace_id"], "workspace_execalc")
+        self.assertEqual(out["audit"]["project_id"], "project_stage8")
+        self.assertEqual(out["audit"]["chat_id"], "chat_execalc")
+        self.assertEqual(out["audit"]["thread_id"], "thread_seed_001")
         self.assertIn("envelope_id", out["audit"])
         self.assertEqual(out["audit"]["persist"]["persisted"], True)
+        self.assertIn("stability", out["audit"])
+        self.assertEqual(out["audit"]["stability"]["mode"], "observe_only")
+        self.assertEqual(out["audit"]["stability"]["status"], "signals_recorded")
+        self.assertIn("drift", out["audit"])
+        self.assertEqual(out["audit"]["drift"]["mode"], "observe_only")
+        self.assertEqual(out["audit"]["drift"]["status"], "signals_recorded")
+        self.assertEqual(out["audit"]["stability"]["registry_version"], "stage8b.2")
+        self.assertIn("decision_result", out["audit"]["stability"]["invariants"])
+        self.assertIn("action_proposal", out["audit"]["stability"]["invariants"])
+        self.assertIn("execution_snapshot", out["audit"]["stability"]["invariants"])
+        self.assertIn("decision_result:present", out["audit"]["stability"]["signals"])
+        self.assertIn("action_proposal:present", out["audit"]["stability"]["signals"])
+        self.assertIn("execution_snapshot:present", out["audit"]["stability"]["signals"])
+        self.assertIn("navigation_context:present", out["audit"]["stability"]["signals"])
+        self.assertEqual(out["audit"]["drift"]["contract_version"], "stage8b.3")
+        self.assertIn("boundary_status", out["audit"]["drift"]["signals_expected"])
+        self.assertIn("scenario_type", out["audit"]["drift"]["signals_expected"])
+        self.assertIn("governing_objective", out["audit"]["drift"]["signals_expected"])
+        self.assertIn("boundary_status:ALLOW", out["audit"]["drift"]["signals"])
+        self.assertIn("scenario_type:draft_trade", out["audit"]["drift"]["signals"])
+        self.assertIn("governing_objective:cut_payroll", out["audit"]["drift"]["signals"])
+        self.assertEqual(out["audit"]["stability"]["anomalies"], [])
+        self.assertEqual(out["audit"]["drift"]["anomalies"], [])
 
         self.assertEqual(len(persisted_records), 1)
         self.assertEqual(persisted_records[0].tenant_id, "tenant_test_001")
@@ -50,6 +88,28 @@ class TestDecisionService(unittest.TestCase):
             persisted_records[0].result["report"]["governing_objective"],
             "cut_payroll",
         )
+
+    def test_run_decision_service_records_observe_only_anomalies(self):
+        def persist_fn(record: ExecutionRecord):
+            return {"persisted": True}
+
+        out = run_decision_service(
+            tenant_id="tenant_test_001",
+            user_id="test_user",
+            scenario_in={
+                "prompt": "Need a quick governed read",
+                "facts": {},
+                "constraints": {},
+            },
+            persist_fn=persist_fn,
+        )
+
+        self.assertEqual(out["audit"]["stability"]["mode"], "observe_only")
+        self.assertEqual(out["audit"]["drift"]["mode"], "observe_only")
+        self.assertIn("navigation_context:missing", out["audit"]["stability"]["signals"])
+        self.assertIn("navigation_context:missing", out["audit"]["stability"]["anomalies"])
+        self.assertIn("governing_objective:unspecified", out["audit"]["drift"]["anomalies"])
+        self.assertEqual(out["audit"]["execution_boundary"]["status"], "ALLOW")
 
     def test_run_decision_service_rejects_non_object_scenario(self):
         def persist_fn(record: ExecutionRecord):

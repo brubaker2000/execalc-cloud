@@ -3,8 +3,11 @@ from __future__ import annotations
 from typing import Any, Callable, Dict
 import secrets
 
+from datetime import UTC, datetime, timedelta
+
 from src.service.decision_loop.engine import run_decision_loop
-from src.service.decision_loop.models import Scenario
+from src.service.decision_loop.execution_boundary_engine import evaluate_execution_boundary
+from src.service.decision_loop.models import ActionProposal, ExecutionSnapshot, Scenario
 from src.service.execution_record import ExecutionRecord
 
 
@@ -49,6 +52,10 @@ def run_decision_service(
         risk_surface=str(scenario_in.get("risk_surface")) if scenario_in.get("risk_surface") is not None else None,
         assumptions=str(scenario_in.get("assumptions")) if scenario_in.get("assumptions") is not None else None,
         decision_notes=str(scenario_in.get("decision_notes")) if scenario_in.get("decision_notes") is not None else None,
+        workspace_id=str(scenario_in.get("workspace_id")) if scenario_in.get("workspace_id") is not None else None,
+        project_id=str(scenario_in.get("project_id")) if scenario_in.get("project_id") is not None else None,
+        chat_id=str(scenario_in.get("chat_id")) if scenario_in.get("chat_id") is not None else None,
+        thread_id=str(scenario_in.get("thread_id")) if scenario_in.get("thread_id") is not None else None,
         tenant_id=tenant_id,
         operator_id=user_id,
     )
@@ -56,15 +63,114 @@ def run_decision_service(
     report = run_decision_loop(tenant_id=tenant_id, user_id=user_id, scenario=scenario)
 
     envelope_id = secrets.token_hex(16)
+
+    issued_at = datetime.now(UTC)
+    proposal = ActionProposal(
+        proposal_id=f"proposal_{envelope_id[:12]}",
+        tenant_id=tenant_id,
+        user_id=user_id,
+        action_type="decision_artifact_ready",
+        target_ref=envelope_id,
+        payload={
+            "scenario_type": scenario.scenario_type,
+            "governing_objective": scenario.governing_objective,
+            "requested_depth": scenario.requested_depth,
+        },
+        decision_envelope_id=envelope_id,
+        issued_at=issued_at,
+        expires_at=issued_at + timedelta(minutes=15),
+        authority_context={"user_id": user_id, "tenant_id": tenant_id, "role": "operator"},
+        risk_level="medium",
+        requires_human_review=False,
+    )
+    snapshot = ExecutionSnapshot(
+        snapshot_time=issued_at,
+        tenant_id=tenant_id,
+        user_id=user_id,
+        current_authority={"user_id": user_id, "tenant_id": tenant_id, "role": "operator"},
+        current_state_hash=f"scenario:{scenario.scenario_type}:{scenario.requested_depth}",
+        constraint_flags=[],
+        policy_flags=[],
+        required_inputs_present=True,
+        risk_posture="normal",
+        execution_window_open=True,
+    )
+    boundary = evaluate_execution_boundary(proposal, snapshot)
+
+    boundary_dict = boundary.to_dict()
+    boundary_status = boundary_dict["status"]
+
+    out = report.to_dict()
+    out["execution_boundary"] = boundary_dict
+    out["audit"] = dict(out.get("audit") or {})
+
+    stability_signals = [
+        "decision_result:present",
+        "action_proposal:present",
+        "execution_snapshot:present",
+    ]
+    stability_anomalies = []
+    if scenario.workspace_id or scenario.project_id or scenario.chat_id:
+        stability_signals.append("navigation_context:present")
+    else:
+        stability_signals.append("navigation_context:missing")
+        stability_anomalies.append("navigation_context:missing")
+
+    out["audit"].setdefault(
+        "stability",
+        {
+            "mode": "observe_only",
+            "status": "signals_recorded",
+            "signals": [],
+            "anomalies": [],
+            "registry_version": "stage8b.2",
+            "invariants": [
+                "decision_result",
+                "action_proposal",
+                "execution_snapshot",
+            ],
+        },
+    )
+    out["audit"]["stability"]["signals"] = stability_signals
+    out["audit"]["stability"]["anomalies"] = stability_anomalies
+
+    drift_signals = [
+        f"boundary_status:{boundary_status}",
+        f"scenario_type:{scenario.scenario_type}",
+        f"governing_objective:{scenario.governing_objective}",
+    ]
+    drift_anomalies = []
+    if scenario.governing_objective == "unspecified_objective":
+        drift_anomalies.append("governing_objective:unspecified")
+    if boundary_status != "ALLOW":
+        drift_anomalies.append("boundary_status:non_allow")
+
+    out["audit"].setdefault(
+        "drift",
+        {
+            "mode": "observe_only",
+            "status": "signals_recorded",
+            "signals": [],
+            "anomalies": [],
+            "contract_version": "stage8b.3",
+            "signals_expected": [
+                "boundary_status",
+                "scenario_type",
+                "governing_objective",
+            ],
+        },
+    )
+    out["audit"]["drift"]["signals"] = drift_signals
+    out["audit"]["drift"]["anomalies"] = drift_anomalies
+    out["audit"]["execution_boundary"] = boundary_dict
+
     record = ExecutionRecord(
         tenant_id=tenant_id,
         envelope_id=envelope_id,
-        result=report.to_dict(),
+        result=out,
     )
     persisted = persist_fn(record)
 
-    out = report.to_dict()
-    out["audit"] = dict(out.get("audit") or {})
     out["audit"]["envelope_id"] = envelope_id
     out["audit"]["persist"] = persisted
     return out

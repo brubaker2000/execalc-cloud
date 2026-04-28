@@ -613,11 +613,6 @@ def db_info():
     return info
 
 
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", "5000"))
-    app.run(host="127.0.0.1", port=port, debug=True)
-
-
 # ------------------------------
 # Stage 4: Decision Loop Engine
 # ------------------------------
@@ -629,6 +624,7 @@ from src.service.decision_loop.service import (
     list_recent_decisions_service,
     run_decision_service,
 )
+from src.service.orchestration.service import run_orchestration
 
 
 @app.post("/decision/run")
@@ -759,3 +755,55 @@ def decision_compare():
         compare_fn=compare_decision_artifacts,
     )
     return out, status
+
+
+@app.post("/orchestration/run")
+def orchestration_run():
+    """
+    Stage 8+:
+    - Tenant-scoped, role-restricted orchestration entry point
+    - Dev-harness-friendly bridge into the thin chat orchestration layer
+    - Returns orchestration envelope directly
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    user_text = str(body.get("user_text") or "")
+    scenario_type = str(body.get("scenario_type") or "general")
+    governing_objective = str(body.get("governing_objective") or "unspecified")
+    relevant_constraints = body.get("relevant_constraints") or {}
+    navigation = body.get("navigation") or {}
+
+    if not user_text.strip():
+        return {"ok": False, "error": "user_text is required"}, 400
+    if not isinstance(relevant_constraints, dict):
+        return {"ok": False, "error": "relevant_constraints must be an object"}, 400
+    if not isinstance(navigation, dict):
+        return {"ok": False, "error": "navigation must be an object"}, 400
+
+    out = run_orchestration(
+        user_text=user_text,
+        scenario_type=scenario_type,
+        governing_objective=governing_objective,
+        relevant_constraints=relevant_constraints,
+        navigation=navigation,
+        tenant_id=claims.tenant_id,
+        user_id=claims.user_id,
+    )
+    return out, 200
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", "5000"))
+    app.run(host="127.0.0.1", port=port, debug=True)
+
+

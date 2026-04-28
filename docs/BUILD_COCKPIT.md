@@ -12,15 +12,17 @@ Run:
 
 Expected:
 - Correct repo directory
-- On intended branch (typically main)
+- On intended branch for the active tranche
 - Clean working tree
 
 ## Baseline Health Gate
 Run:
 - python3 -m unittest -q
+- If touching web/: cd web && npm run build && npm run lint && cd ..
 
 Expected:
-- All tests pass before changes begin
+- All backend tests pass before backend changes begin
+- Frontend build/lint pass before committing frontend changes
 
 ## Core Invariants (Multi-Tenant)
 These must remain true after every change:
@@ -50,7 +52,8 @@ Practical checks:
 3) Inspect the diff:
    - git diff
 4) Run tests relevant to the change:
-   - minimum: python3 -m unittest -q
+   - backend minimum: python3 -m unittest -q
+   - frontend minimum when touching web/: cd web && npm run build && npm run lint && cd ..
 5) Commit only when proven:
    - git add <files>
    - git commit -m "<message that matches intent>"
@@ -60,11 +63,13 @@ Run:
 - git status
 - git log -3 --oneline
 - python3 -m unittest -q
+- If touching web/: cd web && npm run build && npm run lint && cd ..
 
 Expected:
 - Clean working tree
 - Recent commits are coherent and scoped
-- Tests are green
+- Backend tests are green
+- Frontend build/lint are green when web surfaces changed
 
 ## Post-Push Gate
 Run:
