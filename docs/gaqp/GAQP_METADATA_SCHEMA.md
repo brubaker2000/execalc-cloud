@@ -20,6 +20,7 @@
 | evidence_status | enum | Observed / Argued / Inferred / Corroborated / Unverified |
 | freshness_class | enum | Timeless / Date-sensitive / Event-bound / Expiring |
 | composability_score | int | 0-100 — degree to which this claim combines cleanly with others |
+| origin | enum | Internal / External / Mixed — whether the claim arises from inside or outside the organization; required for Strength, Weakness, Threat, and Opportunity; optional for other types |
 
 ## Optional Fields
 
