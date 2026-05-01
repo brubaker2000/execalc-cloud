@@ -2,15 +2,17 @@
 ## Generally Accepted Qualitative Principles — Execalc / Players Capital Group
 
 **Status:** Canonized  
-**Version:** 1.0  
+**Version:** 1.2  
 **Canonized:** 2026-04-25  
+**Revised:** 2026-04-30 (Canon Revision GAQP-CR-001 — added Complaint as #19)  
+**Revised:** 2026-05-01 (Canon Revision GAQP-CR-002 — added Tactic as #20)  
 **Authority:** Execalc GAQP Standards Body  
 
 ---
 
-## The 18 Canonical Claim Types
+## The 20 Canonical Claim Types
 
-Every atomic nugget in the GAQP system belongs to exactly one of these 18 types.
+Every atomic nugget in the GAQP system belongs to exactly one of these 20 types.
 This taxonomy is the governing nomenclature for qualitative classification across all
 Execalc tenants, sessions, and runtime contexts.
 
@@ -38,6 +40,8 @@ This list is locked. Changes require explicit canon revision with documented rat
 | 16 | **Causal Claim** | A directional cause-effect assertion: X drives Y; open or closed causal pathway |
 | 17 | **Declaration of Value** | A stated first principle about what an asset, action, or position is worth or capable of |
 | 18 | **Diagnostic Signal** | A weak but strategically relevant indicator that something may be true; warrants attention before confirmation |
+| 19 | **Stakeholder Complaint Claim** | A stakeholder-originated assertion that a product, service, policy, decision, or experience failed to meet expectation, caused harm, created dissatisfaction, or imposed an unreasonable burden; carries stakeholder provenance; may aggregate into pattern evidence; may create legal, operational, reputational, or design significance depending on context |
+| 20 | **Tactic** | A specific action, maneuver, or procedure deployed in an adversarial or competitive context to achieve an immediate objective; situationally activated, opponent-aware, time-sensitive, and degrades in effectiveness when the adversary adapts; the operational expression of strategy applied against a specific threat, opponent, or competitive condition |
 
 ---
 
@@ -69,4 +73,18 @@ The union produced 23 candidate types. Five were collapsed or reclassified.
 Two borderline types (Analogy, Framework Reference) were deliberately excluded
 as reasoning tools or metadata rather than governed claim types.
 
-The result is 18 canonical types — the permanent GAQP claim type standard.
+The result was 18 canonical types.
+
+**Canon Revision GAQP-CR-001 (2026-04-30):** Stakeholder Complaint Claim added as type #19.
+Governing rationale: Complaint cannot be safely collapsed into Observation, Diagnostic Signal, or
+Event because its stakeholder provenance, failure directionality, aggregation behavior, and
+legal-operational implications require distinct runtime handling.
+Full revision document: docs/gaqp/GAQP_CANON_REVISION_001_COMPLAINT.md
+
+**Canon Revision GAQP-CR-002 (2026-05-01):** Tactic added as type #20.
+Governing rationale: Tactic cannot be safely collapsed into Best Practice, Heuristic, or Doctrine
+because its adversarial dimension, situational specificity, immediate-objective orientation,
+counter-tactic vulnerability, and opponent-adaptive degradation require distinct runtime handling.
+Full revision document: docs/gaqp/GAQP_CANON_REVISION_002_TACTIC.md
+
+The result is 20 canonical types.
