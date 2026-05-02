@@ -39,21 +39,69 @@ def _noop_persist(record: ExecutionRecord) -> Dict[str, Any]:
     }
 
 
+_EBE_BRIDGE_PENDING_REASON = "execution_boundary_bridge_pending"
+
+_EXECUTION_TRIGGERS = {
+    "send it", "send this", "go ahead", "go for it",
+    "run the next step", "approve this", "approve it",
+    "execute this", "execute it", "run it", "do it now",
+    "let's do it", "let's go", "pull the trigger",
+    "confirm this", "confirm it", "submit this", "submit it",
+    "launch this", "launch it", "finalize this", "finalize it",
+    "proceed with this", "proceed with it", "proceed",
+    "authorize this", "authorize it", "make it happen",
+    "move forward on this", "move forward",
+}
+
+_ACTION_TRIGGERS = {
+    "draft the next move", "draft a", "draft the",
+    "prepare the outreach", "prepare a draft", "prepare the draft",
+    "generate the action", "generate an action", "generate a draft",
+    "write the outreach", "write a draft", "write the draft",
+    "compose a", "compose the", "formulate a", "formulate the",
+    "outline the steps", "outline the next steps",
+    "build the plan", "build a plan",
+    "create the action", "create an action",
+    "structure the next move", "structure the action",
+    "put together a plan",
+}
+
+_EVIDENCE_TRIGGERS = {
+    "what evidence", "pull the relevant docs", "what internal data",
+    "show me the data", "what data do we have",
+    "find the relevant docs", "pull the data",
+    "what does the research say", "show the research",
+    "retrieve the docs", "fetch the data",
+    "find evidence", "look up the", "search for evidence",
+    "what information do we have", "what do the docs say",
+}
+
+_DECISION_TRIGGERS = {
+    "which option is better", "which is better", "which should we",
+    "evaluate this", "evaluate the", "what should we do",
+    "what should i do", "should we", "should i",
+    "recommend", "what do you recommend", "what do you think",
+    "assess this", "assess the", "analyze this",
+    "how should we approach", "how should i approach",
+    "compare these", "compare the options", "make a call",
+    "decide", "help me decide", "what's the best option",
+    "what is the best", "weigh the options", "pros and cons",
+    "trade-offs", "tradeoffs", "what's the right move",
+    "what is the right move", "give me your judgment",
+    "run an analysis",
+}
+
+
 def classify_turn(user_text: str) -> TurnClass:
     text = (user_text or "").strip().lower()
-
-    if any(phrase in text for phrase in ["send it", "approve this", "run the next step", "go ahead"]):
+    if any(phrase in text for phrase in _EXECUTION_TRIGGERS):
         return "execution_seeking"
-
-    if any(phrase in text for phrase in ["draft the next move", "prepare the outreach", "generate the action"]):
+    if any(phrase in text for phrase in _ACTION_TRIGGERS):
         return "action_proposing"
-
-    if any(phrase in text for phrase in ["what evidence", "pull the relevant docs", "what internal data"]):
+    if any(phrase in text for phrase in _EVIDENCE_TRIGGERS):
         return "evidence_seeking"
-
-    if any(phrase in text for phrase in ["which option is better", "evaluate this", "what should we do"]):
+    if any(phrase in text for phrase in _DECISION_TRIGGERS):
         return "decision_seeking"
-
     return "conversational"
 
 
@@ -183,7 +231,7 @@ def route_turn(
         if not execution_boundary_result:
             execution_boundary_result = {
                 "status": "ESCALATE",
-                "reason": "EBE v2 integration incomplete",
+                "reason": _EBE_BRIDGE_PENDING_REASON,
             }
         return {
             "decision_result": decision_out,
@@ -198,8 +246,11 @@ def route_turn(
             "decision_result": None,
             "action_proposal": None,
             "execution_boundary_result": None,
-            "assistant_message": "Evidence path selected.",
-            "rail_state": {"mode": "evidence"},
+            "assistant_message": (
+                "Evidence and corpus retrieval is not yet available. "
+                "The GAQP knowledge corpus is a planned Stage 9 capability."
+            ),
+            "rail_state": {"mode": "evidence_unavailable"},
         }
 
     return {
