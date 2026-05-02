@@ -1,7 +1,7 @@
 # Execalc Pitch Doctrine
 
 **Status:** Canonized
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-05-02
 **Authority:** Execalc Product Standards
 
@@ -9,7 +9,7 @@
 
 ## I. The One-Paragraph Cold Outreach Version
 
-Your organization is making decisions on pre-GAAP intelligence. Every strategy meeting, deal analysis, and board presentation produces qualitative insight that disappears into documents nobody reads twice. The document is the wrong unit — a fifty-page report contains perhaps four actionable claims. You are storing forty-six pages of scaffolding and calling it knowledge. GAQP — Generally Accepted Qualitative Principles — does for qualitative intelligence what GAAP did for financial reporting. It reduces written text to its indivisible governed units at an estimated 44:1 noise-to-signal compression ratio, producing a classified, traceable, confidence-weighted corpus your organization can query and act on — instantly, and years from now. Execalc is the platform that enforces that standard at enterprise scale.
+You can find every dollar your organization has ever spent. You cannot find a single insight it has ever produced. Every strategy meeting, deal analysis, and board presentation generates qualitative intelligence that disappears into documents nobody reads twice — not because people are careless, but because the document is the wrong unit. A fifty-page report contains perhaps four actionable claims. You are storing forty-six pages of scaffolding and calling it knowledge. GAQP — Generally Accepted Qualitative Principles — does for qualitative intelligence what GAAP did for financial reporting. It operates at the natural granularity of knowledge: the governed claim, not the document. The result is a 44:1 noise-to-signal reduction and a classified, traceable, confidence-weighted corpus your organization can query and act on — instantly, and years from now. Execalc is the platform that enforces that standard at enterprise scale.
 
 ---
 
@@ -19,27 +19,35 @@ If the executive only hears three things:
 
 1. **"The document is the wrong unit."** — They feel this. They have lived it.
 2. **"GAQP does for qualitative intelligence what GAAP did for financial reporting."** — They understand the standard-setting parallel immediately.
-3. **"44:1 noise-to-signal compression ratio."** — The number is memorable. Flag it as estimated until validated — but it lands.
+3. **"44:1 noise-to-signal ratio."** — The number is memorable. Flag it as estimated until validated — but it lands.
 
 ---
 
-## III. The GAAP Parallel — The One Sentence That Lands
+## III. The Opening Line
+
+> "You can find every dollar your organization has ever spent. You cannot find a single insight it has ever produced."
+
+This is the entry. No new concepts required. The CEO has already felt both halves before you finish the sentence. Do not open with "pre-GAAP intelligence" — that phrase requires the listener to hold an analogy before they have been given one. Earn the GAAP parallel; do not assert it.
+
+---
+
+## IV. The GAAP Parallel — The One Sentence That Lands
 
 > Before GAAP, every company kept its own books in its own way. You couldn't compare them, audit them, or trust them at scale. Most organizations' qualitative intelligence is exactly where accounting was in 1494.
 
-Every executive in the room knows what GAAP is and why it was needed. They do not need to be sold on the parallel. They see it immediately.
+Every executive in the room knows what GAAP is and why it was needed. They do not need to be sold on the parallel. They see it immediately. The parallel is the payoff — not the setup.
 
 ---
 
-## IV. The 90-Second Pitch
+## V. The 90-Second Pitch
 
-Your organization is making decisions on pre-GAAP intelligence.
+You can find every dollar your organization has ever spent. You cannot find a single insight it has ever produced.
 
-Every strategy meeting, every deal analysis, every board presentation produces qualitative insight that disappears into documents nobody reads twice. The document is the wrong unit. A fifty-page report contains perhaps four actionable claims. You are storing forty-six pages of scaffolding and calling it knowledge.
+Every strategy meeting, every deal analysis, every board presentation generates qualitative intelligence that disappears into documents nobody reads twice. The problem is not that people are careless. The problem is that the document is the wrong unit. A fifty-page report contains perhaps four actionable claims. You are storing forty-six pages of scaffolding and calling it knowledge.
 
-GAQP — Generally Accepted Qualitative Principles — does for qualitative intelligence what GAAP did for financial reporting. It reduces written text to its indivisible governed units — atomic nuggets — resulting in an estimated 44:1 noise-to-signal compression ratio.
+GAAP solved this for financial intelligence by identifying the right granularity: the transaction, not the ledger book. GAQP — Generally Accepted Qualitative Principles — solves it for strategic intelligence by identifying the same thing: the governed claim, not the document. It is the natural atom of qualitative knowledge — the smallest unit that carries standalone meaning, can be evaluated for confidence, and can be composed with other claims without reconstructing its source.
 
-The result is not a summary. It is a classified, traceable, confidence-weighted corpus of governed claims your organization can query, compare, and act on — instantly, and years from now.
+The result is an estimated 44:1 noise-to-signal reduction: a classified, traceable, confidence-weighted corpus of governed claims your organization can query, compare, and act on — instantly, and years from now.
 
 When your team makes a decision next quarter, the system surfaces every governed claim in your corpus relevant to that situation. Not a search result. Not an AI summary. Governed intelligence with source attribution and confidence scoring.
 
@@ -47,7 +55,25 @@ That is what Execalc delivers. It is the first platform built to enforce the GAQ
 
 ---
 
-## V. The Compound Knowledge Argument
+## VI. The Granularity Argument
+
+This is the answer to "why hasn't this been done before?" — and it is airtight.
+
+Every field that made a step-change advance found the natural granularity of its subject:
+
+- Finance found the transaction. GAAP was built on it.
+- Chemistry found the atom. Periodicity became visible only at that resolution.
+- Genomics found the base pair. Sequencing required it.
+
+Knowledge management has always operated at document granularity because document-level storage was the only operationally viable option. Better search, better tagging, better summarization — all of these are attempts to compensate for operating at the wrong granularity. They do not solve the problem. They manage it.
+
+AI-assisted extraction is what makes claim-level granularity practical for the first time. The governed claim as the natural atom of qualitative knowledge was always the correct standard. Enforcing it at enterprise scale was not previously possible. It is now.
+
+GAQP defines the standard. Execalc enforces it. The document was never the right unit. It was the only available unit.
+
+---
+
+## VII. The Compound Knowledge Argument
 
 This is the network effects argument — the most powerful thing in the pitch for multi-user organizations.
 
@@ -74,7 +100,7 @@ This is compound institutional memory. Auto-extraction is the floor. The memoria
 
 ---
 
-## VI. Objection Responses
+## VIII. Objection Responses
 
 ### Objection 1: "We already have knowledge management / AI search / a wiki / SharePoint."
 
@@ -126,7 +152,7 @@ When the Bridge architecture is available — the capability that enables signal
 
 ---
 
-## VII. Product Tier Framing
+## IX. Product Tier Framing
 
 **Execalc Cloud** — Standard enterprise deployment. Tenant-scoped corpus in managed cloud infrastructure. Multi-tenant isolation is structural. Synthesis calls go to the model API. Appropriate for most organizations.
 
@@ -136,7 +162,7 @@ Same GAQP standard. Different deployment posture.
 
 ---
 
-## VIII. Source Material Note
+## X. Source Material Note
 
 This pitch doctrine was developed in working sessions and refined through pressure-testing against five objection categories. The GAAP parallel, the 44:1 ratio framing, and the compound knowledge argument are the three formulations with the highest confirmed resonance. The three-line version (Section II) is the minimum viable pitch — start there in time-constrained contexts.
 
