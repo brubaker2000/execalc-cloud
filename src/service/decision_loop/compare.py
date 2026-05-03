@@ -5,10 +5,10 @@ from typing import Any, Dict, List, Tuple
 
 
 CONFIDENCE_SCORE = {
-    "unknown": 0,
-    "low": 1,
-    "medium": 2,
-    "high": 3,
+    "unknown": 0.50,  # Seed — first occurrence
+    "low": 0.72,      # Developing — second corroboration
+    "medium": 0.91,   # Strong — three-point convergence
+    "high": 1.00,     # Structural — institutional doctrine
 }
 
 
@@ -24,7 +24,7 @@ def _sensitivity_count(artifact: Dict[str, Any]) -> int:
     return len(sensitivity) if isinstance(sensitivity, list) else 0
 
 
-def _confidence_value(artifact: Dict[str, Any]) -> int:
+def _confidence_value(artifact: Dict[str, Any]) -> float:
     report = artifact.get("report") or {}
     confidence = str(report.get("confidence") or "unknown").lower()
     return CONFIDENCE_SCORE.get(confidence, 0)

@@ -13,7 +13,8 @@ from src.service.tenant.registry import ensure_tenant_registered, enforcement_en
 # Optional DB persistence (enabled via env var)
 try:
     from src.service.db.postgres import get_conn, insert_execution_record, get_execution_record, list_execution_records, upsert_tenant
-except Exception:
+except Exception as _db_import_err:
+    logging.warning("DB module not available: %s", _db_import_err)
     get_conn = None  # type: ignore
     insert_execution_record = None  # type: ignore
     get_execution_record = None  # type: ignore
@@ -307,7 +308,9 @@ def status():
     if claims.tenant_id and tenant_q and tenant_q != claims.tenant_id:
         return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": "tenant_id mismatch (claims vs query)"}), 400
 
-    tenant_id = claims.tenant_id or tenant_q or "tenant_test_001"
+    tenant_id = claims.tenant_id or tenant_q
+    if not tenant_id:
+        return jsonify({"ok": False, "error_type": "InvalidTenantPayload", "error": "Missing tenant_id"}), 400
     raw_input = {"tenant_id": tenant_id}
 
     try:
