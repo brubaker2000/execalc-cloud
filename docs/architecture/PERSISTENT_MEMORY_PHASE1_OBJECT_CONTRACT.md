@@ -58,6 +58,7 @@ A Phase 1 memory object should include these required fields:
 
 - `memory_family`
   - governed memory category for the object
+  - **GAQP alignment required before implementation:** the current family list (conversational, strategic, decision, knowledge, organizational, heuristic, clarity, constraint, relationship) was designed before GAQP was canonized. This field must be reconciled with the 24 GAQP canonical claim types before any implementation begins. A memory object admitted to the corpus is a governed claim; its classification must come from the GAQP taxonomy, not from a parallel memory-specific hierarchy. The two taxonomies must not coexist — one must subsume the other. Resolution: Stage 9 GAQP data model work should produce a `claim_type` field that replaces or governs `memory_family` here.
 
 - `activation_state`
   - governed state controlling retrieval eligibility and runtime influence posture

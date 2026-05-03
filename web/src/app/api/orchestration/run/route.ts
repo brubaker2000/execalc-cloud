@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.text();
 
-    const upstream = await fetch("http://127.0.0.1:5000/decision/run", {
+    const upstream = await fetch("http://127.0.0.1:5000/orchestration/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -20,9 +20,7 @@ export async function POST(req: NextRequest) {
 
     return new NextResponse(text, {
       status: upstream.status,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     return NextResponse.json(

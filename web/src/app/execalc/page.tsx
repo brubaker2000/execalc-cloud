@@ -75,14 +75,26 @@ type DecisionRunResponse = {
   error?: string;
 };
 
-const INITIAL_PROMPT =
-  "We think this design will make Execalc very sticky. I want the workspace to feel familiar like a browser, but actually function like a governed operating system for executive cognition.";
+type OrchestrationRunResponse = {
+  ok: boolean;
+  turn_class?: string;
+  assistant_message?: string;
+  rail_state?: { mode?: string };
+  decision_result?: unknown;
+  action_proposal?: unknown;
+  execution_boundary_result?: { status?: string; reason?: string } | null;
+  error?: string;
+};
 
 export default function ExecalcPage() {
-  const [prompt, setPrompt] = useState(INITIAL_PROMPT);
+  const [prompt, setPrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [decision, setDecision] = useState<DecisionRunResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [chatPrompt, setChatPrompt] = useState("");
+  const [isOrchestrating, setIsOrchestrating] = useState(false);
+  const [orchestrationResult, setOrchestrationResult] = useState<OrchestrationRunResponse | null>(null);
+  const [orchestrationError, setOrchestrationError] = useState<string | null>(null);
 
   const canSubmit = useMemo(
     () => prompt.trim().length > 0 && !isSubmitting,
@@ -106,28 +118,16 @@ export default function ExecalcPage() {
         },
         body: JSON.stringify({
           scenario: {
-            scenario_type: "strategic_ui_shell",
-            governing_objective: "preserve_optionality",
+            scenario_type: "general",
+            governing_objective: "unspecified",
             prompt,
-            facts: {
-              source_surface: "execalc_workbench",
-              current_focus: "ui_shell_scaffold",
-            },
-            constraints: {
-              stage: "stage8",
-            },
+            facts: {},
+            constraints: {},
             requested_depth: "standard",
-            decision_horizon: "current build cycle",
-            stakeholder_scope: "operator, future executive users",
-            risk_surface: "medium",
-            assumptions:
-              "A familiar shell will increase usability and stickiness.",
-            decision_notes:
-              "Initial UI shell should remain governed, minimal, and extensible.",
-              workspace_id: "workspace_execalc",
-              project_id: "project_stage8",
-              chat_id: "chat_execalc",
-              thread_id: decision?.audit?.envelope_id ?? null,
+            workspace_id: "workspace_execalc",
+            project_id: "project_execalc",
+            chat_id: "chat_execalc",
+            thread_id: decision?.audit?.envelope_id ?? null,
           },
         }),
       });
@@ -146,6 +146,51 @@ export default function ExecalcPage() {
       setError(err instanceof Error ? err.message : "Network error");
     } finally {
       setIsSubmitting(false);
+    }
+  }
+
+  async function sendToOrchestration() {
+    if (!chatPrompt.trim() || isOrchestrating) return;
+
+    setIsOrchestrating(true);
+    setOrchestrationError(null);
+
+    try {
+      const response = await fetch("/api/orchestration/run", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": "test_user",
+          "X-Role": "operator",
+          "X-Tenant-Id": "tenant_test_001",
+        },
+        body: JSON.stringify({
+          user_text: chatPrompt,
+          scenario_type: "general",
+          governing_objective: "unspecified",
+          navigation: {
+            workspace_id: "workspace_execalc",
+            project_id: "project_execalc",
+            chat_id: "chat_execalc",
+            thread_id: decision?.audit?.envelope_id ?? null,
+          },
+        }),
+      });
+
+      const body = (await response.json()) as OrchestrationRunResponse;
+
+      if (!response.ok || !body.ok) {
+        setOrchestrationResult(null);
+        setOrchestrationError(body.error || "Orchestration failed");
+        return;
+      }
+
+      setOrchestrationResult(body);
+    } catch (err) {
+      setOrchestrationResult(null);
+      setOrchestrationError(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setIsOrchestrating(false);
     }
   }
 
@@ -360,7 +405,8 @@ export default function ExecalcPage() {
                 <button
                   key={action}
                   type="button"
-                  className="rounded-full border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-xs font-medium text-zinc-200"
+                  disabled
+                  className="rounded-full border border-zinc-800 bg-zinc-950 px-3 py-1.5 text-xs font-medium text-zinc-600 cursor-not-allowed"
                 >
                   {action}
                 </button>
@@ -483,16 +529,39 @@ export default function ExecalcPage() {
 
       <div className="mt-6 border-t border-zinc-800 bg-zinc-950 px-0 py-4">
         <div className="flex w-full gap-3">
-          <div className="flex-1 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-400">
-            Describe the decision or idea...
-          </div>
+          <textarea
+            value={chatPrompt}
+            onChange={(e) => setChatPrompt(e.target.value)}
+            placeholder="Ask a question or describe a situation..."
+            rows={1}
+            className="flex-1 resize-none rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-200 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
+          />
           <button
             type="button"
-            className="rounded-2xl bg-zinc-100 px-5 py-3 text-sm font-semibold text-zinc-950"
+            onClick={sendToOrchestration}
+            disabled={!chatPrompt.trim() || isOrchestrating}
+            className="rounded-2xl bg-zinc-100 px-5 py-3 text-sm font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Send
+            {isOrchestrating ? "..." : "Send"}
           </button>
         </div>
+        {orchestrationResult ? (
+          <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+            <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              Response
+            </div>
+            <p className="text-sm leading-6 text-zinc-300">{orchestrationResult.assistant_message}</p>
+            {orchestrationResult.turn_class ? (
+              <p className="mt-2 text-xs text-zinc-500">
+                Turn: {orchestrationResult.turn_class} · Mode: {orchestrationResult.rail_state?.mode}
+              </p>
+            ) : null}
+          </div>
+        ) : orchestrationError ? (
+          <div className="mt-3 rounded-xl border border-red-900 bg-red-950/40 p-4">
+            <p className="text-sm text-red-200">{orchestrationError}</p>
+          </div>
+        ) : null}
       </div>
     </WorkspaceShell>
   );

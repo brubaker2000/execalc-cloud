@@ -424,13 +424,18 @@ export default function DecisionsPage() {
         </div>
       ) : null}
 
-      <div className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-          Orchestration Probe
+      <div className="mb-6 rounded-2xl border border-zinc-700/40 bg-zinc-900 p-5">
+        <div className="mb-1 flex items-center gap-2">
+          <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            Orchestration Probe
+          </div>
+          <div className="rounded-full border border-amber-800/50 bg-amber-950/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
+            Dev Fixture
+          </div>
         </div>
         <p className="mb-4 max-w-2xl text-sm text-zinc-400">
-          Narrow end-to-end proof for the thin chat orchestration layer. This sends one
-          executive turn through the new orchestration API and shows the returned runtime envelope.
+          End-to-end proof for the thin chat orchestration layer. Sends one executive turn through
+          the orchestration API and returns the runtime envelope. Will move to the Diagnostics surface.
         </p>
 
         <div className="flex flex-col gap-3">

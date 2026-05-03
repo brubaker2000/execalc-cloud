@@ -15,9 +15,9 @@ export async function GET(req: NextRequest, context: RouteContext) {
       {
         method: "GET",
         headers: {
-          "X-User-Id": req.headers.get("x-user-id") || "test_user",
-          "X-Role": req.headers.get("x-role") || "operator",
-          "X-Tenant-Id": req.headers.get("x-tenant-id") || "tenant_test_001",
+          "X-User-Id": req.headers.get("x-user-id") ?? "",
+          "X-Role": req.headers.get("x-role") ?? "",
+          "X-Tenant-Id": req.headers.get("x-tenant-id") ?? "",
         },
         cache: "no-store",
       }

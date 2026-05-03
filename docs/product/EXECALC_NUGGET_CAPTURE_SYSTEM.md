@@ -1,5 +1,7 @@
 # Execalc Nugget Capture System
 
+> **Supersession Notice:** This document predates the GAQP standard. The right-click Memoralize interaction defined in `docs/product/EXECALC_MEMORIALIZE_SPEC.md` supersedes the manual "capture and sort later" workflow described here. The trigger word ("Nugget") remains a valid keyboard-native complement as described in Section IX of that spec, but the pipeline it feeds is now the GAQP-governed admission path — not a separate review queue.
+
 ## Purpose
 
 This document defines the Nugget Capture System for Execalc.
