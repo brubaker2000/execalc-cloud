@@ -6,13 +6,11 @@ It validates intent and structure only.
 No persistence, side effects, or execution beyond validation are permitted.
 """
 
+from src.service.tenant.errors import InvalidTenantPayload
+
+
 class TenantCreationError(Exception):
     """Base exception for tenant creation violations."""
-    pass
-
-
-class InvalidTenantPayload(TenantCreationError):
-    """Raised when the tenant payload is invalid or incomplete."""
     pass
 
 

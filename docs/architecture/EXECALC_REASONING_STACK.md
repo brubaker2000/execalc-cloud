@@ -86,11 +86,7 @@ It ensures Execalc reasons with awareness of:
 
 ## Memory classes
 
-- conversational memory
-- strategic memory
-- decision memory
-- knowledge memory
-- organizational memory
+Memory classification is governed by the GAQP 24-type claim taxonomy. The pre-GAQP family list (conversational/strategic/decision/knowledge/organizational) has been superseded. See `PERSISTENT_MEMORY_PHASE1_OBJECT_CONTRACT.md` for the reconciliation requirement.
 
 ## Principle
 
@@ -144,8 +140,7 @@ It is the home of the Strategic Mesh.
 ### Cognitive Engine
 - Prime Directive
 - Persistent Memory
-- Polymorphia / Multi-Dimensional Thinking
-- Heuristic Coding System
+- Polymorphia / Multi-Dimensional Thinking (see EXECALC_POLYMORPHIA_DOCTRINE.md)
 - Recursive Analysis
 - Proactive Solutions Architecture
 - Executive Knowledge Engine
