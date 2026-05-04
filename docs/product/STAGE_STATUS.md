@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
 Last updated: 2026-05-04
-Last verified state: Stage 9C complete — GAQP corpus persistence layer live on main. Stage 9A GAQPClaim data model and ActivationBundle, Stage 9B extraction pipeline with seven-test admission gate, Stage 9C Postgres gaqp_claims table with idempotent fingerprint write path and full query surface implemented, tested, and merged to main.
+Last verified state: Stage 9E complete — full GAQP loop live on main. Stage 9A GAQPClaim data model, Stage 9B extraction pipeline, Stage 9C corpus persistence, Stage 9D activation engine, and Stage 9E orchestration rail integration implemented, tested (103 tests), and merged to main.
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -241,8 +241,27 @@ Last verified state: Stage 9C complete — GAQP corpus persistence layer live on
   - 0964c09 Stage 9C: GAQP corpus persistence layer
   - 9ec0142 Stage 9C: GAQP corpus persistence layer
 
+## Stage 9D: GAQP Activation Engine (COMPLETE ON main)
+- `activate()` in `src/service/gaqp/activation.py` — `ScenarioEnvelope` in → `ActivationBundle` out
+- Fetches admitted claims across private / tenant / structural scopes; deduplicates by `claim_id`
+- Universal-scope claims always fire; other scopes require activation trigger keyword match (case-insensitive)
+- Sorted by `confidence_score` DESC, capped at `max_claims` (default 20); confidence floor default 0.50 (Seed)
+- DB errors return empty bundle — never raises to caller
+- Unit tests: `src/service/gaqp/test_activation.py` (19 tests)
+- Key commit: 1f3cd15 Stage9/9d activation engine (#54)
+
+## Stage 9E: GAQP Orchestration Rail Integration (COMPLETE ON main)
+- `activate()` wired into `run_orchestration()` — fires on every turn
+- Every orchestration response carries `corpus_intelligence` (`ActivationBundle.to_dict()`) as a top-level field
+- `rail_state` gains `corpus_claims_count` on all turn classes
+- `evidence_seeking` turns promoted from stub to live corpus path; `rail_state` mode is `corpus_evidence`
+- `assistant_message` reflects claim count or signals empty corpus for evidence-seeking turns
+- `DecisionReport` is never modified — bundle is operator-visible context, not silent prompt injection
+- Unit tests: `src/service/orchestration/test_service_9e.py` (12 tests)
+- Key commit: 1f3cd15 Stage9/9d activation engine (#54)
+
 ## Current Architecture Reality
-Execalc is now operating as a decision-plus-execution-governance system with a live qualitative knowledge corpus.
+Execalc is now operating as a decision-plus-execution-governance system with a live, activating qualitative knowledge corpus.
 
 Current governed runtime path:
 - operator input
@@ -253,20 +272,20 @@ Current governed runtime path:
 - allow / block / recompute / escalate
 - execution or human review
 
-Parallel GAQP path (Stage 9A–9C live):
+Parallel GAQP path (Stage 9A–9E live):
 - DecisionReport → extraction pipeline → admission tests → GAQPClaim
 - Admitted claims → gaqp_claims (Postgres, idempotent)
-- Future: activation engine retrieves claims as ActivationBundle alongside next decision
+- Activation engine retrieves relevant claims as ActivationBundle for each incoming scenario
+- ActivationBundle surfaces alongside DecisionReport in orchestration rail — operator-visible, not injected
 
 The Executive Rail remains a display surface.
 The decision service remains the current runtime spine.
-The GAQP corpus is now a live persistence layer, not yet wired into the decision path.
+The GAQP corpus is now a live, compounding intelligence layer wired into the orchestration path.
 
 ## Next
-- Stage 9D: activation engine — scenario in → `ActivationBundle` out (requires 9B + 9C stable)
-- Stage 9E: orchestration rail integration — surface `ActivationBundle` to operator right rail
-- Backfill: run 9B+9C extraction against all existing `execution_records` once 9C is confirmed stable
-- Stage 7B DB-available integration-test slice, when explicitly pulled forward
+- Backfill: run 9B+9C extraction against all existing `execution_records` to bootstrap corpus from prior history
+- Stage 10: semantic/embedding-based matching, LLM decomposition, claim lifecycle automation
+- Stage 7A DB-available integration-test slice, when explicitly pulled forward
 
 ## Future Layer Awareness
 - Intelligent Front Door is now recognized as a future architectural layer.

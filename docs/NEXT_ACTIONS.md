@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-05-04 (America/New_York)
+Last updated: 2026-05-04 (America/New_York) — refreshed after Stage 9D+9E
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,10 +15,10 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Stage 9D — activation engine
-   - Implement scenario → ActivationBundle retrieval against the live gaqp_claims table.
-   - Confidence floor filtering and activation_triggers matching are the core query path.
-   - Do not wire into the decision report or inject into prompt material — operator-visible output only.
+1) Backfill — run Stage 9B+9C extraction against existing execution_records
+   - Bootstrap the corpus from prior decision history already in Postgres.
+   - Requires a live DB connection. Fingerprint idempotency means it is safe to run multiple times.
+   - Do not run against production data without verifying 9C is stable under real workload first.
 
 2) Preserve workstation reliability
    - Prefer short, verifiable commands in this shell environment.
@@ -32,8 +32,7 @@ Source of truth for completion claims:
 
 ## NEXT (Queued)
 
-- Stage 9E: orchestration rail integration — surface ActivationBundle to operator right rail
-- Backfill: run Stage 9B+9C extraction against existing execution_records (once 9C is confirmed stable under real data)
+- Stage 10 planning — semantic / embedding-based claim matching, LLM decomposition of paragraph fields, claim lifecycle automation
 - Stage 7A DB-available integration-test slice, when explicitly pulled forward
 
 ---
