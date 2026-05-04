@@ -6,7 +6,7 @@ Purpose:
 - PRs should reference which "NOW" item(s) they close.
 - If chat memory conflicts with this file, this file wins.
 
-Last updated: 2026-03-31 (America/New_York)
+Last updated: 2026-05-04 (America/New_York)
 
 Source of truth for completion claims:
 - docs/product/STAGE_STATUS.md
@@ -15,10 +15,10 @@ Source of truth for completion claims:
 
 ## NOW (1–3 items only)
 
-1) Choose the next smallest governed Stage 8 increment after the access-policy tranche
-   - Keep the next move architectural and documentary unless runtime memory implementation is explicitly pulled forward.
-   - Prefer narrow truth-surface hardening or architecture clarification over new feature sprawl.
-   - Do not widen beyond the documented phased rollout without an explicit decision.
+1) Stage 9D — activation engine
+   - Implement scenario → ActivationBundle retrieval against the live gaqp_claims table.
+   - Confidence floor filtering and activation_triggers matching are the core query path.
+   - Do not wire into the decision report or inject into prompt material — operator-visible output only.
 
 2) Preserve workstation reliability
    - Prefer short, verifiable commands in this shell environment.
@@ -26,22 +26,24 @@ Source of truth for completion claims:
 
 3) Keep branch cleanliness and repo-truth discipline intact
    - Keep changes narrowly scoped.
-   - Close the truth loop whenever a documentary tranche lands.
+   - Close the truth loop whenever a tranche lands.
 
 ---
 
 ## NEXT (Queued)
 
-- Stage 8 observe-only stability and drift follow-through
+- Stage 9E: orchestration rail integration — surface ActivationBundle to operator right rail
+- Backfill: run Stage 9B+9C extraction against existing execution_records (once 9C is confirmed stable under real data)
 - Stage 7A DB-available integration-test slice, when explicitly pulled forward
-- Stage 7B: `/decision/compare`
-- Stage 7C: multi-objective comparison logic
 
 ---
 
 ## LATER (Explicitly not now)
 
 - Intelligent Front Door implementation
+- Chat Orchestration Layer (classifies turns: discuss / decide / action / execute)
+- LLM decomposition of paragraph-level DecisionReport fields (Stage 9 v2)
+- Semantic / embedding-based claim matching
+- Cross-tenant corpus search UI
 - Bridges / subscriber-to-subscriber operability
 - Any vector DB expansion beyond explicitly scoped semantic fields
-- Any new feature surface that outruns the current operational rails
