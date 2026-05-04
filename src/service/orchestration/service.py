@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 from src.service.decision_loop.models import ActionProposal
 from src.service.decision_loop.service import run_decision_service
 from src.service.execution_record import ExecutionRecord
+from src.service.gaqp.activation import activate
 from src.service.orchestration.models import NavigationEnvelope, ScenarioEnvelope, TurnClass
 
 
@@ -246,11 +247,8 @@ def route_turn(
             "decision_result": None,
             "action_proposal": None,
             "execution_boundary_result": None,
-            "assistant_message": (
-                "Evidence and corpus retrieval is not yet available. "
-                "The GAQP knowledge corpus is a planned Stage 9 capability."
-            ),
-            "rail_state": {"mode": "evidence_unavailable"},
+            "assistant_message": "corpus_evidence",  # replaced in run_orchestration
+            "rail_state": {"mode": "corpus_evidence"},
         }
 
     return {
@@ -288,6 +286,21 @@ def run_orchestration(
         user_id=user_id,
     )
 
+    bundle = activate(scenario=scenario, tenant_id=tenant_id)
+    claim_count = len(bundle.activated_claims)
+
+    if turn_class == "evidence_seeking":
+        assistant_message = (
+            f"{claim_count} corpus claim(s) activated for this scenario."
+            if claim_count
+            else "No corpus claims matched this scenario yet."
+        )
+    else:
+        assistant_message = routed["assistant_message"]
+
+    rail_state = dict(routed["rail_state"])
+    rail_state["corpus_claims_count"] = claim_count
+
     return {
         "ok": True,
         "turn_class": turn_class,
@@ -295,6 +308,7 @@ def run_orchestration(
         "decision_result": routed["decision_result"],
         "action_proposal": routed["action_proposal"],
         "execution_boundary_result": routed["execution_boundary_result"],
-        "assistant_message": routed["assistant_message"],
-        "rail_state": routed["rail_state"],
+        "assistant_message": assistant_message,
+        "rail_state": rail_state,
+        "corpus_intelligence": bundle.to_dict(),
     }
