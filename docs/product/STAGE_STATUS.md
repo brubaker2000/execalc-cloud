@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-03-31
-Last verified state: Stage 8 UI shell scaffold, navigation identity threading, truthful left-rail injection, observe-only Stage 8B anomaly recording, executive-rail anomaly surfacing, runtime-nugget rail surfacing, observe-only signal surfacing, distinct signal styling, routed signal nugget styling, split stability/drift signal nuggets, anomaly-priority signal suppression, explicit decisions anomaly labeling, drift-anomaly priority ranking, distinct drift-anomaly visual treatment, canonical persistent-memory architecture drafting, persistent-memory Phase 1 attachment mapping, persistent-memory Phase 1 object-contract drafting, persistent-memory Phase 1 service-seam drafting, persistent-memory Phase 1 persistence-path drafting, persistent-memory Phase 1 admission-path drafting, persistent-memory Phase 1 retrieval-path drafting, and persistent-memory Phase 1 access-policy drafting implemented, integrated, verified, and pushed on stage8/ui-shell-scaffold
+Last updated: 2026-05-04
+Last verified state: Stage 9E complete — full GAQP loop live on main. Stage 9A GAQPClaim data model, Stage 9B extraction pipeline, Stage 9C corpus persistence, Stage 9D activation engine, and Stage 9E orchestration rail integration implemented, tested (103 tests), and merged to main.
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
@@ -199,8 +199,69 @@ Last verified state: Stage 8 UI shell scaffold, navigation identity threading, t
   - 91ce24c Define persistent memory phase 1 retrieval path
   - 199dcee Define persistent memory phase 1 access policy
 
+## Stage 9A: GAQPClaim Data Model + ActivationBundle (COMPLETE ON main)
+- `GAQPClaim` frozen dataclass with all 21 fields per architecture lock
+- `ActivationBundle` dataclass — output of the future Stage 9D activation engine
+- `ClaimProvenance`, `CorroborationProfile` supporting objects
+- Canonical enumerations: 24 `ClaimType` values, `ConfidenceLevel`, `AdmissionStatus`, `CorpusScope`, `ActivationScope`, `ExtractionMethod`, `Domain`
+- GAQP confidence ladder: Seed 0.50 / Developing 0.72 / Strong 0.91 / Structural 1.00
+- Deterministic `compute_fingerprint` (sha256 over tenant + envelope + claim_type + normalized content + scope + schema_version)
+- `SCHEMA_VERSION = "stage9_v1"`
+- Unit tests: `src/service/gaqp/test_models.py`
+- Key commits:
+  - 5f0b88c Canonize Stage 9A-0 Architecture Lock
+  - b759a95 Stage 9A: GAQPClaim data model and ActivationBundle
+
+## Stage 9B: GAQP Extraction Pipeline (COMPLETE ON main)
+- `extract_claims()` — extracts `GAQPClaim` candidates from a `DecisionReport`
+- Extraction surface: 5 scalar fields + 4 list fields per architecture lock
+  - Scalar: `value_assessment`, `risk_reward_assessment`, `supply_demand_assessment`, `asset_assessment`, `liability_assessment`
+  - List: `incentives`, `asymmetries`, `tradeoffs.key_tradeoffs`, `confidence_rationale`
+- Seven-test sequential admission gate:
+  - Tests 1–4 failure → `rejected`
+  - Tests 5–7 failure → `needs_review`
+  - All pass → `admitted`
+- Activation triggers enriched with `objective:` and `scenario:` context at extraction time
+- `admitted_claims()` and `needs_review_claims()` filter helpers
+- Unit tests: `src/service/gaqp/test_extraction.py`
+- Key commit:
+  - fba2b9f Stage 9B: GAQP extraction pipeline
+
+## Stage 9C: GAQP Corpus Persistence Layer (COMPLETE ON main)
+- `gaqp_claims` Postgres table added to `docs/db/schema.sql`
+  - JSONB columns: `provenance`, `activation_triggers`, `corroboration_profile`, `contradiction_refs`, `support_refs`
+  - Unique index on `fingerprint` — idempotent backfill safe
+  - Indexes: `(tenant_id, claim_type)`, `(corpus_scope, confidence_score)`, `(tenant_id, source_envelope_id)`
+- Write path: `insert_claim()` (single), `insert_claims()` (batch with `InsertSummary`)
+  - Only `admitted` claims are written; `rejected` and `needs_review` are never persisted
+  - `ON CONFLICT (fingerprint) DO NOTHING` — safe to run extraction twice
+- Read path: `get_claim()`, `list_claims()` (with type/scope/confidence filters), `list_claims_by_envelope()`
+- Unit tests: `src/service/gaqp/test_corpus.py`
+- Key commits:
+  - 0964c09 Stage 9C: GAQP corpus persistence layer
+  - 9ec0142 Stage 9C: GAQP corpus persistence layer
+
+## Stage 9D: GAQP Activation Engine (COMPLETE ON main)
+- `activate()` in `src/service/gaqp/activation.py` — `ScenarioEnvelope` in → `ActivationBundle` out
+- Fetches admitted claims across private / tenant / structural scopes; deduplicates by `claim_id`
+- Universal-scope claims always fire; other scopes require activation trigger keyword match (case-insensitive)
+- Sorted by `confidence_score` DESC, capped at `max_claims` (default 20); confidence floor default 0.50 (Seed)
+- DB errors return empty bundle — never raises to caller
+- Unit tests: `src/service/gaqp/test_activation.py` (19 tests)
+- Key commit: 1f3cd15 Stage9/9d activation engine (#54)
+
+## Stage 9E: GAQP Orchestration Rail Integration (COMPLETE ON main)
+- `activate()` wired into `run_orchestration()` — fires on every turn
+- Every orchestration response carries `corpus_intelligence` (`ActivationBundle.to_dict()`) as a top-level field
+- `rail_state` gains `corpus_claims_count` on all turn classes
+- `evidence_seeking` turns promoted from stub to live corpus path; `rail_state` mode is `corpus_evidence`
+- `assistant_message` reflects claim count or signals empty corpus for evidence-seeking turns
+- `DecisionReport` is never modified — bundle is operator-visible context, not silent prompt injection
+- Unit tests: `src/service/orchestration/test_service_9e.py` (12 tests)
+- Key commit: 1f3cd15 Stage9/9d activation engine (#54)
+
 ## Current Architecture Reality
-Execalc is now operating as a decision-plus-execution-governance system, not merely a decision artifact generator.
+Execalc is now operating as a decision-plus-execution-governance system with a live, activating qualitative knowledge corpus.
 
 Current governed runtime path:
 - operator input
@@ -211,17 +272,23 @@ Current governed runtime path:
 - allow / block / recompute / escalate
 - execution or human review
 
+Parallel GAQP path (Stage 9A–9E live):
+- DecisionReport → extraction pipeline → admission tests → GAQPClaim
+- Admitted claims → gaqp_claims (Postgres, idempotent)
+- Activation engine retrieves relevant claims as ActivationBundle for each incoming scenario
+- ActivationBundle surfaces alongside DecisionReport in orchestration rail — operator-visible, not injected
+
 The Executive Rail remains a display surface.
 The decision service remains the current runtime spine.
-A future chat orchestration layer will sit above both.
+The GAQP corpus is now a live, compounding intelligence layer wired into the orchestration path.
 
 ## Next
-- Formalize the runtime architecture docs so the EBE is canon in the system map
-- Define the chat orchestration layer that classifies turns into discuss / decide / action / execute
-- Introduce real execution adapters after orchestration exists
-- Deepen persistence so execution-boundary events can be queried independently over time
+- Backfill: run 9B+9C extraction against all existing `execution_records` to bootstrap corpus from prior history
+- Stage 10: semantic/embedding-based matching, LLM decomposition, claim lifecycle automation
+- Stage 7A DB-available integration-test slice, when explicitly pulled forward
 
 ## Future Layer Awareness
 - Intelligent Front Door is now recognized as a future architectural layer.
 - Chat Orchestration Layer is now recognized as a future architectural layer.
 - Neither should bypass the Execution Boundary Engine once action is implicated.
+- LLM decomposition of paragraph-level `DecisionReport` fields (e.g. `executive_summary`) is deferred to Stage 9 v2.

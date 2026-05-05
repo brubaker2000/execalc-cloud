@@ -1,21 +1,25 @@
 # Execalc Build Checkpoint
-70c645f
+1f3cd15
 Last Stable Commit
-15dabc0
+1f3cd15
 
 Branch State
 main (clean)
 
 Current Stage
-Stage 5D complete (docs merged)
+Stage 9E complete (GAQP activation engine + orchestration rail integration)
 
 Next Stage
-Stage 6 – Decision Journal Persistence Wiring
+Backfill – run 9B+9C extraction against existing execution_records
 
 Verification Status
 ✔ python -m compileall -q src/service (passed)
-✔ python -m unittest -q (40 tests OK, in venv)
+✔ pytest -q (103 tests passed)
 
 Notes
-- Stage 5D local Postgres persistence runbook merged to main via PR #19.
-- Decision Loop Engine artifacts and spec exist on main.
+- Stage 9A: GAQPClaim data model and ActivationBundle merged to main.
+- Stage 9B: GAQP extraction pipeline with seven-test admission gate merged to main.
+- Stage 9C: gaqp_claims Postgres table, idempotent write path, and full read surface merged to main.
+- Stage 9D: activation engine (scenario → ActivationBundle) merged to main.
+- Stage 9E: orchestration rail integration — corpus_intelligence surfaced on all turn classes merged to main.
+- Stage 9A-0 architecture lock canonized in docs/gaqp/STAGE_9A0_ARCHITECTURE_LOCK.md.
