@@ -249,6 +249,47 @@ def list_claims(
         conn.close()
 
 
+_UPDATE_CORROBORATION_SQL = """
+    UPDATE gaqp_claims
+    SET corroboration_profile = %s,
+        confidence_level = %s,
+        confidence_score = %s,
+        updated_at = NOW()
+    WHERE claim_id = %s AND tenant_id = %s
+"""
+
+
+def update_claim_corroboration(
+    *,
+    claim_id: str,
+    tenant_id: str,
+    new_profile: "CorroborationProfile",
+    new_confidence_level: str,
+    new_confidence_score: float,
+) -> bool:
+    """
+    Persist a corroboration profile update and confidence promotion to the corpus.
+
+    Returns True if the claim was found and updated, False if not found.
+    Called exclusively by the corroboration engine after computing the new profile.
+    """
+    from src.service.gaqp.models import CorroborationProfile  # local to avoid circular
+    Json = _load_psycopg2_json()
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(_UPDATE_CORROBORATION_SQL, (
+                Json(new_profile.to_dict()),
+                new_confidence_level,
+                new_confidence_score,
+                claim_id,
+                tenant_id,
+            ))
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
 def list_claims_by_envelope(
     *,
     tenant_id: str,

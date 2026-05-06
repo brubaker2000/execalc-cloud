@@ -94,13 +94,17 @@ class CorroborationProfile:
     """
     Tracks independent evidence, not raw repetition.
     confidence_score advances only when independent_sources increases.
+    corroborating_actors stores "tenant_id:actor_id" keys seen so far —
+    used by the promotion engine to determine independence without a
+    separate events table.
     """
     corroboration_count: int = 0
     independent_sources: int = 0      # distinct tenant+user combinations
-    same_tenant_count: int = 0        # within-tenant repetitions (weak signal)
+    same_tenant_count: int = 0        # within-tenant corroborations
     cross_tenant_count: int = 0       # structural-tier cross-tenant matches
     contradictions: int = 0           # active contradicting claims
     last_corroborated_at: Optional[datetime] = None
+    corroborating_actors: List[str] = field(default_factory=list)  # "tid:uid" keys
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -113,6 +117,7 @@ class CorroborationProfile:
                 self.last_corroborated_at.isoformat()
                 if self.last_corroborated_at else None
             ),
+            "corroborating_actors": list(self.corroborating_actors),
         }
 
 
