@@ -238,6 +238,26 @@ class GAQPClaim:
 
 
 # ---------------------------------------------------------------------------
+# ContradictionAlert — a conflict surfaced alongside activated claims
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class ContradictionAlert:
+    """
+    Surfaces a contradiction between an activated claim and a corpus claim
+    that disputes it. Included in ActivationBundle for operator visibility.
+    """
+    activated_claim_id: str
+    contradicting_claim: "GAQPClaim"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "activated_claim_id": self.activated_claim_id,
+            "contradicting_claim": self.contradicting_claim.to_dict(),
+        }
+
+
+# ---------------------------------------------------------------------------
 # ActivationBundle — activated corpus intelligence surfaced beside a decision
 # ---------------------------------------------------------------------------
 
@@ -253,6 +273,7 @@ class ActivationBundle:
     activation_rationale: List[str]   # one entry per claim, why it matched
     corpus_scope: CorpusScope
     confidence_floor: float           # minimum score threshold used for retrieval
+    contradiction_alerts: List[ContradictionAlert] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -260,6 +281,7 @@ class ActivationBundle:
             "activation_rationale": self.activation_rationale,
             "corpus_scope": self.corpus_scope,
             "confidence_floor": self.confidence_floor,
+            "contradiction_alerts": [a.to_dict() for a in self.contradiction_alerts],
         }
 
     @property
