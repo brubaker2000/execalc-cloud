@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from typing import List, Tuple
 
 from src.service.gaqp.corpus import get_claim, update_claim_corroboration
+from src.service.gaqp.exceptions import ClaimNotFoundError
 from src.service.gaqp.models import (
     CONFIDENCE_SCORE,
     ConfidenceLevel,
@@ -13,6 +14,12 @@ from src.service.gaqp.models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Re-export: callers that import ClaimNotFoundError from this module still work.
+__all__ = [
+    "CorroborationResult", "ClaimNotFoundError",
+    "corroborate", "_compute_confidence", "_actor_key",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -29,14 +36,6 @@ class CorroborationResult:
     previous_score: float
     new_score: float
     independent_sources: int    # total after this corroboration
-
-
-# ---------------------------------------------------------------------------
-# Exceptions
-# ---------------------------------------------------------------------------
-
-class ClaimNotFoundError(Exception):
-    """Raised when the target claim does not exist in the tenant corpus."""
 
 
 # ---------------------------------------------------------------------------

@@ -290,6 +290,43 @@ def update_claim_corroboration(
         conn.close()
 
 
+_UPDATE_CONTRADICTIONS_SQL = """
+    UPDATE gaqp_claims
+    SET contradiction_refs = %s,
+        corroboration_profile = %s,
+        updated_at = NOW()
+    WHERE claim_id = %s AND tenant_id = %s
+"""
+
+
+def update_claim_contradictions(
+    *,
+    claim_id: str,
+    tenant_id: str,
+    new_contradiction_refs: List[str],
+    new_corroboration_profile: "CorroborationProfile",
+) -> bool:
+    """
+    Persist updated contradiction_refs and corroboration_profile for a claim.
+
+    Returns True if the claim was found and updated, False if not found.
+    Called exclusively by the contradiction engine after linking or resolving.
+    """
+    Json = _load_psycopg2_json()
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(_UPDATE_CONTRADICTIONS_SQL, (
+                Json(new_contradiction_refs),
+                Json(new_corroboration_profile.to_dict()),
+                claim_id,
+                tenant_id,
+            ))
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
 def list_claims_by_envelope(
     *,
     tenant_id: str,

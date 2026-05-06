@@ -4,10 +4,11 @@ import logging
 from datetime import UTC, datetime
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.service.gaqp.corpus import list_claims
+from src.service.gaqp.corpus import get_claim, list_claims
 from src.service.gaqp.models import (
     ActivationBundle,
     ClaimProvenance,
+    ContradictionAlert,
     CorroborationProfile,
     GAQPClaim,
 )
@@ -61,9 +62,12 @@ def activate(
     matched.sort(key=lambda pair: pair[0].get("confidence_score", 0.0), reverse=True)
     matched = matched[:max_claims]
 
+    contradiction_alerts = _build_contradiction_alerts(matched, tenant_id)
+
     return ActivationBundle(
         activated_claims=[_dict_to_claim(row) for row, _ in matched],
         activation_rationale=[r for _, r in matched],
+        contradiction_alerts=contradiction_alerts,
         corpus_scope="structural",
         confidence_floor=confidence_floor,
     )
@@ -118,6 +122,41 @@ def _match_rationale(row: Dict[str, Any], search_text: str) -> Optional[str]:
             return f'Trigger match: "{trigger}" found in scenario context.'
 
     return None
+
+
+def _build_contradiction_alerts(
+    matched: List[Tuple[Dict[str, Any], str]],
+    tenant_id: str,
+) -> List[ContradictionAlert]:
+    """
+    For each activated claim that carries contradiction_refs, fetch the
+    contradicting claims and build ContradictionAlert objects.
+
+    Errors fetching individual refs are logged and skipped — a missing ref
+    does not abort the activation.
+    """
+    alerts: List[ContradictionAlert] = []
+    for row, _ in matched:
+        refs: List[str] = row.get("contradiction_refs") or []
+        for ref_id in refs:
+            try:
+                contra_row = get_claim(claim_id=ref_id, tenant_id=tenant_id)
+                if contra_row:
+                    alerts.append(ContradictionAlert(
+                        activated_claim_id=row["claim_id"],
+                        contradicting_claim=_dict_to_claim(contra_row),
+                    ))
+                else:
+                    logger.warning(
+                        "Contradiction ref %r not found in corpus for tenant %s (claim %s)",
+                        ref_id, tenant_id, row["claim_id"],
+                    )
+            except Exception:
+                logger.exception(
+                    "Failed to fetch contradiction ref %r for claim %s tenant %s",
+                    ref_id, row["claim_id"], tenant_id,
+                )
+    return alerts
 
 
 def _parse_dt(value: Optional[str]) -> datetime:
