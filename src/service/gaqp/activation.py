@@ -146,6 +146,7 @@ def _dict_to_claim(row: Dict[str, Any]) -> GAQPClaim:
         cross_tenant_count=corr_raw.get("cross_tenant_count", 0),
         contradictions=corr_raw.get("contradictions", 0),
         last_corroborated_at=datetime.fromisoformat(lca_raw) if lca_raw else None,
+        corroborating_actors=list(corr_raw.get("corroborating_actors") or []),
     )
 
     return GAQPClaim(
