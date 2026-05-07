@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from src.service.decision_loop.models import DecisionReport
+from src.service.gaqp.ingress import evaluate_type_gate
 from src.service.gaqp.models import (
     CONFIDENCE_SCORE,
     SCHEMA_VERSION,
@@ -200,6 +201,15 @@ def _build_claim(
     if scenario_type and scenario_type not in ("general", ""):
         triggers.append(f"scenario:{scenario_type}")
 
+    # Stage 9G: type-specific gate -- downgrade admitted -> needs_review if gate fails
+    resolved_admission = admission.admission_status
+    resolved_failed = list(admission.failed_tests)
+    if admission.admission_status == "admitted":
+        type_gate = evaluate_type_gate(content, claim_type)
+        if not type_gate.passed:
+            resolved_admission = "needs_review"
+            resolved_failed = list(type_gate.failed_gates)
+
     fp = compute_fingerprint(
         tenant_id=tenant_id,
         source_envelope_id=source_envelope_id,
@@ -217,7 +227,7 @@ def _build_claim(
         content=content,
         confidence_level="seed",
         confidence_score=CONFIDENCE_SCORE["seed"],
-        admission_status=admission.admission_status,
+        admission_status=resolved_admission,
         corpus_scope="tenant",
         extraction_method="direct_field",
         provenance=ClaimProvenance(
