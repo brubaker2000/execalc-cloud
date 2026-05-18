@@ -53,15 +53,18 @@ def _compute_confidence(independent_sources: int) -> Tuple[str, float]:
     independent_sources is the count of post-creation independent corroborations.
     Structural is operator-only — this function never returns it.
 
-    Ladder:
-      0 → seed (0.50)       no corroboration yet
-      1 → developing (0.72) second independent source
-     ≥2 → strong (0.91)    three or more converging
+    Ladder (per GAQP-Master v1.0):
+      0 → seed (0.50)          no corroboration yet
+      1 → single_source (0.65) one credible external source
+      2 → developing (0.72)    secondary sources present
+     ≥3 → corroborated (0.91)  three or more independent sources converging
     """
+    if independent_sources >= 3:
+        return ("corroborated", CONFIDENCE_SCORE["corroborated"])
     if independent_sources >= 2:
-        return ("strong", CONFIDENCE_SCORE["strong"])
-    if independent_sources >= 1:
         return ("developing", CONFIDENCE_SCORE["developing"])
+    if independent_sources >= 1:
+        return ("single_source", CONFIDENCE_SCORE["single_source"])
     return ("seed", CONFIDENCE_SCORE["seed"])
 
 

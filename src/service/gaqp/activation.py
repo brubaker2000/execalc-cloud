@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 from src.service.gaqp.corpus import get_claim, list_claims
 from src.service.gaqp.models import (
@@ -12,7 +12,6 @@ from src.service.gaqp.models import (
     CorroborationProfile,
     GAQPClaim,
 )
-from src.service.orchestration.models import ScenarioEnvelope
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +20,16 @@ _DEFAULT_MAX_CLAIMS = 20
 _CORPUS_FETCH_LIMIT = 200  # fetch wide, filter in Python
 
 
+class _ScenarioLike(Protocol):
+    """Duck-typed protocol — any object with these three fields works."""
+    scenario_type: str
+    governing_objective: str
+    prompt: str
+
+
 def activate(
     *,
-    scenario: ScenarioEnvelope,
+    scenario: _ScenarioLike,
     tenant_id: str,
     confidence_floor: float = _DEFAULT_CONFIDENCE_FLOOR,
     max_claims: int = _DEFAULT_MAX_CLAIMS,
@@ -99,7 +105,7 @@ def _fetch_candidates(tenant_id: str, confidence_floor: float) -> List[Dict[str,
     return candidates
 
 
-def _build_search_text(scenario: ScenarioEnvelope) -> str:
+def _build_search_text(scenario: _ScenarioLike) -> str:
     """Combine scenario fields into a single lowercase search surface."""
     parts = [scenario.scenario_type, scenario.governing_objective, scenario.prompt]
     return " ".join(p for p in parts if p).lower()
@@ -208,6 +214,9 @@ def _dict_to_claim(row: Dict[str, Any]) -> GAQPClaim:
         support_refs=list(row.get("support_refs") or []),
         fingerprint=row.get("fingerprint", ""),
         schema_version=row.get("schema_version", "stage9_v1"),
+        standards_package_version=row.get("standards_package_version", "gaqp_v1.0"),
+        inference_flag=bool(row.get("inference_flag", False)),
+        source_location=row.get("source_location"),
         created_at=_parse_dt(row.get("created_at")),
         updated_at=_parse_dt(row.get("updated_at")),
     )

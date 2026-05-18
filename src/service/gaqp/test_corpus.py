@@ -216,6 +216,8 @@ class TestGetClaim:
             claim.corroboration_profile.to_dict(),
             claim.contradiction_refs, claim.support_refs,
             claim.fingerprint, claim.schema_version,
+            claim.inference_flag, claim.source_location,
+            claim.standards_package_version,
             datetime.now(UTC), datetime.now(UTC),
         )
 

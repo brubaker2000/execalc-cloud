@@ -57,6 +57,9 @@ def _claim_to_row(claim: GAQPClaim, Json: Any) -> tuple:
         Json(claim.support_refs),
         claim.fingerprint,
         claim.schema_version,
+        claim.inference_flag,
+        claim.source_location,
+        claim.standards_package_version,
     )
 
 
@@ -66,13 +69,15 @@ _INSERT_SQL = """
         confidence_level, confidence_score, admission_status, corpus_scope,
         extraction_method, provenance, activation_scope, activation_triggers,
         corroboration_profile, contradiction_refs, support_refs,
-        fingerprint, schema_version
+        fingerprint, schema_version, inference_flag, source_location,
+        standards_package_version
     ) VALUES (
         %s, %s, %s, %s, %s, %s,
         %s, %s, %s, %s,
         %s, %s, %s, %s,
         %s, %s, %s,
-        %s, %s
+        %s, %s, %s, %s,
+        %s
     )
     ON CONFLICT (fingerprint) DO NOTHING
 """
@@ -82,7 +87,8 @@ _SELECT_BY_ID_SQL = """
            confidence_level, confidence_score, admission_status, corpus_scope,
            extraction_method, provenance, activation_scope, activation_triggers,
            corroboration_profile, contradiction_refs, support_refs,
-           fingerprint, schema_version, created_at, updated_at
+           fingerprint, schema_version, inference_flag, source_location,
+           standards_package_version, created_at, updated_at
     FROM gaqp_claims
     WHERE claim_id = %s AND tenant_id = %s
 """
@@ -92,7 +98,8 @@ _SELECT_BY_ENVELOPE_SQL = """
            confidence_level, confidence_score, admission_status, corpus_scope,
            extraction_method, provenance, activation_scope, activation_triggers,
            corroboration_profile, contradiction_refs, support_refs,
-           fingerprint, schema_version, created_at, updated_at
+           fingerprint, schema_version, inference_flag, source_location,
+           standards_package_version, created_at, updated_at
     FROM gaqp_claims
     WHERE tenant_id = %s AND source_envelope_id = %s
     ORDER BY created_at ASC
@@ -105,7 +112,8 @@ def _row_to_dict(row: tuple) -> Dict[str, Any]:
         confidence_level, confidence_score, admission_status, corpus_scope,
         extraction_method, provenance, activation_scope, activation_triggers,
         corroboration_profile, contradiction_refs, support_refs,
-        fingerprint, schema_version, created_at, updated_at,
+        fingerprint, schema_version, inference_flag, source_location,
+        standards_package_version, created_at, updated_at,
     ) = row
     return {
         "claim_id": claim_id,
@@ -127,6 +135,9 @@ def _row_to_dict(row: tuple) -> Dict[str, Any]:
         "support_refs": support_refs,
         "fingerprint": fingerprint,
         "schema_version": schema_version,
+        "inference_flag": inference_flag,
+        "source_location": source_location,
+        "standards_package_version": standards_package_version,
         "created_at": created_at.isoformat() if created_at else None,
         "updated_at": updated_at.isoformat() if updated_at else None,
     }
@@ -233,7 +244,8 @@ def list_claims(
         "confidence_level, confidence_score, admission_status, corpus_scope, "
         "extraction_method, provenance, activation_scope, activation_triggers, "
         "corroboration_profile, contradiction_refs, support_refs, "
-        "fingerprint, schema_version, created_at, updated_at "
+        "fingerprint, schema_version, inference_flag, source_location, "
+        "standards_package_version, created_at, updated_at "
         "FROM gaqp_claims "
         "WHERE " + " AND ".join(conditions) +
         " ORDER BY confidence_score DESC, created_at DESC LIMIT %s"
