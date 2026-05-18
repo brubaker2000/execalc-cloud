@@ -1,7 +1,7 @@
 # Execalc Stage Status
 
-Last updated: 2026-05-04
-Last verified state: Stage 9E complete — full GAQP loop live on main. Stage 9A GAQPClaim data model, Stage 9B extraction pipeline, Stage 9C corpus persistence, Stage 9D activation engine, and Stage 9E orchestration rail integration implemented, tested (103 tests), and merged to main.
+Last updated: 2026-05-18
+Last verified state: Stage 9H complete. 359 tests passing. — full GAQP loop live on main. Stage 9A GAQPClaim data model, Stage 9B extraction pipeline, Stage 9C corpus persistence, Stage 9D activation engine, and Stage 9E orchestration rail integration implemented, tested (103 tests), and merged to main.
 
 ## Stage 4A–4B: Decision Loop Engine (COMPLETE)
 - Spec: docs/product/DECISION_LOOP_ENGINE_SPEC.md
