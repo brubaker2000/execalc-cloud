@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from src.service.decision_loop.models import DecisionReport, Scenario, SensitivityVariable
 from src.service.decision_loop.support_stack import support_stack_trace
+from src.service.gaqp.models import ActivationBundle
 
 
 CRITICAL_FIELDS_BY_SCENARIO: Dict[str, List[str]] = {
@@ -214,7 +215,100 @@ def _build_polymorphia_fields(
     }
 
 
-def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> DecisionReport:
+_GAQP_UPSIDE_TYPES = {"strength", "opportunity", "asset"}
+_GAQP_DOWNSIDE_TYPES = {"threat", "weakness", "liability", "constraint"}
+_GAQP_RATIONALE_TYPES = {"axiom", "principle", "doctrine"}
+_GAQP_ACTION_TYPES = {"heuristic", "best_practice", "tactic"}
+
+
+def _apply_gaqp_preconditioning(
+    *,
+    bundle: ActivationBundle,
+    upside: List[str],
+    downside: List[str],
+    rationale: List[str],
+    next_actions: List[str],
+    confidence: str,
+) -> Dict[str, Any]:
+    """
+    Enrich decision output with activated GAQP corpus claims.
+
+    Confidence gates (per catchup1 doctrine — evidence state governs influence):
+      - upside/downside enrichment: seed+ (0.50)
+      - next_actions enrichment: developing+ (0.72)
+      - rationale enrichment: strong+ (0.91)
+      - threshold_condition confidence demotion: structural only (1.00)
+
+    Returns enriched field values and a trace dict for audit.
+    Additive only — never overrides the deterministic base output.
+    """
+    if bundle.is_empty:
+        return {
+            "upside": upside, "downside": downside,
+            "rationale": rationale, "next_actions": next_actions,
+            "confidence": confidence,
+            "trace": {"claims_applied": 0, "claim_types": [], "bundle_size": 0},
+        }
+
+    new_upside = list(upside)
+    new_downside = list(downside)
+    new_rationale = list(rationale)
+    new_next_actions = list(next_actions)
+    new_confidence = confidence
+    applied: List[str] = []
+
+    for claim in bundle.activated_claims:
+        ct = claim.claim_type
+        score = claim.confidence_score
+        label = f"[GAQP:{claim.confidence_level}]"
+        entry = f"{label} {claim.content}"
+
+        if ct in _GAQP_UPSIDE_TYPES and score >= 0.50:
+            if entry not in new_upside:
+                new_upside.append(entry)
+                applied.append(ct)
+
+        elif ct in _GAQP_DOWNSIDE_TYPES and score >= 0.50:
+            if entry not in new_downside:
+                new_downside.append(entry)
+                applied.append(ct)
+
+        elif ct in _GAQP_RATIONALE_TYPES and score >= 0.91:
+            if entry not in new_rationale:
+                new_rationale.append(entry)
+                applied.append(ct)
+
+        elif ct in _GAQP_ACTION_TYPES and score >= 0.72:
+            if entry not in new_next_actions:
+                new_next_actions.append(entry)
+                applied.append(ct)
+
+        elif ct == "threshold_condition" and score >= 1.00 and new_confidence == "medium":
+            new_confidence = "low"
+            new_rationale.append(f"[GAQP:structural threshold] {claim.content}")
+            applied.append(ct)
+
+    return {
+        "upside": new_upside,
+        "downside": new_downside,
+        "rationale": new_rationale,
+        "next_actions": new_next_actions,
+        "confidence": new_confidence,
+        "trace": {
+            "claims_applied": len(applied),
+            "claim_types": applied,
+            "bundle_size": len(bundle.activated_claims),
+        },
+    }
+
+
+def run_decision_loop(
+    *,
+    tenant_id: str,
+    user_id: str,
+    scenario: Scenario,
+    activation_bundle: Optional[ActivationBundle] = None,
+) -> DecisionReport:
     """
     Stage 4A: deterministic structured output.
     - No hallucinated facts
@@ -301,6 +395,28 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
     prime = _build_prime_directive_assessments(scenario, sensitivity)
     polymorphia = _build_polymorphia_fields(scenario, sensitivity)
 
+    gaqp_pre = _apply_gaqp_preconditioning(
+        bundle=activation_bundle,
+        upside=upside,
+        downside=downside,
+        rationale=rationale,
+        next_actions=next_actions,
+        confidence=confidence,
+    ) if activation_bundle is not None else {
+        "upside": upside, "downside": downside, "rationale": rationale,
+        "next_actions": next_actions, "confidence": confidence,
+        "trace": {"claims_applied": 0, "claim_types": [], "bundle_size": 0},
+    }
+
+    upside = gaqp_pre["upside"]
+    downside = gaqp_pre["downside"]
+    rationale = gaqp_pre["rationale"]
+    next_actions = gaqp_pre["next_actions"]
+    confidence = gaqp_pre["confidence"]
+
+    tradeoffs["upside"] = upside
+    tradeoffs["downside"] = downside
+
     execution_trace = {
         "scenario_type": scenario.scenario_type,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -310,8 +426,10 @@ def run_decision_loop(*, tenant_id: str, user_id: str, scenario: Scenario) -> De
             "generated tradeoff analysis",
             "generated prime directive assessments",
             "generated polymorphia fields",
+            "applied gaqp preconditioning",
             "generated support stack trace",
         ],
+        "gaqp_preconditioning": gaqp_pre["trace"],
         "context_used": {
             "decision_horizon": scenario.decision_horizon,
             "stakeholder_scope": scenario.stakeholder_scope,

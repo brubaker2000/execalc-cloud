@@ -35,6 +35,8 @@ ClaimType = Literal[
     "weakness",
     "threat",
     "opportunity",
+    "asset",
+    "liability",
 ]
 
 CLAIM_TYPES: List[str] = [
@@ -43,24 +45,24 @@ CLAIM_TYPES: List[str] = [
     "institutional_precedent", "constraint", "threshold_condition", "objective",
     "tradeoff", "causal_claim", "declaration_of_value", "diagnostic_signal",
     "stakeholder_complaint", "tactic", "strength", "weakness", "threat",
-    "opportunity",
+    "opportunity", "asset", "liability",
 ]
 
-ConfidenceLevel = Literal["seed", "developing", "strong", "structural", "disputed"]
+ConfidenceLevel = Literal["seed", "single_source", "developing", "corroborated", "structural", "disputed"]
 AdmissionStatus = Literal["admitted", "rejected", "needs_review", "candidate"]
 CorpusScope = Literal["private", "tenant", "structural"]
 ActivationScope = Literal["universal", "domain_specific", "situational", "tenant_specific"]
 ExtractionMethod = Literal["direct_field", "llm_decomposed", "operator_memoralized"]
 Domain = Literal["strategy", "capital", "operations", "human_behavior", "governance"]
 
-# GAQP confidence ladder — Triangulation operationalized.
-# Seed=first occurrence, Developing=second independent, Strong=three-point,
-# Structural=institutional doctrine. Aligns exactly with the Polymorphia
-# triangulation framework.
+# GAQP confidence ladder — per GAQP-Master v1.0.
+# Advances through independent corroboration only; same-source repetition does not promote.
+# Structural requires human elevation — never auto-promoted.
 CONFIDENCE_SCORE: Dict[str, float] = {
     "seed": 0.50,
+    "single_source": 0.65,
     "developing": 0.72,
-    "strong": 0.91,
+    "corroborated": 0.91,
     "structural": 1.00,
 }
 
@@ -206,6 +208,11 @@ class GAQPClaim:
 
     # Versioning
     schema_version: str = SCHEMA_VERSION
+    standards_package_version: str = "gaqp_v1.0"
+
+    # Provenance quality
+    inference_flag: bool = False          # True if claim involves deconstructor inference beyond source
+    source_location: Optional[str] = None # field/page/paragraph within the source artifact
 
     # Timestamps
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
@@ -232,6 +239,9 @@ class GAQPClaim:
             "support_refs": self.support_refs,
             "fingerprint": self.fingerprint,
             "schema_version": self.schema_version,
+            "standards_package_version": self.standards_package_version,
+            "inference_flag": self.inference_flag,
+            "source_location": self.source_location,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

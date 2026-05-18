@@ -216,7 +216,7 @@ class TestExtractClaims:
 
     def test_claim_types_from_expected_set(self):
         valid_types = {
-            "tradeoff", "causal_claim", "strength", "weakness",
+            "tradeoff", "causal_claim", "asset", "liability",
             "objective", "observation",
         }
         claims = extract_claims(

@@ -1,14 +1,20 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict
+import logging
 import secrets
-
 from datetime import UTC, datetime, timedelta
+from typing import Any, Callable, Dict
 
 from src.service.decision_loop.engine import run_decision_loop
 from src.service.decision_loop.execution_boundary_engine import evaluate_execution_boundary
 from src.service.decision_loop.models import ActionProposal, ExecutionSnapshot, Scenario
 from src.service.execution_record import ExecutionRecord
+from src.service.gaqp.activation import activate
+from src.service.gaqp.corpus import insert_claim
+from src.service.gaqp.extraction import admitted_claims, extract_claims
+from src.service.gaqp.models import ActivationBundle
+
+logger = logging.getLogger(__name__)
 
 
 def run_decision_service(
@@ -60,9 +66,21 @@ def run_decision_service(
         operator_id=user_id,
     )
 
-    report = run_decision_loop(tenant_id=tenant_id, user_id=user_id, scenario=scenario)
-
     envelope_id = secrets.token_hex(16)
+
+    try:
+        activation_bundle = activate(scenario=scenario, tenant_id=tenant_id)
+    except Exception:
+        logger.exception("GAQP activation failed for tenant %s; proceeding without preconditioning", tenant_id)
+        activation_bundle = ActivationBundle(
+            activated_claims=[], activation_rationale=[],
+            corpus_scope="structural", confidence_floor=0.50,
+        )
+
+    report = run_decision_loop(
+        tenant_id=tenant_id, user_id=user_id,
+        scenario=scenario, activation_bundle=activation_bundle,
+    )
 
     issued_at = datetime.now(UTC)
     proposal = ActionProposal(
@@ -163,6 +181,23 @@ def run_decision_service(
     out["audit"]["drift"]["signals"] = drift_signals
     out["audit"]["drift"]["anomalies"] = drift_anomalies
     out["audit"]["execution_boundary"] = boundary_dict
+
+    try:
+        new_claims = extract_claims(
+            report=report,
+            tenant_id=tenant_id,
+            source_envelope_id=envelope_id,
+            actor_id=user_id,
+        )
+        for claim in admitted_claims(new_claims):
+            try:
+                insert_claim(claim)
+            except Exception:
+                logger.exception("GAQP corpus write failed for claim %s envelope %s", claim.claim_id, envelope_id)
+    except Exception:
+        logger.exception("GAQP extraction failed for envelope %s", envelope_id)
+
+    out["gaqp_activation"] = activation_bundle.to_dict()
 
     record = ExecutionRecord(
         tenant_id=tenant_id,

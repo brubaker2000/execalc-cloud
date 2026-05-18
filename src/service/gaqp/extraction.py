@@ -101,52 +101,59 @@ def _run_admission_tests(content: str) -> AdmissionResult:
 # Per STAGE_9A0_ARCHITECTURE_LOCK.md — direct field extraction only in v1.
 # ---------------------------------------------------------------------------
 
-# Each entry: (content_accessor, claim_type, domain, base_activation_triggers, activation_scope)
+# Each entry: (content_accessor, claim_type, domain, base_activation_triggers, activation_scope, source_field)
 _SCALAR_FIELDS: List[Tuple[
     Callable[[DecisionReport], Optional[str]],
-    str,   # claim_type
-    str,   # domain
+    str,        # claim_type
+    str,        # domain
     List[str],  # base activation triggers
-    str,   # activation_scope
+    str,        # activation_scope
+    str,        # source_field — location within the report
 ]] = [
     (
         lambda r: r.value_assessment,
         "tradeoff", "strategy",
         ["value_assessment", "governing_objective"],
         "situational",
+        "report.value_assessment",
     ),
     (
         lambda r: r.risk_reward_assessment,
         "tradeoff", "strategy",
         ["risk_reward_assessment", "risk_decision"],
         "situational",
+        "report.risk_reward_assessment",
     ),
     (
         lambda r: r.supply_demand_assessment,
         "causal_claim", "strategy",
         ["supply_demand_assessment", "market_analysis"],
         "situational",
+        "report.supply_demand_assessment",
     ),
     (
         lambda r: r.asset_assessment,
-        "strength", "strategy",
+        "asset", "strategy",
         ["asset_assessment", "capability_review"],
         "situational",
+        "report.asset_assessment",
     ),
     (
         lambda r: r.liability_assessment,
-        "weakness", "strategy",
+        "liability", "strategy",
         ["liability_assessment", "constraint_review"],
         "situational",
+        "report.liability_assessment",
     ),
 ]
 
-# Each entry: (list_accessor, claim_type, domain, base_activation_triggers, activation_scope)
+# Each entry: (list_accessor, claim_type, domain, base_activation_triggers, activation_scope, source_field)
 _LIST_FIELDS: List[Tuple[
     Callable[[DecisionReport], List[str]],
     str,
     str,
     List[str],
+    str,
     str,
 ]] = [
     (
@@ -154,24 +161,28 @@ _LIST_FIELDS: List[Tuple[
         "objective", "strategy",
         ["incentive_analysis", "stakeholder_alignment"],
         "situational",
+        "report.incentives",
     ),
     (
         lambda r: r.asymmetries,
         "causal_claim", "strategy",
         ["asymmetry_analysis", "leverage_assessment"],
         "situational",
+        "report.asymmetries",
     ),
     (
         lambda r: (r.tradeoffs or {}).get("key_tradeoffs") or [],
         "tradeoff", "strategy",
         ["tradeoff_analysis", "key_tradeoffs"],
         "situational",
+        "report.tradeoffs.key_tradeoffs",
     ),
     (
         lambda r: r.confidence_rationale,
         "observation", "strategy",
         ["confidence_review", "rationale_audit"],
         "situational",
+        "report.confidence_rationale",
     ),
 ]
 
@@ -193,6 +204,7 @@ def _build_claim(
     actor_id: str,
     governing_objective: Optional[str],
     scenario_type: Optional[str],
+    source_location: Optional[str] = None,
 ) -> GAQPClaim:
     # Enrich activation triggers with scenario context
     triggers = list(base_triggers)
@@ -241,6 +253,9 @@ def _build_claim(
         activation_triggers=triggers,
         corroboration_profile=CorroborationProfile(),
         fingerprint=fp,
+        inference_flag=False,
+        source_location=source_location,
+        standards_package_version="gaqp_v1.0",
     )
 
 
@@ -273,7 +288,7 @@ def extract_claims(
     claims: List[GAQPClaim] = []
 
     # Scalar fields — one candidate per field
-    for accessor, claim_type, domain, triggers, scope in _SCALAR_FIELDS:
+    for accessor, claim_type, domain, triggers, scope, source_field in _SCALAR_FIELDS:
         content = accessor(report)
         if not content:
             continue
@@ -290,14 +305,15 @@ def extract_claims(
             actor_id=actor_id,
             governing_objective=governing_objective,
             scenario_type=scenario_type,
+            source_location=source_field,
         ))
 
     # List fields — one candidate per list item
-    for accessor, claim_type, domain, triggers, scope in _LIST_FIELDS:
+    for accessor, claim_type, domain, triggers, scope, source_field in _LIST_FIELDS:
         items = accessor(report)
         if not items:
             continue
-        for item in items:
+        for i, item in enumerate(items):
             content = str(item).strip() if item else ""
             if not content:
                 continue
@@ -314,6 +330,7 @@ def extract_claims(
                 actor_id=actor_id,
                 governing_objective=governing_objective,
                 scenario_type=scenario_type,
+                source_location=f"{source_field}[{i}]",
             ))
 
     return claims

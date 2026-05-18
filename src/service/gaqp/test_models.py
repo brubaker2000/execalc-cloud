@@ -56,8 +56,9 @@ def _make_claim(**overrides) -> GAQPClaim:
 class TestConfidenceLadder:
     def test_scores_match_gaqp_ladder(self):
         assert CONFIDENCE_SCORE["seed"] == 0.50
+        assert CONFIDENCE_SCORE["single_source"] == 0.65
         assert CONFIDENCE_SCORE["developing"] == 0.72
-        assert CONFIDENCE_SCORE["strong"] == 0.91
+        assert CONFIDENCE_SCORE["corroborated"] == 0.91
         assert CONFIDENCE_SCORE["structural"] == 1.00
 
     def test_scores_are_ordered(self):
@@ -66,8 +67,8 @@ class TestConfidenceLadder:
 
 
 class TestClaimTypes:
-    def test_24_canonical_types(self):
-        assert len(CLAIM_TYPES) == 24
+    def test_26_canonical_types(self):
+        assert len(CLAIM_TYPES) == 26
 
     def test_swot_types_present(self):
         for t in ("strength", "weakness", "threat", "opportunity"):

@@ -50,6 +50,9 @@ CREATE TABLE IF NOT EXISTS gaqp_claims (
   support_refs         JSONB       NOT NULL DEFAULT '[]',
   fingerprint          TEXT        NOT NULL,
   schema_version       TEXT        NOT NULL,
+  inference_flag       BOOLEAN     NOT NULL DEFAULT FALSE,
+  source_location      TEXT,
+  standards_package_version TEXT   NOT NULL DEFAULT 'gaqp_v1.0',
   created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (claim_id)

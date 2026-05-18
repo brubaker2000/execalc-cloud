@@ -84,21 +84,21 @@ class TestComputeConfidence:
         assert level == "seed"
         assert score == CONFIDENCE_SCORE["seed"]
 
-    def test_one_independent_source_is_developing(self):
+    def test_one_independent_source_is_single_source(self):
         level, score = _compute_confidence(1)
+        assert level == "single_source"
+        assert score == CONFIDENCE_SCORE["single_source"]
+
+    def test_two_independent_sources_is_developing(self):
+        level, score = _compute_confidence(2)
         assert level == "developing"
         assert score == CONFIDENCE_SCORE["developing"]
 
-    def test_two_independent_sources_is_strong(self):
-        level, score = _compute_confidence(2)
-        assert level == "strong"
-        assert score == CONFIDENCE_SCORE["strong"]
-
-    def test_three_or_more_still_strong(self):
+    def test_three_or_more_is_corroborated(self):
         for n in (3, 5, 10):
             level, score = _compute_confidence(n)
-            assert level == "strong", f"Expected strong for {n} sources"
-            assert score == CONFIDENCE_SCORE["strong"]
+            assert level == "corroborated", f"Expected corroborated for {n} sources"
+            assert score == CONFIDENCE_SCORE["corroborated"]
 
     def test_never_returns_structural(self):
         for n in range(10):
@@ -109,7 +109,8 @@ class TestComputeConfidence:
         _, s0 = _compute_confidence(0)
         _, s1 = _compute_confidence(1)
         _, s2 = _compute_confidence(2)
-        assert s0 < s1 < s2
+        _, s3 = _compute_confidence(3)
+        assert s0 < s1 < s2 < s3
 
 
 # ---------------------------------------------------------------------------
@@ -142,7 +143,7 @@ class TestCorroborate:
             ),
         )
 
-    def test_first_corroboration_promotes_seed_to_developing(self):
+    def test_first_corroboration_promotes_seed_to_single_source(self):
         row = _make_corpus_row()
         with patch("src.service.gaqp.corroboration.get_claim", return_value=row), \
              patch("src.service.gaqp.corroboration.update_claim_corroboration") as mock_update:
@@ -156,15 +157,15 @@ class TestCorroborate:
         assert result.was_independent is True
         assert result.promoted is True
         assert result.previous_level == "seed"
-        assert result.new_level == "developing"
-        assert result.new_score == CONFIDENCE_SCORE["developing"]
+        assert result.new_level == "single_source"
+        assert result.new_score == CONFIDENCE_SCORE["single_source"]
         assert result.independent_sources == 1
         mock_update.assert_called_once()
 
-    def test_second_independent_corroboration_promotes_to_strong(self):
+    def test_second_independent_corroboration_promotes_to_developing(self):
         row = _make_corpus_row(
-            confidence_level="developing",
-            confidence_score=CONFIDENCE_SCORE["developing"],
+            confidence_level="single_source",
+            confidence_score=CONFIDENCE_SCORE["single_source"],
             corroboration_profile={
                 "corroboration_count": 1,
                 "independent_sources": 1,
@@ -186,7 +187,7 @@ class TestCorroborate:
 
         assert result.was_independent is True
         assert result.promoted is True
-        assert result.new_level == "strong"
+        assert result.new_level == "developing"
         assert result.independent_sources == 2
 
     def test_same_actor_repetition_does_not_promote(self):
@@ -228,7 +229,7 @@ class TestCorroborate:
 
         assert result2.was_independent is False
         assert result2.promoted is False
-        assert result2.new_level == "developing"
+        assert result2.new_level == "single_source"
         assert result2.independent_sources == 1  # unchanged
 
     def test_cross_tenant_corroboration_is_independent(self):
@@ -244,7 +245,7 @@ class TestCorroborate:
 
         assert result.was_independent is True
         assert result.promoted is True
-        assert result.new_level == "developing"
+        assert result.new_level == "single_source"
 
         # Verify cross_tenant_count was incremented in the profile passed to update
         _, kwargs = mock_update.call_args
