@@ -2,7 +2,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict, FrozenSet, List, Optional, Tuple
 GATE_VERSION = "9h_v1"
-_HARD_REJECT_TYPES: FrozenSet[str] = frozenset({"observation", "strength", "weakness"})
+# Hard-reject types: 100% pass rate in calibration.
+# "asset" and "liability" inherit calibration from "strength"/"weakness" —
+# same language patterns, same extraction field, renamed claim types in PR #64.
+_HARD_REJECT_TYPES: FrozenSet[str] = frozenset({
+    "observation", "strength", "weakness", "asset", "liability",
+})
 def gate_enforcement(claim_type: str) -> str:
     return "rejected" if claim_type in _HARD_REJECT_TYPES else "needs_review"
 @dataclass(frozen=True)
@@ -25,6 +30,8 @@ _GATE_SPECS = {
     "causal_claim": _GateSpec([["because","leads to","lead to","results in","result in","drives","causes","caused by","due to","as a result","therefore","consequently","which means","producing","generates","creates pressure","compresses","suppresses","driven by","depends on","shaped by","is a function of","is driven","contingent on","determined by"]], 30, ["causal_connector"], ["Causal claims must contain an explicit causal connector."]),
     "strength": _GateSpec([["advantage","strength","capability","asset","competitive","superior","effective","strong","robust","proven","differentiated","established","reliable","efficient","trusted","leading","best-in-class"]], 25, ["capability_language"], ["Strength claims must describe an explicit organizational capability, asset, or competitive advantage."]),
     "weakness": _GateSpec([["weakness","liability","limitation","constraint","gap","deficit","insufficient","lacking","risk","exposure","vulnerable","underdeveloped","dependent","costly","fragile","absent","missing","slow"]], 25, ["limitation_language"], ["Weakness claims must describe an explicit organizational limitation, liability, or gap."]),
+    "asset": _GateSpec([["advantage","strength","capability","asset","competitive","superior","effective","strong","robust","proven","differentiated","established","reliable","efficient","trusted","leading","best-in-class"]], 25, ["capability_language"], ["Asset claims must describe an explicit organizational capability, asset, or competitive advantage."]),
+    "liability": _GateSpec([["weakness","liability","limitation","constraint","gap","deficit","insufficient","lacking","risk","exposure","vulnerable","underdeveloped","dependent","costly","fragile","absent","missing","slow"]], 25, ["limitation_language"], ["Liability claims must describe an explicit organizational limitation, liability, or gap."]),
     "objective": _GateSpec([["goal","objective","target","aim","achieve","seek","pursue","intend","commit","aspire","priority","ambition","mission","purpose","drive toward","preserv","protect","maintain","maximiz","minimiz","optim","ensure","deliver"]], 25, ["goal_language"], ["Objective claims must contain explicit goal or target language."]),
     "observation": _GateSpec([["indicates","suggests","shows","demonstrates","reveals","found","observed","noted","appears","evident","data","evidence","pattern","trend","signal","recorded","measured","reported","confirmed","is ","are ","was ","were ","has ","have "]], 30, ["epistemic_grounding"], ["Observation claims should contain epistemic grounding."]),
     "constraint": _GateSpec([["must not","cannot","limited to","cap","ceiling","floor","maximum","minimum","not exceed","boundary","hard limit","no more than","at most","at least","threshold","restricted"]], 25, ["boundary_language"], ["Constraint claims must specify an explicit boundary or limit."]),
