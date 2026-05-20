@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime
 from typing import Any, Dict, Optional
 
@@ -8,6 +9,13 @@ from src.service.decision_loop.service import run_decision_service
 from src.service.execution_record import ExecutionRecord
 from src.service.gaqp.activation import activate
 from src.service.orchestration.models import NavigationEnvelope, ScenarioEnvelope, TurnClass
+from src.service.substrate import call_substrate
+from src.service.substrate.interface import (
+    CoverageLevel,
+    SubstrateCallClass,
+    SubstrateRequest,
+)
+from src.service.substrate.prompts import build_system_prompt
 
 
 def _now() -> datetime:
@@ -260,6 +268,54 @@ def route_turn(
     }
 
 
+_TURN_TO_CALL_CLASS: dict[str, SubstrateCallClass] = {
+    "conversational":   SubstrateCallClass.CONVERSATIONAL,
+    "decision_seeking": SubstrateCallClass.STRUCTURED_SYNTHESIS,
+    "action_proposing": SubstrateCallClass.ACTION_FRAMING,
+    "execution_seeking": SubstrateCallClass.EXECUTION_GATE,
+    "evidence_seeking": SubstrateCallClass.CORPUS_RETRIEVAL,
+}
+
+
+def _coverage(scenario: ScenarioEnvelope, claim_count: int) -> CoverageLevel:
+    has_objective = scenario.governing_objective not in ("unspecified", "", None)
+    has_claims = claim_count > 0
+    if has_objective and has_claims:
+        return CoverageLevel.FULL
+    if has_objective or has_claims:
+        return CoverageLevel.PARTIAL
+    return CoverageLevel.MINIMAL
+
+
+def _generate_assistant_message(
+    *,
+    turn_class: str,
+    scenario: ScenarioEnvelope,
+    tenant_id: str,
+    corpus_claims: list[dict[str, Any]],
+    claim_count: int,
+) -> str:
+    call_class = _TURN_TO_CALL_CLASS.get(turn_class, SubstrateCallClass.CONVERSATIONAL)
+    coverage = _coverage(scenario, claim_count)
+    system_prompt = build_system_prompt(
+        call_class=call_class,
+        tenant_id=tenant_id,
+        governing_objective=scenario.governing_objective,
+        corpus_claims=corpus_claims,
+    )
+    request = SubstrateRequest(
+        call_class=call_class,
+        governance_coverage=coverage,
+        system_prompt=system_prompt,
+        user_turn=scenario.prompt,
+        tenant_id=tenant_id,
+        call_id=str(uuid.uuid4()),
+        max_tokens=1024,
+    )
+    response = call_substrate(request)
+    return response.content
+
+
 def run_orchestration(
     *,
     user_text: str,
@@ -288,15 +344,15 @@ def run_orchestration(
 
     bundle = activate(scenario=scenario, tenant_id=tenant_id)
     claim_count = len(bundle.activated_claims)
+    corpus_claims = bundle.to_dict().get("activated_claims", [])
 
-    if turn_class == "evidence_seeking":
-        assistant_message = (
-            f"{claim_count} corpus claim(s) activated for this scenario."
-            if claim_count
-            else "No corpus claims matched this scenario yet."
-        )
-    else:
-        assistant_message = routed["assistant_message"]
+    assistant_message = _generate_assistant_message(
+        turn_class=turn_class,
+        scenario=scenario,
+        tenant_id=tenant_id,
+        corpus_claims=corpus_claims,
+        claim_count=claim_count,
+    )
 
     rail_state = dict(routed["rail_state"])
     rail_state["corpus_claims_count"] = claim_count

@@ -99,9 +99,9 @@ class TestOrchestration9E(unittest.TestCase):
     def test_evidence_seeking_empty_corpus_message(self):
         with patch("src.service.orchestration.service.activate", side_effect=_empty_bundle):
             out = run_orchestration(user_text="Show me the data.")
-        self.assertIn("No corpus claims matched", out["assistant_message"])
-        self.assertNotIn("not yet available", out["assistant_message"])
-        self.assertNotIn("planned Stage 9", out["assistant_message"])
+        # assistant_message is now substrate-generated, not a static stub
+        self.assertIsInstance(out["assistant_message"], str)
+        self.assertGreater(len(out["assistant_message"]), 0)
 
     def test_evidence_seeking_nonempty_corpus_message(self):
         from src.service.gaqp.activation import _dict_to_claim
@@ -130,7 +130,10 @@ class TestOrchestration9E(unittest.TestCase):
 
         with patch("src.service.orchestration.service.activate", return_value=bundle):
             out = run_orchestration(user_text="What evidence do we have?")
-        self.assertIn("1 corpus claim(s)", out["assistant_message"])
+        # assistant_message is now substrate-generated; corpus claims surfaced via system prompt
+        self.assertIsInstance(out["assistant_message"], str)
+        self.assertGreater(len(out["assistant_message"]), 0)
+        self.assertEqual(out["rail_state"]["corpus_claims_count"], 1)
 
     # ------------------------------------------------------------------
     # existing turn class modes unaffected
