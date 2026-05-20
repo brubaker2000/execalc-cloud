@@ -77,6 +77,17 @@ def run_decision_service(
             corpus_scope="structural", confidence_floor=0.50,
         )
 
+    try:
+        from src.service.memory import get_upstream_context
+        memory_context = get_upstream_context(
+            tenant_id=tenant_id,
+            scenario_type=scenario.scenario_type,
+            domain=scenario_in.get("domain"),
+        )
+    except Exception:
+        logger.exception("PEM context assembly failed for tenant %s; proceeding without memory", tenant_id)
+        memory_context = None
+
     report = run_decision_loop(
         tenant_id=tenant_id, user_id=user_id,
         scenario=scenario, activation_bundle=activation_bundle,
@@ -198,6 +209,7 @@ def run_decision_service(
         logger.exception("GAQP extraction failed for envelope %s", envelope_id)
 
     out["gaqp_activation"] = activation_bundle.to_dict()
+    out["pem_context"] = memory_context.to_dict() if memory_context is not None else {"item_count": 0, "items": []}
 
     record = ExecutionRecord(
         tenant_id=tenant_id,
