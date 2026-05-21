@@ -625,6 +625,38 @@ def insert_promotion_candidate(candidate: "PromotionCandidate") -> bool:
         conn.close()
 
 
+def get_promotion_candidate(
+    *,
+    candidate_id: str,
+    tenant_id: str,
+) -> Optional[Dict[str, Any]]:
+    """Fetch a single promotion candidate by (candidate_id, tenant_id)."""
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT candidate_id, tenant_id, source_artifact_id, source_conclusion_id, "
+                "candidate_text, proposed_claim_type, nominated_by, nominated_by_user_id, "
+                "nominated_at, nomination_rationale, review_status, "
+                "reviewed_by, reviewed_at, rejection_reason, canon_nugget_id "
+                "FROM qcr_promotion_candidates "
+                "WHERE candidate_id = %s AND tenant_id = %s",
+                (candidate_id, tenant_id),
+            )
+            row = cur.fetchone()
+            if row is None:
+                return None
+            cols = [
+                "candidate_id", "tenant_id", "source_artifact_id", "source_conclusion_id",
+                "candidate_text", "proposed_claim_type", "nominated_by", "nominated_by_user_id",
+                "nominated_at", "nomination_rationale", "review_status",
+                "reviewed_by", "reviewed_at", "rejection_reason", "canon_nugget_id",
+            ]
+            return dict(zip(cols, row))
+    finally:
+        conn.close()
+
+
 def list_promotion_candidates(
     *,
     tenant_id: str,
