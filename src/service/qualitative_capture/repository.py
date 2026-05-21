@@ -148,6 +148,127 @@ def list_nuggets(
         conn.close()
 
 
+def list_expired_ephemeral_nuggets(
+    *,
+    tenant_id: str,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """
+    Return ephemeral nuggets whose expires_at has passed and whose
+    confidence_score is still above 0 (not yet zeroed by a previous decay pass).
+
+    Canon-confidence nuggets (score == 1.00) are excluded — they are
+    governed by canon revision, not the automated decay system.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT nugget_id, tenant_id, confidence_score, confidence_level "
+                "FROM qcr_atomic_nuggets "
+                "WHERE tenant_id = %s "
+                "  AND durability_class = 'ephemeral' "
+                "  AND expires_at IS NOT NULL "
+                "  AND expires_at <= NOW() "
+                "  AND confidence_score > 0 "
+                "  AND confidence_score < 1.0 "
+                "ORDER BY expires_at ASC LIMIT %s",
+                (tenant_id, limit),
+            )
+            rows = cur.fetchall() or []
+            cols = ["nugget_id", "tenant_id", "confidence_score", "confidence_level"]
+            return [dict(zip(cols, r)) for r in rows]
+    finally:
+        conn.close()
+
+
+def list_stale_medium_term_nuggets(
+    *,
+    tenant_id: str,
+    months_threshold: int = 12,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """
+    Return medium_term nuggets older than months_threshold months whose
+    confidence_score is above 0 and below 1.0 (not canon-exempt).
+
+    These are candidates for a decay review notification; their scores
+    are not changed by the decay worker.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT nugget_id, tenant_id, confidence_score, confidence_level, created_at "
+                "FROM qcr_atomic_nuggets "
+                "WHERE tenant_id = %s "
+                "  AND durability_class = 'medium_term' "
+                "  AND confidence_score > 0 "
+                "  AND confidence_score < 1.0 "
+                "  AND created_at <= NOW() - (%s * INTERVAL '1 month') "
+                "ORDER BY created_at ASC LIMIT %s",
+                (tenant_id, months_threshold, limit),
+            )
+            rows = cur.fetchall() or []
+            cols = ["nugget_id", "tenant_id", "confidence_score", "confidence_level", "created_at"]
+            return [dict(zip(cols, r)) for r in rows]
+    finally:
+        conn.close()
+
+
+def list_stale_date_sensitive_nuggets(
+    *,
+    tenant_id: str,
+    days_threshold: int = 90,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """
+    Return date_sensitive nuggets that have not been corroborated and are
+    older than days_threshold days. Excludes canon-confidence nuggets.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "SELECT nugget_id, tenant_id, confidence_score, confidence_level, created_at "
+                "FROM qcr_atomic_nuggets "
+                "WHERE tenant_id = %s "
+                "  AND freshness_class = 'date_sensitive' "
+                "  AND confidence_score > 0 "
+                "  AND confidence_score < 1.0 "
+                "  AND created_at <= NOW() - (%s * INTERVAL '1 day') "
+                "ORDER BY created_at ASC LIMIT %s",
+                (tenant_id, days_threshold, limit),
+            )
+            rows = cur.fetchall() or []
+            cols = ["nugget_id", "tenant_id", "confidence_score", "confidence_level", "created_at"]
+            return [dict(zip(cols, r)) for r in rows]
+    finally:
+        conn.close()
+
+
+def update_nugget_confidence(
+    *,
+    nugget_id: str,
+    tenant_id: str,
+    new_score: float,
+    new_level: str,
+) -> bool:
+    """Update a nugget's confidence_score and confidence_level."""
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "UPDATE qcr_atomic_nuggets "
+                "SET confidence_score = %s, confidence_level = %s "
+                "WHERE nugget_id = %s AND tenant_id = %s",
+                (new_score, new_level, nugget_id, tenant_id),
+            )
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
 def search_nuggets(
     *,
     tenant_id: str,

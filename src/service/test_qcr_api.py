@@ -327,5 +327,33 @@ class TestQCRPromotion(TestQCRApiBase):
         self.assertTrue(body["rejected"])
 
 
+class TestQCRDecayRun(TestQCRApiBase):
+    @patch(f"{_MOD}.apply_decay_pass",
+           return_value={"expired": 2, "flagged_medium_term": 1, "flagged_date_sensitive": 3, "failed": 0})
+    def test_returns_summary(self, mock_decay):
+        resp = self.client.post("/qcr/decay/run", headers=_HEADERS, json={"batch_size": 50})
+        self.assertEqual(resp.status_code, 200)
+        body = resp.get_json()
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["expired"], 2)
+        self.assertEqual(body["flagged_medium_term"], 1)
+        self.assertEqual(body["flagged_date_sensitive"], 3)
+
+    @patch(f"{_MOD}.apply_decay_pass",
+           return_value={"expired": 0, "flagged_medium_term": 0, "flagged_date_sensitive": 0, "failed": 0})
+    def test_default_batch_size(self, mock_decay):
+        self.client.post("/qcr/decay/run", headers=_HEADERS, json={})
+        _, kwargs = mock_decay.call_args
+        self.assertEqual(kwargs["batch_size"], 50)
+
+    def test_invalid_batch_size_returns_400(self):
+        resp = self.client.post("/qcr/decay/run", headers=_HEADERS, json={"batch_size": "bad"})
+        self.assertEqual(resp.status_code, 400)
+
+    def test_out_of_range_batch_size_returns_400(self):
+        resp = self.client.post("/qcr/decay/run", headers=_HEADERS, json={"batch_size": 9999})
+        self.assertEqual(resp.status_code, 400)
+
+
 if __name__ == "__main__":
     unittest.main()

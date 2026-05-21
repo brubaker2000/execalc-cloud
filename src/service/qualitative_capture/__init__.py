@@ -23,6 +23,7 @@ from src.service.qualitative_capture.retrieval import (
     retrieve_session_conclusions,
     search_claims,
 )
+from src.service.qualitative_capture.decay import apply_decay_pass
 from src.service.qualitative_capture.second_order import process_pending_artifacts
 from src.service.qualitative_capture.session_packet import (
     SessionIntelligencePacket,
@@ -54,6 +55,8 @@ __all__ = [
     "retrieve_pending_promotions",
     "retrieve_session_conclusions",
     "search_claims",
+    # Temporal decay
+    "apply_decay_pass",
     # Second-order deconstruction
     "process_pending_artifacts",
     # Session Intelligence Packet

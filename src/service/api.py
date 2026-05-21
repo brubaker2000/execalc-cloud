@@ -810,6 +810,7 @@ def orchestration_run():
 # -----------------------------------------------------------------------
 
 from src.service.qualitative_capture import (
+    apply_decay_pass,
     generate_session_packet,
     get_session_rail,
     ingest_event,
@@ -1143,6 +1144,34 @@ def qcr_reject(candidate_id: str):
         rejection_reason=rejection_reason,
     )
     return {"ok": True, "rejected": rejected}, 200
+
+
+@app.post("/qcr/decay/run")
+def qcr_decay_run():
+    """Trigger a temporal decay pass for the tenant."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=True) or {}
+    raw_batch = body.get("batch_size")
+    try:
+        batch_size = int(raw_batch) if raw_batch is not None else 50
+        if batch_size < 1 or batch_size > 500:
+            raise ValueError
+    except (ValueError, TypeError):
+        return {"ok": False, "error": "batch_size must be an integer between 1 and 500"}, 400
+
+    summary = apply_decay_pass(tenant_id=claims.tenant_id, batch_size=batch_size)
+    return {"ok": True, **summary}, 200
 
 
 if __name__ == "__main__":
