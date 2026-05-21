@@ -339,6 +339,60 @@ def update_claim_contradictions(
         conn.close()
 
 
+_PROMOTE_STRUCTURAL_SQL = """
+    UPDATE gaqp_claims
+    SET confidence_level = 'structural',
+        confidence_score = 1.00,
+        updated_at = NOW()
+    WHERE claim_id = %s AND tenant_id = %s
+    RETURNING claim_id, tenant_id, claim_type, domain, content, confidence_score
+"""
+
+
+def promote_to_structural(
+    *,
+    claim_id: str,
+    tenant_id: str,
+    actor_id: Optional[str] = None,
+) -> bool:
+    """
+    Operator-only: elevate a claim to structural confidence (1.00).
+
+    Structural is the ceiling — the corroboration engine never auto-promotes here.
+    After the DB update, the claim is admitted to PEM via qcr_bridge.
+
+    Returns True if the claim was found and promoted, False if not found.
+    """
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(_PROMOTE_STRUCTURAL_SQL, (claim_id, tenant_id))
+            row = cur.fetchone()
+        if row is None:
+            return False
+        ret_claim_id, ret_tenant_id, claim_type, domain, content, confidence_score = row
+    finally:
+        conn.close()
+
+    try:
+        from src.service.memory.qcr_bridge import admit_structural_claim
+        admit_structural_claim(
+            claim_id=ret_claim_id,
+            tenant_id=ret_tenant_id,
+            claim_type=claim_type,
+            domain=domain or "strategy",
+            content=content,
+            confidence_score=confidence_score,
+            source_envelope_id=ret_claim_id,
+            actor_id=actor_id,
+        )
+    except Exception:
+        logger.exception("PEM admission failed after structural promotion of claim %s", claim_id)
+
+    logger.info("Claim %s elevated to structural confidence for tenant %s", claim_id, tenant_id)
+    return True
+
+
 def list_claims_by_envelope(
     *,
     tenant_id: str,
