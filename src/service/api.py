@@ -1110,10 +1110,14 @@ def qcr_approve(candidate_id: str):
     if claims.role not in ("admin", "operator"):
         return {"ok": False, "error": "forbidden"}, 403
 
+    body = request.get_json(force=True, silent=True) or {}
+    domain = body.get("domain") or None
+
     approved = approve_candidate(
         candidate_id=candidate_id,
         tenant_id=claims.tenant_id,
         reviewed_by=claims.user_id,
+        domain=domain,
     )
     return {"ok": True, "approved": approved}, 200
 
