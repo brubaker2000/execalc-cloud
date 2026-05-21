@@ -545,6 +545,54 @@ def mark_artifact_deconstructed(
         conn.close()
 
 
+def update_artifact_deconstruction_status(
+    *,
+    artifact_id: str,
+    tenant_id: str,
+    new_status: str,
+) -> bool:
+    """Transition artifact deconstruction status (pending → in_progress → complete/skipped)."""
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "UPDATE qcr_rail_artifacts SET second_order_deconstruction_status = %s "
+                "WHERE artifact_id = %s AND tenant_id = %s",
+                (new_status, artifact_id, tenant_id),
+            )
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+def insert_audit_event(
+    *,
+    audit_id: str,
+    tenant_id: str,
+    event_kind: str,
+    actor_id: Optional[str] = None,
+    source_object_type: Optional[str] = None,
+    source_object_id: Optional[str] = None,
+    payload: Optional[Dict[str, Any]] = None,
+) -> bool:
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO qcr_audit_events "
+                "(audit_id, tenant_id, event_kind, actor_id, source_object_type, source_object_id, payload) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (audit_id) DO NOTHING",
+                (
+                    audit_id, tenant_id, event_kind, actor_id,
+                    source_object_type, source_object_id,
+                    _json(payload or {}),
+                ),
+            )
+            return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
 # ---------------------------------------------------------------------------
 # promotion_candidates
 # ---------------------------------------------------------------------------

@@ -23,6 +23,7 @@ from src.service.qualitative_capture.retrieval import (
     retrieve_session_conclusions,
     search_claims,
 )
+from src.service.qualitative_capture.second_order import process_pending_artifacts
 from src.service.qualitative_capture.session_packet import (
     SessionIntelligencePacket,
     generate_session_packet,
@@ -53,6 +54,8 @@ __all__ = [
     "retrieve_pending_promotions",
     "retrieve_session_conclusions",
     "search_claims",
+    # Second-order deconstruction
+    "process_pending_artifacts",
     # Session Intelligence Packet
     "SessionIntelligencePacket",
     "generate_session_packet",
