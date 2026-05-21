@@ -318,3 +318,35 @@ class TestListClaimsByEnvelope:
         with patch("src.service.gaqp.corpus.get_conn", return_value=conn):
             list_claims_by_envelope(tenant_id="t1", source_envelope_id="e1")
         conn.close.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# promote_to_structural
+# ---------------------------------------------------------------------------
+
+class TestPromoteToStructural:
+    def test_returns_true_when_claim_found(self):
+        from src.service.gaqp.corpus import promote_to_structural
+        conn, cur = _mock_conn(rowcount=1)
+        cur.fetchone.return_value = ("claim1", "t1", "doctrine", "strategy", "Content text.", 1.00)
+        with patch("src.service.gaqp.corpus.get_conn", return_value=conn), \
+             patch("src.service.memory.qcr_bridge.admit_structural_claim", return_value=True):
+            result = promote_to_structural(claim_id="claim1", tenant_id="t1", actor_id="u1")
+        assert result is True
+
+    def test_returns_false_when_claim_not_found(self):
+        from src.service.gaqp.corpus import promote_to_structural
+        conn, cur = _mock_conn(rowcount=0)
+        cur.fetchone.return_value = None
+        with patch("src.service.gaqp.corpus.get_conn", return_value=conn):
+            result = promote_to_structural(claim_id="missing", tenant_id="t1")
+        assert result is False
+
+    def test_pem_failure_does_not_raise(self):
+        from src.service.gaqp.corpus import promote_to_structural
+        conn, cur = _mock_conn(rowcount=1)
+        cur.fetchone.return_value = ("claim1", "t1", "doctrine", "strategy", "Content.", 1.00)
+        with patch("src.service.gaqp.corpus.get_conn", return_value=conn), \
+             patch("src.service.memory.qcr_bridge.admit_structural_claim", side_effect=Exception("pem down")):
+            result = promote_to_structural(claim_id="claim1", tenant_id="t1")
+        assert result is True
