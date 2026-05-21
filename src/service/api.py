@@ -805,6 +805,346 @@ def orchestration_run():
     )
     return out, 200
 
+# -----------------------------------------------------------------------
+# Stage 11: Qualitative Capture Runtime API
+# -----------------------------------------------------------------------
+
+from src.service.qualitative_capture import (
+    generate_session_packet,
+    get_session_rail,
+    ingest_event,
+    memorialize,
+    nominate_for_promotion,
+    approve_candidate,
+    reject_candidate,
+    process_pending_artifacts,
+    retrieve_doctrine,
+    retrieve_risks,
+    retrieve_opportunities,
+    retrieve_decisions,
+    retrieve_open_questions,
+    search_claims,
+    retrieve_session_conclusions,
+)
+from src.service.qualitative_capture.deconstructor import deconstruct_event
+from src.service.qualitative_capture.repository import insert_nugget
+
+
+@app.post("/qcr/events")
+def qcr_ingest_event():
+    """Ingest a conversation event and extract GAQP claims into the corpus."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    session_id = str(body.get("session_id") or "")
+    role = str(body.get("role") or "operator")
+    message_text = str(body.get("message_text") or "")
+    domain = str(body.get("domain") or "strategy")
+
+    if not session_id:
+        return {"ok": False, "error": "session_id is required"}, 400
+    if not message_text.strip():
+        return {"ok": False, "error": "message_text is required"}, 400
+
+    try:
+        event = ingest_event(
+            tenant_id=claims.tenant_id,
+            session_id=session_id,
+            user_id=claims.user_id,
+            role=role,
+            message_text=message_text,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+
+    nuggets = deconstruct_event(event, domain=domain)
+    nuggets_persisted = 0
+    for nugget in nuggets:
+        try:
+            insert_nugget(nugget)
+            nuggets_persisted += 1
+        except Exception:
+            logging.exception("qcr_ingest_event: insert_nugget failed")
+
+    return {
+        "ok": True,
+        "event_id": event.event_id,
+        "nuggets_extracted": len(nuggets),
+        "nuggets_persisted": nuggets_persisted,
+    }, 200
+
+
+@app.post("/qcr/ideas")
+def qcr_memorialize():
+    """Memorialize a human-selected idea from a session."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    session_id = str(body.get("session_id") or "")
+    source_event_id = str(body.get("source_event_id") or "")
+    selected_text = str(body.get("selected_text") or "")
+    claim_type = str(body.get("claim_type") or "observation")
+    domain = body.get("domain") or None
+
+    if not session_id:
+        return {"ok": False, "error": "session_id is required"}, 400
+    if not source_event_id:
+        return {"ok": False, "error": "source_event_id is required"}, 400
+    if not selected_text.strip():
+        return {"ok": False, "error": "selected_text is required"}, 400
+
+    try:
+        idea = memorialize(
+            tenant_id=claims.tenant_id,
+            session_id=session_id,
+            source_event_id=source_event_id,
+            selected_text=selected_text,
+            memorialized_by=claims.user_id,
+            claim_type=claim_type,
+            domain=domain,
+        )
+    except Exception as e:
+        logging.exception("qcr_memorialize: failed")
+        return {"ok": False, "error": str(e)}, 500
+
+    return {"ok": True, "idea": idea.to_dict()}, 200
+
+
+@app.get("/qcr/session/<session_id>/packet")
+def qcr_session_packet(session_id: str):
+    """Generate a Session Intelligence Packet for a completed session."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    domain = request.args.get("domain") or None
+    packet = generate_session_packet(
+        tenant_id=claims.tenant_id,
+        session_id=session_id,
+        domain=domain,
+    )
+    return {"ok": True, "packet": packet.to_dict()}, 200
+
+
+@app.get("/qcr/session/<session_id>/rail")
+def qcr_session_rail(session_id: str):
+    """Return right-rail cards for a session."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    cards = get_session_rail(tenant_id=claims.tenant_id, session_id=session_id)
+    return {"ok": True, "cards": cards, "count": len(cards)}, 200
+
+
+@app.get("/qcr/nuggets")
+def qcr_get_nuggets():
+    """
+    Retrieve nuggets from the corpus.
+
+    Query params:
+      category — doctrine | risks | opportunities | decisions | open
+      q        — keyword search (takes precedence over category)
+      session_id, domain — optional scope filters
+    """
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    tenant_id = claims.tenant_id
+    session_id = request.args.get("session_id") or None
+    domain = request.args.get("domain") or None
+    query = request.args.get("q") or ""
+    category = (request.args.get("category") or "").lower()
+
+    if query.strip():
+        nuggets = search_claims(
+            tenant_id=tenant_id, query=query, session_id=session_id, domain=domain
+        )
+    elif category == "doctrine":
+        nuggets = retrieve_doctrine(tenant_id=tenant_id, session_id=session_id)
+    elif category == "risks":
+        nuggets = retrieve_risks(tenant_id=tenant_id, session_id=session_id)
+    elif category == "opportunities":
+        nuggets = retrieve_opportunities(tenant_id=tenant_id, session_id=session_id)
+    elif category == "decisions":
+        nuggets = retrieve_decisions(tenant_id=tenant_id, session_id=session_id)
+    elif category == "open":
+        nuggets = retrieve_open_questions(tenant_id=tenant_id, session_id=session_id)
+    else:
+        return {"ok": False, "error": "category or q is required"}, 400
+
+    return {"ok": True, "nuggets": nuggets, "count": len(nuggets)}, 200
+
+
+@app.post("/qcr/second-order/run")
+def qcr_second_order_run():
+    """Trigger a batch of second-order artifact deconstruction."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=True) or {}
+    raw_batch = body.get("batch_size")
+    try:
+        batch_size = int(raw_batch) if raw_batch is not None else 10
+        if batch_size < 1 or batch_size > 100:
+            raise ValueError
+    except (ValueError, TypeError):
+        return {"ok": False, "error": "batch_size must be an integer between 1 and 100"}, 400
+
+    summary = process_pending_artifacts(tenant_id=claims.tenant_id, batch_size=batch_size)
+    return {"ok": True, **summary}, 200
+
+
+@app.post("/qcr/promotion/nominate")
+def qcr_nominate():
+    """Nominate a claim for promotion to the Canon."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=False) or {}
+    candidate_text = str(body.get("candidate_text") or "")
+    proposed_claim_type = str(body.get("proposed_claim_type") or "")
+    source_artifact_id = body.get("source_artifact_id") or None
+    source_conclusion_id = body.get("source_conclusion_id") or None
+    nomination_rationale = body.get("nomination_rationale") or None
+
+    if not candidate_text.strip():
+        return {"ok": False, "error": "candidate_text is required"}, 400
+    if not proposed_claim_type.strip():
+        return {"ok": False, "error": "proposed_claim_type is required"}, 400
+    if not source_artifact_id and not source_conclusion_id:
+        return {"ok": False, "error": "source_artifact_id or source_conclusion_id is required"}, 400
+
+    try:
+        candidate = nominate_for_promotion(
+            tenant_id=claims.tenant_id,
+            candidate_text=candidate_text,
+            proposed_claim_type=proposed_claim_type,
+            nominated_by="operator",
+            nominated_by_user_id=claims.user_id,
+            source_artifact_id=source_artifact_id,
+            source_conclusion_id=source_conclusion_id,
+            nomination_rationale=nomination_rationale,
+        )
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}, 400
+
+    return {"ok": True, "candidate_id": candidate.candidate_id}, 200
+
+
+@app.post("/qcr/promotion/<candidate_id>/approve")
+def qcr_approve(candidate_id: str):
+    """Approve a promotion candidate for Canon elevation."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    approved = approve_candidate(
+        candidate_id=candidate_id,
+        tenant_id=claims.tenant_id,
+        reviewed_by=claims.user_id,
+    )
+    return {"ok": True, "approved": approved}, 200
+
+
+@app.post("/qcr/promotion/<candidate_id>/reject")
+def qcr_reject(candidate_id: str):
+    """Reject a promotion candidate."""
+    allowed, denial = _require_api_key_or_dev_harness()
+    if not allowed:
+        return denial
+
+    claims, denial = _claims_or_denial()
+    if denial:
+        return denial
+    if not claims.tenant_id:
+        return {"ok": False, "error": "tenant_id is required"}, 400
+    if claims.role not in ("admin", "operator"):
+        return {"ok": False, "error": "forbidden"}, 403
+
+    body = request.get_json(force=True, silent=True) or {}
+    rejection_reason = body.get("rejection_reason") or None
+
+    rejected = reject_candidate(
+        candidate_id=candidate_id,
+        tenant_id=claims.tenant_id,
+        reviewed_by=claims.user_id,
+        rejection_reason=rejection_reason,
+    )
+    return {"ok": True, "rejected": rejected}, 200
+
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "5000"))
     app.run(host="127.0.0.1", port=port, debug=True)
