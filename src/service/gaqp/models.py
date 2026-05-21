@@ -37,6 +37,7 @@ ClaimType = Literal[
     "opportunity",
     "asset",
     "liability",
+    "problem",
 ]
 
 CLAIM_TYPES: List[str] = [
@@ -45,7 +46,7 @@ CLAIM_TYPES: List[str] = [
     "institutional_precedent", "constraint", "threshold_condition", "objective",
     "tradeoff", "causal_claim", "declaration_of_value", "diagnostic_signal",
     "stakeholder_complaint", "tactic", "strength", "weakness", "threat",
-    "opportunity", "asset", "liability",
+    "opportunity", "asset", "liability", "problem",
 ]
 
 ConfidenceLevel = Literal["seed", "single_source", "developing", "corroborated", "structural", "disputed"]

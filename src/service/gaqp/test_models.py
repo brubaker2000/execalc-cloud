@@ -67,8 +67,8 @@ class TestConfidenceLadder:
 
 
 class TestClaimTypes:
-    def test_26_canonical_types(self):
-        assert len(CLAIM_TYPES) == 26
+    def test_27_canonical_types(self):
+        assert len(CLAIM_TYPES) == 27
 
     def test_swot_types_present(self):
         for t in ("strength", "weakness", "threat", "opportunity"):

@@ -40,6 +40,7 @@ _GATE_SPECS = {
     "principle": _GateSpec([["should","ought","must","always","never","principle","govern","rule","standard","require","dictate","mandate","ensure","uphold"]], 30, ["normative_language"], ["Principle claims must contain normative language."]),
     "doctrine": _GateSpec([["doctrine","policy","we will","we do not","we always","we never","our approach","non-negotiable","standing rule","organizational commitment","we are committed"]], 35, ["organizational_commitment"], ["Doctrine claims must express an explicit organizational commitment."]),
     "declaration_of_value": _GateSpec([["we believe","value","commitment","matters","conviction","principle","care","prioritize","stand for","at our core","what we stand for"]], 30, ["value_language"], ["Declaration of value claims must express an explicit value or belief."]),
+    "problem": _GateSpec([["problem","issue","challenge","obstacle","barrier","difficulty","failure","breakdown","gap","deficiency","flaw","defect","impediment","bottleneck","pain point","friction","concern","prevents","blocks","hinders","undermines","impedes"]], 25, ["problem_language"], ["Problem claims must identify an explicit problem, issue, or impediment."]),
 }
 def evaluate_type_gate(content: str, claim_type: str) -> TypeGateResult:
     spec = _GATE_SPECS.get(claim_type)
