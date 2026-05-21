@@ -148,6 +148,114 @@ def list_nuggets(
         conn.close()
 
 
+def search_nuggets(
+    *,
+    tenant_id: str,
+    query: str,
+    claim_types: Optional[List[str]] = None,
+    domain: Optional[str] = None,
+    session_id: Optional[str] = None,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    """
+    Keyword search across claim_text using ILIKE.
+
+    Returns nuggets whose claim_text contains all words in the query (case-insensitive).
+    Ordered by confidence_score DESC so the most authoritative matches surface first.
+    """
+    query = (query or "").strip()
+    if not query:
+        return []
+
+    conditions = ["tenant_id = %s"]
+    params: List[Any] = [tenant_id]
+
+    for word in query.split():
+        conditions.append("claim_text ILIKE %s")
+        params.append(f"%{word}%")
+
+    if session_id:
+        conditions.append("session_id = %s")
+        params.append(session_id)
+    if domain:
+        conditions.append("domain = %s")
+        params.append(domain)
+    if claim_types:
+        placeholders = ",".join(["%s"] * len(claim_types))
+        conditions.append(f"claim_type IN ({placeholders})")
+        params.extend(claim_types)
+
+    params.append(limit)
+
+    sql = (
+        "SELECT nugget_id, tenant_id, session_id, source_event_id, claim_text, claim_type, "
+        "domain, subdomain, confidence_level, confidence_score, provenance_source, "
+        "provenance_author, activation_scope, activation_triggers, polarity, "
+        "durability_class, evidence_status, freshness_class, composability_score, "
+        "origin, counterclaim_links, supporting_claim_links, scenario_tags, "
+        "rail_candidate, selection_method, generation_depth, "
+        "source_rail_artifact_id, created_at, expires_at "
+        "FROM qcr_atomic_nuggets "
+        "WHERE " + " AND ".join(conditions) +
+        " ORDER BY confidence_score DESC, created_at DESC LIMIT %s"
+    )
+
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(sql, params)
+            rows = cur.fetchall() or []
+            cols = [
+                "nugget_id", "tenant_id", "session_id", "source_event_id", "claim_text", "claim_type",
+                "domain", "subdomain", "confidence_level", "confidence_score", "provenance_source",
+                "provenance_author", "activation_scope", "activation_triggers", "polarity",
+                "durability_class", "evidence_status", "freshness_class", "composability_score",
+                "origin", "counterclaim_links", "supporting_claim_links", "scenario_tags",
+                "rail_candidate", "selection_method", "generation_depth",
+                "source_rail_artifact_id", "created_at", "expires_at",
+            ]
+            return [dict(zip(cols, r)) for r in rows]
+    finally:
+        conn.close()
+
+
+def list_preserved_ideas_for_session(
+    *,
+    tenant_id: str,
+    session_id: Optional[str] = None,
+    limit: int = 50,
+) -> List[Dict[str, Any]]:
+    conditions = ["tenant_id = %s"]
+    params: List[Any] = [tenant_id]
+    if session_id:
+        conditions.append("session_id = %s")
+        params.append(session_id)
+    params.append(limit)
+
+    sql = (
+        "SELECT idea_id, tenant_id, nugget_id, session_id, source_event_id, "
+        "selected_text, memorialized_by, memorialized_at, corroboration_count, "
+        "corroborated_by, structural_threshold_crossed_at, rail_card_id "
+        "FROM qcr_preserved_ideas "
+        "WHERE " + " AND ".join(conditions) +
+        " ORDER BY memorialized_at DESC LIMIT %s"
+    )
+
+    conn = get_conn()
+    try:
+        with conn, conn.cursor() as cur:
+            cur.execute(sql, params)
+            rows = cur.fetchall() or []
+            cols = [
+                "idea_id", "tenant_id", "nugget_id", "session_id", "source_event_id",
+                "selected_text", "memorialized_by", "memorialized_at", "corroboration_count",
+                "corroborated_by", "structural_threshold_crossed_at", "rail_card_id",
+            ]
+            return [dict(zip(cols, r)) for r in rows]
+    finally:
+        conn.close()
+
+
 # ---------------------------------------------------------------------------
 # preserved_ideas
 # ---------------------------------------------------------------------------
